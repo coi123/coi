@@ -1,0 +1,94 @@
+# Mapping CT 8 Drug Class to Drug Ontology
+#   Base was: file:///acasvn/triples/hcls/DrugOntology/DrugOntology04.owl
+    @prefix owl: <http://www.w3.org/2002/07/owl#> .    
+    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+    @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+    
+    @prefix : <http://www.owl-ontologies.com/DrugOntology.owl#> .
+    
+    
+#Drug Mentioned in CT 8
+#metformin
+:C0025598    a    :CTDrugName.
+
+#Alpha Glucoside Inhabitor
+:C1299007    a    :CTDrugName.
+
+#Anticogulant
+:C0003280    a    :CTDrugName.
+#although Asprin and Dipyridamole is not classified as "antocogulant", it is often used in such way
+:C000405   a    :CTDrugName.
+:C0012582  a    :CTDrugName.
+
+#Insulin secretagogue, in DrugOntology, it is called Sulfonylurea
+:C0038766  a    :CTDrugName.
+
+#Therapy with rosiglitazone (Avandia) or pioglitazone (Actos), or extendin-4 (Byetta), 
+:C0289313   a    :CTDrugName.
+:C0071097   a    :CTDrugName.
+:C1562104   a    :CTDrugName.
+
+#corticosteroids and derivatives
+:C0582125   a    :CTDrugName.
+
+#weightloss drugs 
+#Peripherally acting antiobesity agent (orlist)
+:C0732646   a    :CTDrugName.
+
+
+#Phenylpropanolamine
+:C0031495   a    :CTDrugName.
+
+#derived weight loss drugs
+:C0005096 a :CTDrugName.
+:C0011782 a :CTDrugName.
+:C0011786 a :CTDrugName.
+:C0012201 a :CTDrugName.
+:C0015827 a :CTDrugName.
+:C0024977 a :CTDrugName.
+:C0025611 a :CTDrugName.
+:C0031411 a :CTDrugName.
+:C0031447 a :CTDrugName.
+:C0031495 a :CTDrugName.
+:C0070549 a :CTDrugName.
+:C0074493 a :CTDrugName.
+:C0076275 a :CTDrugName.
+:C0142278 a :CTDrugName.
+:C0148932 a :CTDrugName.
+:C0282133 a :CTDrugName.
+:C0282179 a :CTDrugName.
+:C0282233 a :CTDrugName.
+:C0282304 a :CTDrugName.
+:C0546851 a :CTDrugName.
+:C0600560 a :CTDrugName.
+:C0700556 a :CTDrugName.
+:C0960052 a :CTDrugName.
+:C0982339 a :CTDrugName.
+
+#non-steroidal anti-inflammatory preparations (not sure)
+:C0003211  a    :CTDrugName.
+
+#clopidogrel, anti-patelet agent
+:C0070166   a    :CTDrugName.
+
+#probenecid
+:C0033209    a    :CTDrugName.
+
+#sulfinpyrazone
+:C0038742    a    :CTDrugName.
+
+#uricosuric agent
+:C0041983    a    :CTDrugName.
+
+#inference rule
+{
+?A  a  :CTDrugName.
+?B  rdfs:subClassOf ?A.
+} =>
+{
+?B  a  :CTDrugName.
+}.
+
+
+
+
