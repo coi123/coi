@@ -344,7 +344,7 @@
 	BUTTON.applyCode {
 		position: absolute; 
 		top: 500px;
-		left: 250px;
+		left: 10px;
 		width: 120px;
 		border-buttom-color: RGB(74,140,110);
 		border-buttom-style: solid;
@@ -356,20 +356,13 @@
 		font-size: 10;
 		font-weight: bold;
 	}
-	BUTTON.clear {
+	.clear {
 		position: absolute; 
-		top: 500px;
-		left: 100px;
-		width: 120px;
-		border-buttom-color: RGB(74,140,110);
-		border-buttom-style: solid;
-		border-top-style: none;
-		border-left-style: none;
-		border-right-style: none;
-		border-buttom-width: 2px;
-		background-color: RGB(208,232,217);
-		font-size: 10;
-		font-weight: bold;
+		top: 490px;
+		left: 130px;
+		border-style: none;
+		width: 35px;
+		height: 35px;
 	}
 	SELECT {
 		width: 80%

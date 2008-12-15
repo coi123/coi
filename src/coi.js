@@ -1,6 +1,5 @@
 var blockUI = false;
 var inclusionFlag = false;
-var exclusionFlag = false;
 var defaultNameSpace = "http://www.w3.org/2002/07/owl#";
 
 
@@ -133,7 +132,7 @@ function itemHasChild(uri) {
 }
 
 /* Transform the N3 retrieved from the URL to RDF/XML and process it in the callback function. */
-/**function processRDF(url, callback) {
+function processRDF(url, callback) {
 	try {
 		$.post("/JENA2", { URL: url, CONVERSION: "N3 RDF/XML" }, function(rdfXml) {
 			callback(rdfXml);
@@ -142,10 +141,8 @@ function itemHasChild(uri) {
 		alert("ERROR [processRDF] " + e);
 	}
 }
-*/
 
-//sync execution of callback
-
+// direct processing the N3 string using pattern matching
 function process(url, callback) {
 	try {
 		$.ajaxSync({url: "/POST", type: "POST", data: { URL: url }, success: function(n3) {
@@ -1039,12 +1036,6 @@ function searchTree(container, nodeValue){
 		foundTermsList.push(problem);
 	}
 	
-		
-		
-		
-		
-		
-		
 		
 		alert ("found Terms: "+foundTerms.length);
 		if (foundTerms.length > 0)
@@ -2263,20 +2254,73 @@ function selectIndications()
 }
 
 function selectDemographicCriteria(container, category, value) 
-{
-  //alert (" adding criteria: " + container +"," + category + ",  " + value);   
+{   
+  var id = category ;
+      id +=  (inclusionFlag)?"in":"ex";
   
-  var tag = (inclusionFlag)?"in":"ex";
+  //delete the selection if the same item was previously in the table
+  $('tr',container).each(function() 
+  {          	      
+ 
+      if ($(this).attr('id') == id) 
+      {   
+          deleteById(id);
+          return false;
+      }   
+  });
   
-  var entry = "<tr id = '" + category + tag + "'  class='codelist'>" +
+  var entry = "<tr id = '" + id + "'  class='codelist'>" +
               "<td class='showStyle'>" + category + "</td>" +
               " <td class='showStyle'>" + value + "</td>" +
-              " <td class='showStyle' title='delete'><a href=\"javascript:deleteById('" + category + "');\"><img alt='delete' border='0' src='img/DeleteIcon.png' width='19' height='19'/></a></td> " + 
+              " <td class='showStyle' title='delete'><a href=\"javascript:deleteById('" + id + "');\"><img alt='delete' border='0' src='img/DeleteIcon.png' width='19' height='19'/></a></td> " + 
               " </tr>";
-   alert (entry);            
+           
   $(container).append(entry);
   
 }
+
+function clearCriteriaContainer()
+{
+    
+    // clear pre-selection in criteria container
+    $("INPUT[@type='text']", "#DRUG").each(function()
+    {     
+     $(this).val("");
+    });
+    
+    $("INPUT[@type='checkbox']", "#PSEARCHCRITERIA").each(function()
+    {    
+      this.checked = false;
+    });
+    
+    $("#BROSWER").empty();
+    $("#PROPERTY").empty();
+   
+}
+
+function clearCriteriaList()
+{
+    //clear all entries in inclusion and exclusion list
+    $("tr", "#exListBody").each(function()
+    {
+    	deleteById(this.id);
+    
+    });
+    $("tr", "#inListBody").each(function()
+    {
+    deleteById(this.id);
+    });
+    
+}
+
+function isNumeric(form_value) 
+{ 
+    if (form_value.match(/^\d+$/) == null) 
+        return false; 
+    else 
+        return true; 
+} 
+
 
 /* Bootstrap */
 $(function() {
@@ -2285,7 +2329,7 @@ $(function() {
 		toggleSectionContainer("#INCLUSIONGRP");
 		
 		inclusionFlag = true;
-		exclusionFlag = false;
+		
 		
 		$("#BROSWER").empty();
 		$("#pathology").empty();
@@ -2299,7 +2343,7 @@ $(function() {
 		toggleSectionContainer("#EXCLUSIONGRP");
 		
 		inclusionFlag = false;
-		exclusionFlag = true;
+		
 		
 		$("#BROSWER").empty();
 		$("#pathology").empty();
@@ -2309,43 +2353,40 @@ $(function() {
 	});
 	
 	$("#drugSearch").click(function(){
-			var drugName = $("#drugName").get(0).value;
+			var drugName = $("#drugName").val();
 			alert ("searching for " + drugName);
 			searchTree("#BROSWER", drugName);			
 	});
 	
 	$("#CLEAR").click(function(){
-		$(".selectColor").each(function(){
-			$(this).removeClass("selectColor");
-		});
-		$(".selectColorForPathology").each(function(){
-			$(this).removeClass("selectColorForPathology");
-		});
+		clearCriteriaContainer();	
 	});
 	
-	$("#PSEARCHCRITERIA tbody td input[@type='checkbox']").click(function(){		
-	
-		if (inclusionFlag) {
-				selectDemographicCriteria("#Inclusion", $(this).get(0).value, $(this).get(0).checked);
-			} else {
-				selectDemographicCriteria("#Exclusion", $(this).get(0).value, $(this).get(0).checked);
-			}			
-				
+	$("INPUT[@type='checkbox']", "#PSEARCHCRITERIA").click(function(){		
+		var container = (inclusionFlag)?"#Inclusion":"#Exclusion";
+		selectDemographicCriteria(container, this.value, this.checked);
+	});
+    
+    
+    $("INPUT[@type='text']", "#PSEARCHCRITERIA").keypress(function(event) {		
+		 if(event.keyCode == 13 )
+		 {
+		   if (isNumeric(this.value) && this.value > 0) {
+				var container = (inclusionFlag)?"#Inclusion":"#Exclusion";
+				selectDemographicCriteria(container, this.name, this.value);
+				}				
+			else {
+				alert ("Please entry a valid number for " + this.name);
+				this.value = "";
+			}
+		}
 	});
 
-     $("#PSEARCHCRITERIA tbody td input[@type='text']").click(function(){		
-	
-		if (inclusionFlag) {
-				selectDemographicCriteria("#Inclusion", $(this).get(0).name, $(this).get(0).value);
-			} else {
-				selectDemographicCriteria("#Exclusion", $(this).get(0).name, $(this).get(0).value);
-			}			
-				
-	});
 	
 	$("#QUERYEXEC").click(function(){
 		window.open("patientList.html");	
 	});
+	
 	$("#cancel").click(function(){
 		$("#SELECTEDP").get(0).value="";
 		$("#codeListBody").empty();
@@ -2354,6 +2395,7 @@ $(function() {
 		$("#indicationINPUT").val("");
 		toggleDetailContainer("#DEFAULTCONT");
 	});
+	
 	$("#DisplayAllDrug").click(function(){
 		$("#BROSWER").empty();
 		$("#PROPERTY").empty();
@@ -2364,19 +2406,13 @@ $(function() {
 	
 	$("#RESET").click(function(){
 		toggleDetailContainer("#DEFAULTCONT");
-		
-		
-		//$("#DRUG").empty();
-		//$("#pathology").empty();
-		//$("#anatomyName").val("");
-		//getAlltologyTreeView("#BROSWER");
-		//getAllTreeView("#INCLUSION", "anatomic location", "RID3");
+		clearCriteriaContainer();
+		clearCriteriaList();
 	})
 	
 	toggleDetailContainer("#DEFAULTCONT");
-//	inclusionFlag = false;
-//	exclusionFlag = false;
-		
+	inclusionFlag = false;
+	clearCriteriaContainer();	
 		
 });
 
