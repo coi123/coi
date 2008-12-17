@@ -96,22 +96,7 @@ function doSelect(e)
 	//assign the details of the selected patient to "patient field"
     
 	$("#SELECTEDP").attr({ value: pname});
-	getDetailInfo(trElem);
-}
-
-function getDetailInfo(trElem){
-	//alert(trElem.childNodes.length);
-	$("#patientName").attr({ value: trElem.childNodes[1].innerHTML});
-	$("#firstName").attr({ value: trElem.childNodes[2].innerHTML});
-	$("#Birthday").attr({ value: trElem.childNodes[3].innerHTML});
-	$("#Gender").attr({ value: trElem.childNodes[4].innerHTML});
-	$("#phone").attr({ value:""});
-	$("#street").attr({ value:""});
-	$("#nPoint").attr({ value:""});
-	$("#postalCode").attr({ value:""});
-	$("#city").attr({ value:""});
-	$("#state").attr({ value:""});
-	$("#country").attr({ value:""});
+	//getDetailInfo(trElem);
 }
 
 /* Extract the fragment id from the given URI */
@@ -124,11 +109,6 @@ function extractFragmentId(uri) {
     	return ""
     }
     return uri.slice(i+1,uri.length)
-}
-
-/* if has child return the data that is greater than 0,else return 0*/
-function itemHasChild(uri) {
-	return "0";
 }
 
 /* Transform the N3 retrieved from the URL to RDF/XML and process it in the callback function. */
@@ -150,71 +130,51 @@ function process(url, callback) {
 				callback(n3);
 			} catch (e) {
 				alert("ERROR [ajax] " + e.message);
+				showWait(false);
 			}
 		}});
 	} catch (e) {
 		alert("ERROR [process] " + e.message);
+		showWait(false);
 	}
 }
 
 
-
-
-function addNamespace(resource) {
-	return resource.replace(/:/g, defaultNameSpace);
-}
-
-
-/* Returns the elements of the N3 list */
-function getList(resource) {
-	var list;
-	var pattern = "[<:\\w/#>e\\-\\+\\.]+";
-	var regex = new RegExp(pattern, "g");
-	list = resource.match(regex);
-	return list;
-}
-
-/* Returns the first element of the N3 list */
-function getHeadOfList(resource) {
-	return getList(resource)[0];
-}
-
 /* Returns the subject of the N3 triple statement */
 function getSubject(statement) {
-	var subjects;
-	var pattern = "([\\(<:\\w\\s/#>e\\-\\+\\.\\)]+)\\s+[<:\\w\\./#>]+\\s+[\\(<:\\w\\s/#>e\\-\\+\\.\\)]+\\.";
-	var regex = new RegExp(pattern);
-	subjects = statement.match(regex);
-	return subjects[1];
+	var subject = statement.split(" ");	
+	return subject[0];
 }
 
 /* Returns the object of the N3 triple statement */
 function getObject(statement) {
-	var objects;
-	var pattern = "(\"[\\w\\s]+\")";
-	var regex = new RegExp(pattern);
-	objects = statement.match(regex);
-	return objects[1];
+	var objects = statement.split(" ");
+	var obj = "";
+	var p = "\\w*[^\"\.]";
+	var regex = new RegExp(p, "g");
+	
+	for (var i = 2; i <= objects.length-1; i++)  {
+	    obj +=  objects[i].match(regex) + " ";
+	}
+	return obj;
 }
 
 /* Returns an array with the statements having the 'property' predicate. */
 function getStatements(n3, property) {
 	var statements = [];
-	//var pattern = "\\(\\d\\.?\\d*e?\\-?\\+?\\d*\\)\\s" + property + "\\s[\\(<:\\w\\s>/\\)]+\\.";
 	
-	var pattern = "\\(\\.\)\\s" + property + "\\s[\\(<:\\w\\s>/\\)]+\\.";
+	//replace : with \\: for matching expression
+	var p = property.replace(/:/,"\\\:");
+	var pattern = "\\w*\\:\\w*\\s+" + p + "+\\s.*";
+	
 	
 	var regex = new RegExp(pattern, "g");
 	statements = n3.match(regex);
 	
 	if (statements == null) {
+		alert ("no statement found");
 		statements = [];
 	}
-	
-	// add namespace
-	//for (index = 0; index < statements.length; index++) {
-	//	statements[index] = addNamespace(statements[index]);
-	//}
 	return statements;
 }
 
@@ -601,11 +561,11 @@ function loadPathologyTree(container, bodyLocation, bodyID) {
 	if($(container).get(0).childNodes.length > 0){
 		nodeValue = $(container).get(0).firstChild.childNodes[1].nodeValue;
 	}
-	if("Indications for "+bodyLocation != nodeValue){
+	if("Property of "+bodyLocation != nodeValue){
 		$(container).empty();
 		
 		//get indications that have bodyLocation as their "hasLocativeAttribute"
-		$(container).append(getRootNode("Indications for "+bodyLocation, "Indication"));
+		$(container).append(getRootNode("Property for "+bodyLocation, "Proerty"));
 		//$(container).append(getRootNode("Pathology Phenonmenon ", "Patho"));
 		
 		$(container).Treeview({speed: "fast",
@@ -672,20 +632,21 @@ function getTreeData(node, value){
   	process("http://localhost/doSubName?drugClass="+encodeURIComponent(value), function(n3) {
         
 		try{			
-			var subItemsName = getStatements(n3, "rdfs:label");
+			var triples = getStatements(n3, "rdfs:label");
 			//alert ("subitems no "+subItemsName.length)
-			var subValue;
 			
-			if (subItemsName.length > 0) { 
-				for (var i = 0; i < subItemsName.length; i++)
+			if (triples.length > 0) { 
+				var drugList = new Array();
+				for (var i = 0; i < triples.length; i++)
 					{
-						var nodeID = extractFragmentId(subItemsName[i][0]);
-						var nodeValue = subItemsName[i][1];                
+						var nodeID = extractFragmentId(getObject(triples[i]));
+						var nodeValue = extractFragmentId(getObject(triples[i]));                
 						node.append("<li id='" + nodeID + "li' class='closed unselectColor'>" + nodeValue + getTempNode(nodeID) + "</li>");
 					}
 			}
-			else
+			else { 
 				alert ("There is no sub-items for this node")
+			}	
 			
 			getTreeView(node);
 			showWait(false);
@@ -710,7 +671,7 @@ function getTreeData(node, value){
 							}
 						}
 						var bodyId = this.id.substring(0, this.id.length-2);
-						loadPathologyTree("#pathology", this.childNodes[1].nodeValue, bodyId);
+						loadPathologyTree("#PROPERTY", this.childNodes[1].nodeValue, bodyId);
 						// aviod the children select end
 						$(this).addClass("selectColor");
 						selectTimeForAcr = new Date().getTime();
@@ -750,7 +711,7 @@ function getTreeData(node, value){
 								}
 							}
 							var bodyId = this.id.substring(0, this.id.length-2);
-							loadPathologyTree("#pathology", this.childNodes[1].nodeValue, bodyId);
+							loadPathologyTree("#PROPERTY", this.childNodes[1].nodeValue, bodyId);
 							// aviod the children select end
 							$(this).addClass("selectColor");
 							selectTimeForAcr = new Date().getTime();
@@ -956,7 +917,6 @@ function getTempNode(item){
 
 function toggleDetailContainer(name){    
 	$(".showDetails").hide();
-	//$(".anatomyTree").hide();
 	$(name).show();
 }
 function toggleSectionContainer(name) {
@@ -965,9 +925,9 @@ function toggleSectionContainer(name) {
 }
 
 function doSearch(){
-	var id = $("#id").get(0).value;
-	var birthday = $("#birthday").get(0).value;
-	var name = $("#name").get(0).value;
+	var id = $("#id").val();
+	var birthday = $("#birthday").val();
+	var name = $("#name").val();
 	$("#SPLIST tbody").empty();
 	SearchPatientList(id, name, birthday);
 }
@@ -1002,127 +962,130 @@ function deleteById(id){
 	$("#"+id).remove();
 }
 
-function clearTheSearchInfo(){
-	$("#id").get(0).value="";
-	$("#birthday").get(0).value="";
-	$("#name").get(0).value="";
+function searchDrugTree(container, nodeValue){
+
+	showWait(true);
+	
+	try {	
+  		process("http://localhost/doNames?drugName="+encodeURIComponent(nodeValue), function(n3) {  		
+
+			var foundTerms = processTerms(n3);
+ 			if (foundTerms.length > 0)
+			{
+ 				displayTree(container, foundTerms);
+ 			} else  {
+ 				alert ("no terms found");
+ 			}
+ 		});
+ 	} 
+ 	catch (e) {
+ 		alert("ERROR [suggest]:" + e.toString());
+		showWait(false);
+	}
+ 	
 }
-function clearACRCodeSelect(){
-	$(".codehovered").each(function(){
-			this.className = "codelist";
-		}
-	);
+
+function processTerms(n3)
+{
+	var foundTerms = getStatements(n3,"rdfs:label");		
+	alert ("found Terms: "+foundTerms.length);
+	
+	var foundTermsList = new Array();	
+	if (foundTerms.length > 0)
+	{
+		for (var index = 0; index < foundTerms.length; index++) {		
+			var nodeName = getObject(foundTerms[index]);
+			var nodeID = getSubject(foundTerms[index]);			
+			foundTermsList.push([nodeID, nodeName]);
+		} 
+	}
+	else {
+		alert ("no terms found");
+	}
+		
+	showWait(false); 
+	return foundTermsList;
 }
 
-
-
-function searchTree(container, nodeValue){
+function displayTree(container,nodeValue)
+{
 	$(container).empty();	
 	
-	showWait(true);    
-   		
-  	process("http://localhost/doNames?drugName="+encodeURIComponent(nodeValue), function(n3) {
-  		
-  		var foundTerms = getStatements(n3,"rdfs:label");
-		
-		alert ("found Terms: "+foundTerms.length);
-		
-		
-		
-		
-		var foundTermsList = new Array();
-	for (var index = 0; index < foundTerms.length; index++) {		
-		var problem = getObject(triples[index]);
-		foundTermsList.push(problem);
+	for(var i = 0;i < nodeValue.length; i++){		
+		$(container).append(getRootNode(nodeValue[i][1], nodeValue[i][0]));
 	}
 	
-		
-		alert ("found Terms: "+foundTerms.length);
-		if (foundTerms.length > 0)
-		{
-			for(var i = 0;i < foundTerms.length; i++){
-				var foundID = extractFragmentId(foundTerms[i][0]);
-				var foundName = foundTerms[i][1];
-				//alert (foundID + ', '+ foundName);		
-				$(container).append(getRootNode(foundName, foundID));
-			}
-			$("#BROSWER li").click(function(){
-				var children = $(this).find(".selectColor");
-				if(children.length == 0){
-					$("#BROSWER .selectColor").each(function(){
-						$(this).removeClass("selectColor");
-					});
-					$(this).addClass("selectColor");
-					selectTimeForAcr=new Date().getTime();
-					var bodyId = this.id.substring(0, this.id.length-2);
-					//loadPathologyTree("#pathology", this.childNodes[1].nodeValue, bodyId);
-					// aviod the children select start
-					$(this).removeClass("unselectColor");
-					var ulChildren = $(this).children("ul");
-					if(ulChildren.length != 0){
-						liChildren = $(ulChildren).children("li");
-						if(liChildren.length != 0){
-							for(var i = 0 ; i < liChildren.length;i++){
-								$(liChildren).addClass("unselectColor");
-							}
-						}
-					}
-					// aviod the children select end
-					selectAnatomyId = this.lastChild.id;
-					selectAnatomy = this.childNodes[1].nodeValue;
+	$("#BROSWER li").click(function(){
+		var children = $(this).find(".selectColor");
+		if(children.length == 0){
+			$("#BROSWER .selectColor").each(function(){
+				$(this).removeClass("selectColor");
+			});
+
+			$(this).addClass("selectColor");
+			selectTimeForAcr=new Date().getTime();
+			var bodyId = this.id.substring(0, this.id.length-2);
+			loadPathologyTree("#PROPERTY", this.childNodes[1].nodeValue, bodyId);
+					
+			// aviod the children select start
+			$(this).removeClass("unselectColor");
+			var ulChildren = $(this).children("ul");
+			if(ulChildren.length != 0){
+				liChildren = $(ulChildren).children("li");
+				if(liChildren.length != 0){
+					for(var i = 0 ; i < liChildren.length;i++){
+						$(liChildren).addClass("unselectColor");
+					}	
 				}
-				else{
-					var flg = 0;
-					$("#BROSWER .selectColor").each(function(){
-						var time = new Date().getTime();
-						if(time-selectTimeForAcr >= 1000){
-							flg = 1;
-							$(this).removeClass("selectColor");
-						}
-					});
-					if(flg == 1){
-						// aviod the children select start
-						$(this).removeClass("unselectColor");
-						var ulChildren = $(this).children("ul");
-						if(ulChildren.length != 0){
-							liChildren = $(ulChildren).children("li");
-							if(liChildren.length != 0){
-								for(var i = 0 ; i < liChildren.length;i++){
-									$(liChildren).addClass("unselectColor");
-								}
-							}
-						}
-						var bodyId = this.id.substring(0, this.id.length-2);
-						loadPathologyTree("#pathology", this.childNodes[1].nodeValue, bodyId);
-						// aviod the children select end
-						$(this).addClass("selectColor");
-						selectTimeForAcr = new Date().getTime();
-						selectAnatomyId = this.lastChild.id;
-						selectAnatomy = this.childNodes[1].nodeValue;
-						flg = 0;
-					}
+			}// aviod the children select end
+		
+			selectAnatomyId = this.lastChild.id;
+			selectAnatomy = this.childNodes[1].nodeValue;
+		
+		} else{
+			var flg = 0;
+			$("#BROSWER .selectColor").each(function(){
+				var time = new Date().getTime();
+				if(time-selectTimeForAcr >= 1000){
+					flg = 1;
+					$(this).removeClass("selectColor");
 				}
 			});
-            $(container).Treeview({speed: "fast",
-	            toggle: function() {
-		        if(this.style.display=="block"){
-			           appendTree($("#"+this.id));
-		        	}
-				}
-            });
-		}
-		else{
-			$(container).append("no drug name found");
-			alert ("not found in drug ontology");
-		}
-		showWait(false);
-		
-	});
 			
-	//searchAnatomy = nodeValue;
-	
-	
+			if(flg == 1){
+			// aviod the children select start
+				$(this).removeClass("unselectColor");
+				var ulChildren = $(this).children("ul");
+				if(ulChildren.length != 0){
+					liChildren = $(ulChildren).children("li");
+					if(liChildren.length != 0){
+						for(var i = 0 ; i < liChildren.length;i++){
+							$(liChildren).addClass("unselectColor");
+						}
+					}
+				}
+				var bodyId = this.id.substring(0, this.id.length-2);
+				loadPathologyTree("#PROPERTY", this.childNodes[1].nodeValue, bodyId);
+				
+				// aviod the children select end
+				$(this).addClass("selectColor");
+				selectTimeForAcr = new Date().getTime();
+				selectAnatomyId = this.lastChild.id;
+				selectAnatomy = this.childNodes[1].nodeValue;
+				flg = 0;
+			}
+		}
+	});
+    
+    $(container).Treeview({speed: "fast",
+		toggle: function() {
+			if(this.style.display=="block"){
+				appendTree($("#"+this.id));
+		    }
+		}
+	});
 }
+
 function searchIndicationTree(container, nodeValue){
 	$(container).empty();
 	alert ("searching indication: "+nodeValue);
@@ -2006,17 +1969,6 @@ function clearSelectProcedureTree(){
 	);
 }
 
-
-function getAllTreeView(container, rootNodeName, rootNodeID){
-	$(container).append(getRootNode(rootNodeName, rootNodeID));
-	$(container).Treeview({speed: "fast",
-		toggle: function() {
-			if(this.style.display=="block"){
-				appendTree($("#"+this.id));
-			}
-		}
-	});
-}
 function getAllIndicationTreeView(container, rootNodeName, rootNodeID){
 	$(container).append(getRootNode(rootNodeName, rootNodeID));
 	$(container).Treeview({speed: "fast",
@@ -2326,36 +2278,21 @@ function isNumeric(form_value)
 $(function() {
 	$("#ADDIN").click(function() {			
 		toggleDetailContainer("#DRUG");
-		toggleSectionContainer("#INCLUSIONGRP");
-		
-		inclusionFlag = true;
-		
-		
-		$("#BROSWER").empty();
-		$("#pathology").empty();
-		/* load drug ontology and populate the treeview */
-		ontologyTreeView("#BROSWER");
-		$("#drugName").val("");
+		toggleSectionContainer("#INCLUSIONGRP");		
+		inclusionFlag = true;	
+		clearCriteriaContainer();	
 	});
 	
 	$("#ADDEX").click(function() {			
 		toggleDetailContainer("#DRUG");
-		toggleSectionContainer("#EXCLUSIONGRP");
-		
-		inclusionFlag = false;
-		
-		
-		$("#BROSWER").empty();
-		$("#pathology").empty();
-		/* load radlex/galen anatomy ontology and populate the treeview */
-		//ontologyTreeView("#BROSWER");
-		//$("#anatomyName").val("");
+		toggleSectionContainer("#EXCLUSIONGRP");		
+		inclusionFlag = false;	
+		clearCriteriaContainer();	
+
 	});
 	
 	$("#drugSearch").click(function(){
-			var drugName = $("#drugName").val();
-			alert ("searching for " + drugName);
-			searchTree("#BROSWER", drugName);			
+		searchDrugTree("#BROSWER", $("#drugName").val());			
 	});
 	
 	$("#CLEAR").click(function(){
@@ -2397,11 +2334,7 @@ $(function() {
 	});
 	
 	$("#DisplayAllDrug").click(function(){
-		$("#BROSWER").empty();
-		$("#PROPERTY").empty();
-		$("#drugName").val("");
-		//getAlltologyTreeView("#BROSWER");
-		getAllTreeView("#BROSWER", "IngredientDrug", "IngredientDrug");
+		searchDrugTree("#BROSWER", "IngredientDrug");	
 	})
 	
 	$("#RESET").click(function(){

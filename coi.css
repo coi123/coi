@@ -233,28 +233,8 @@
 		overflow: auto;
 	}
 	
-	BUTTON {
 
-		text-align: center;
-		font-size: 11;
-		font-weight: bold;
-		background-color: RGB(241, 241, 241);
-	}
-	
-	BUTTON.order {
-		position: relative;
-		top: 10px;
-		width: 120px;
-		border-buttom-color: RGB(74,140,110);
-		border-buttom-style: solid;
-		border-top-style: none;
-		border-left-style: none;
-		border-right-style: none;
-		border-buttom-width: 2px;
-		background-color: RGB(208,232,217);
-		font-size: 10;
-		font-weight: bold;
-	}
+
 	BUTTON.cancel {
 		position: relative;
 		top: 10px;
@@ -277,21 +257,6 @@
 		top: 5px;
 		left:3px;
 		width: 60px;
-		border-buttom-color: RGB(74,140,110);
-		border-buttom-style: solid;
-		border-top-style: none;
-		border-left-style: none;
-		border-right-style: none;
-		border-buttom-width: 2px;
-		background-color: RGB(208,232,217);
-		font-size: 10;
-		font-weight: bold;
-	}
-	BUTTON.confirm {
-		position: relative;
-		top: 10px;
-		left:3px;
-		width: 100px;
 		border-buttom-color: RGB(74,140,110);
 		border-buttom-style: solid;
 		border-top-style: none;
