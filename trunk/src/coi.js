@@ -45,7 +45,7 @@ var searchAnatomy = "";
 function showWait(wait) {
 	if (wait) {
 		if (blockUI) {
-			$.blockUI("<p><img src='js/busy.gif' /> <strong>Please wait...</strong></p> ");
+			$.blockUI("<p><img src='images/busy.gif' /> <strong>Please wait...</strong></p> ");
 		} else {
 			$("*").css("cursor", "wait");
 		}
@@ -109,6 +109,12 @@ function extractFragmentId(uri) {
     	return ""
     }
     return uri.slice(i+1,uri.length)
+}
+
+/* Extract the id from prefix-ed name, for example, given D:C12345, return C12345 */
+function filterPrefix(pname) {
+	var i = pname.indexOf(":")
+    return pname.slice(i+1,pname.length)
 }
 
 /* Transform the N3 retrieved from the URL to RDF/XML and process it in the callback function. */
@@ -178,395 +184,19 @@ function getStatements(n3, property) {
 	return statements;
 }
 
-function hasBodyPartName(id, A) {
-	//check if id is an element of array A, if yes, return 1, otherwise, return 0
-	for (var i=0; i< A.length; i++)
-			if (A[i][1].match(id) != null) return 1;	
-	return 0;
-}
 
-function getBodyPartsNameByProcedureID(procIDs){
-	var bodyPartIDNameArr = [];
-	var k = 0;
-	for(var i = 0;i < procIDs.length;i++){
-		for(var j = 0; j < globalProcID.length;j++){
-			if (extractFragmentId(globalProcID[j]) == procIDs[i]){
-                if (hasBodyPartName(globalProcBodyParts[j], bodyPartIDNameArr) == 0)
-                  {
-                  	bodyPartIDNameArr.push([extractFragmentId(globalProcRadIDs[j]), globalProcBodyParts[j]]);
-                  	break;
-                  }	
-			}   
-		}       
-	}           
-	
-    return bodyPartIDNameArr;
-}              
-                  
-
-
-function ontologyTreeView(container){
-	$("#BROSWER").empty();
- 	
- 	//test date for drug names
- 	
-	var dnameArr = [];	
-	dname.push(["Metformin", "C0005382"]);
-	dname.push(["Anticoagulant antagonist", "C1638316"]);
-	dname.push(["Warfarin", "C0043031"]);
-			
-		
-	var dLength = dname.length;
-	
-	for (var i = 0; i<dLength; i++){
-		// this algorithm can have problem because when use RID as dom element ID, it can be used somewhere else, make sure to put time stamp on
-		$("#BROSWER").append(getRootNode(dname[i][1], dname[i][0]));
-	}
-
-	$("#BROSWER li").click(function(){
-		var children = $(this).find(".selectColor");
-		if(children.length == 0){
-			$("#BROSWER .selectColor").each(function(){
-				$(this).removeClass("selectColor");
-			});
-			$(this).addClass("selectColor");
-			selectTimeForAcr=new Date().getTime();
-			var bodyId = this.id.substring(0, this.id.length-2);
-			loadPathologyTree("#pathology", this.childNodes[1].nodeValue, bodyId);
-			// aviod the children select start
-			$(this).removeClass("unselectColor");
-			var ulChildren = $(this).children("ul");
-			if(ulChildren.length != 0){
-				liChildren = $(ulChildren).children("li");
-				if(liChildren.length != 0){
-					for(var i = 0 ; i < liChildren.length;i++){
-						$(liChildren).addClass("unselectColor");
-					}
-				}
-			}
-			// aviod the children select end
-			selectAnatomyId = this.lastChild.id;
-			selectAnatomy = this.childNodes[1].nodeValue;
-		}
-		else{
-			var flg = 0;
-			$("#BROSWER .selectColor").each(function(){
-				var time = new Date().getTime();
-				if(time-selectTimeForAcr >= 1000){
-					flg = 1;
-					$(this).removeClass("selectColor");
-				}
-			});
-			if(flg == 1){
-				// aviod the children select start
-				$(this).removeClass("unselectColor");
-				var ulChildren = $(this).children("ul");
-				if(ulChildren.length != 0){
-					liChildren = $(ulChildren).children("li");
-					if(liChildren.length != 0){
-						for(var i = 0 ; i < liChildren.length;i++){
-							$(liChildren).addClass("unselectColor");
-						}
-					}
-				}
-				var bodyId = this.id.substring(0, this.id.length-2);
-				loadPathologyTree("#pathology", this.childNodes[1].nodeValue, bodyId);
-				// aviod the children select end
-				$(this).addClass("selectColor");
-				selectTimeForAcr = new Date().getTime();
-				selectAnatomyId = this.lastChild.id;
-				selectAnatomy = this.childNodes[1].nodeValue;
-				flg = 0;
-			}
-		}
-	});
-	$("#BROSWER").Treeview({speed: "fast",
-		toggle: function() {
-			if(this.style.display=="block"){
-				appendTree($("#"+this.id));
-			}
-		}
-	});
-}
-
-function loadIndicationSubTree(container, bodyID) {
-	
-/**	
-  //get indication from ACR2007.n3
-  var selection = "@prefix : <http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#> .\n"+
-    				"@prefix owl: <http://www.w3.org/2002/07/owl#> .\n" +
-    				"@prefix radlex: <http://bioontology.org/projects/ontologies/radlex/radlexOwlDlComponent#> .\n"+
-    				"@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n" +
-    				"@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n"
-	
-	selection +=  "radlex:" + bodyID + "   a :selectBodyPart. \n"
-	
-	//alert('loading indication: selection = '+selection)
-	
-	selection = "http://localhost/.context" + encodeURIComponent(" " + selection);	
-	
-	
-	var pquery = 	"@prefix : <http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#> .\n"+
-    				"@prefix owl: <http://www.w3.org/2002/07/owl#> .\n" +
-    				"@prefix radlex: <http://bioontology.org/projects/ontologies/radlex/radlexOwlDlComponent#> .\n"+
-    				"@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n" +
-    				"@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n" +
-    				"{?A 	a :selectBodyPart. \n" + 
-    				" ?B    :hasLocativeAttribute ?A;  \n" +
-    				"       rdfs:label    ?C } \n" +
-    				"  => \n" +
- 			       	"{?B 	rdfs:label   ?C}. \n"  
-
-    //alert('loading indication: query = '+pquery)
-  	pquery = "http://localhost/.context" + encodeURIComponent(" " + pquery);				
-  	
-  	processRDF("http://localhost/Indication?location="+encodeURIComponent(selection)+"&query="+encodeURIComponent(pquery), function(rdfXml) {	       
-
-       */
-    //get indication from acr database   
-    processRDF("http://localhost/acrIndicationByBodyPart?RID="+bodyID, function(rdfXml) {	          
-               var pathoItem = getSubjectObjects(getRDFParser(rdfXml),"http://www.w3.org/2000/01/rdf-schema#label");
-	    
-       
-		//need to sort according pathoItem[index][1]
-		//pathoItem.sort();
-		
-		var k = pathoItem.length;
-		
-		
-		if(k > 0){
-			for(var i = 0;i < k;i++){
-				var itemID = extractFragmentId(pathoItem[i][0]);
-				var s = "<li id='" + itemID +"' class='closed unselectColorForPathology'>" + pathoItem[i][1] + "</li>"
-				$(container).append(s);
-			}
-			$(container+" li").click(function(){
-			var children = $(this).find(".selectColorForPathology");
-			if(children.length == 0){
-					$("#pathology .selectColorForPathology").each(function(){
-						$(this).removeClass("selectColorForPathology");
-					});
-					$(this).addClass("selectColorForPathology");
-					selectTimeForPath=new Date().getTime();
-					// aviod the children select start
-					$(this).removeClass("unselectColorForPathology");
-					var ulChildren = $(this).children("ul");
-					if(ulChildren.length != 0){
-						liChildren = $(ulChildren).children("li");
-						if(liChildren.length != 0){
-							for(var i = 0 ; i < liChildren.length;i++){
-								$(liChildren).addClass("unselectColorForPathology");
-							}
-						}
-					}
-					// aviod the children select end
-					if(this.lastChild.id != undefined){
-						selectPathologyId = this.lastChild.id;
-					}
-					else{
-						selectPathologyId = this.id;
-					}
-					if(this.childNodes.length > 1){
-						selectPathology = this.childNodes[1].nodeValue;
-					}
-					else{
-						selectPathology = this.childNodes[0].nodeValue;
-					}
-				}
-				else{
-					var flg = 0;
-					$("#pathology .selectColorForPathology").each(function(){
-						var time = new Date().getTime();
-						if(time-selectTimeForPath >= 1000){
-							flg = 1;
-							$(this).removeClass("selectColorForPathology");
-						}
-					});
-					if(flg == 1){
-						// aviod the children select start
-						$(this).removeClass("unselectColorForPathology");
-						var ulChildren = $(this).children("ul");
-						if(ulChildren.length != 0){
-							liChildren = $(ulChildren).children("li");
-							if(liChildren.length != 0){
-								for(var i = 0 ; i < liChildren.length;i++){
-									$(liChildren).addClass("unselectColorForPathology");
-								}
-							}
-						}
-						// aviod the children select end
-						$(this).addClass("selectColorForPathology");
-						selectTimeForPath = new Date().getTime();
-						if(this.lastChild.id != undefined){
-							selectPathologyId = this.lastChild.id;
-						}
-						else{
-							selectPathologyId = this.id;
-						}
-						if(this.childNodes.length > 1){
-							selectPathology = this.childNodes[1].nodeValue;
-						}
-						else{
-							selectPathology = this.childNodes[0].nodeValue;
-						}
-						flg = 0;
-					}
-				}
-			});
-			$(container).Treeview({speed: "fast",
-			toggle: function() {
-		}
-		});
-		}
-		else 
-		{
-			//alert ("no indication specific to this location")
-		}
-  	});
-}		
-
-function loadPathoSubTree(container, bodyID)  {
-	
-	//load galen pathological phenonemon for the body part
-	
-	var selection = "@prefix : <http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#> .\n"+
-    				"@prefix owl: <http://www.w3.org/2002/07/owl#> .\n" +
-    				"@prefix radlex: <http://bioontology.org/projects/ontologies/radlex/radlexOwlDlComponent#> .\n"+
-    				"@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n" +
-    				"@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n"
-	
-	selection +=  "radlex:" + bodyID + "   a :selectBodyPart. \n"
-	
-	//alert('loading indication: selection = '+selection)
-	
-	selection = "http://localhost/.context" + encodeURIComponent(" " + selection);	
-	
-	
-	var pquery = 	"@prefix : <http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#> .\n"+
-    				"@prefix owl: <http://www.w3.org/2002/07/owl#> .\n" +
-    				"@prefix radlex: <http://bioontology.org/projects/ontologies/radlex/radlexOwlDlComponent#> .\n"+
-    				"@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n" +
-    				"@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n" +
-    				"{?A 	a :selectBodyPart. \n" + 
-    				" ?B    :hasLocativeAttribute ?A;  \n" +
-    				"       rdfs:label    ?C } \n" +
-    				"  => \n" +
- 			       	"{?B 	rdfs:label   ?C}. \n"  
-
-    //alert('loading indication: query = '+pquery)
-  	pquery = "http://localhost/.context" + encodeURIComponent(" " + pquery);				
-  	
-  	processRDF("http://localhost/Indication?location="+encodeURIComponent(selection)+"&query="+encodeURIComponent(pquery), function(rdfXml) {	       
-       var pathoItem = getSubjectObjects(getRDFParser(rdfXml),"http://www.w3.org/2000/01/rdf-schema#label");
-	    
-       
-		//need to sort according pathoItem[index][1]
-		//pathoItem.sort();
-		
-		var k = pathoItem.length;
-		
-		
-		if(k > 0){
-			for(var i = 0;i < k;i++){
-				//alert ("itemID:" +pathoItem[i][0]+ ", Label: "+pathoItem[i][1])
-				var itemID = extractFragmentId(pathoItem[i][0]);
-				//var itemLabel = extractFragmentId(pathoItem[i][1]);
-				var s = "<li id='" + itemID+ i+"' class='closed unselectColor'>" + pathoItem[i][1] + "</li>"
-				//alert('loading indication: pathoItem = '+ s)
-				$(container).append(s);
-				$("#Patho li").click(function(){
-					var children = $(this).find(".selectColorForPathology");
-					if(children.length == 0){
-							$("#pathology .selectColorForPathology").each(function(){
-								$(this).removeClass("selectColorForPathology");
-							});
-							$(this).addClass("selectColorForPathology");
-							selectTimeForPath=new Date().getTime();
-							// aviod the children select start
-							$(this).removeClass("unselectColorForPathology");
-							var ulChildren = $(this).children("ul");
-							if(ulChildren.length != 0){
-								liChildren = $(ulChildren).children("li");
-								if(liChildren.length != 0){
-									for(var i = 0 ; i < liChildren.length;i++){
-										$(liChildren).addClass("unselectColorForPathology");
-									}
-								}
-							}
-							// aviod the children select end
-							if(this.lastChild.id != undefined){
-								selectPathologyId = this.lastChild.id;
-							}
-							else{
-								selectPathologyId = this.id;
-							}
-							if(this.childNodes.length > 1){
-								selectPathology = this.childNodes[1].nodeValue;
-							}
-							else{
-								selectPathology = this.childNodes[0].nodeValue;
-							}
-						}
-						else{
-							var flg = 0;
-							$("#pathology .selectColorForPathology").each(function(){
-								var time = new Date().getTime();
-								if(time-selectTimeForPath >= 1000){
-									flg = 1;
-									$(this).removeClass("selectColorForPathology");
-								}
-							});
-							if(flg == 1){
-								// aviod the children select start
-								$(this).removeClass("unselectColorForPathology");
-								var ulChildren = $(this).children("ul");
-								if(ulChildren.length != 0){
-									liChildren = $(ulChildren).children("li");
-									if(liChildren.length != 0){
-										for(var i = 0 ; i < liChildren.length;i++){
-											$(liChildren).addClass("unselectColorForPathology");
-										}
-									}
-								}
-								// aviod the children select end
-								$(this).addClass("selectColorForPathology");
-								selectTimeForPath = new Date().getTime();
-								if(this.lastChild.id != undefined){
-									selectPathologyId = this.lastChild.id;
-								}
-								else{
-									selectPathologyId = this.id;
-								}
-								if(this.childNodes.length > 1){
-									selectPathology = this.childNodes[1].nodeValue;
-								}
-								else{
-									selectPathology = this.childNodes[0].nodeValue;
-								}
-								flg = 0;
-							}
-						}
-				});
-			}
-		}
-		else 
-		{
-			alert ("no indication specific to this location")
-		}
-  	});
-}
-
-function loadPathologyTree(container, bodyLocation, bodyID) {
+function loadPropertyTree(container, value, id) {
 	var nodeValue ="";
+	alert ("loading property tree: id = " +  id + ", value = " + value);
 	if($(container).get(0).childNodes.length > 0){
 		nodeValue = $(container).get(0).firstChild.childNodes[1].nodeValue;
 	}
-	if("Property of "+bodyLocation != nodeValue){
+	if("Property of "+value != nodeValue){
 		$(container).empty();
 		
 		//get indications that have bodyLocation as their "hasLocativeAttribute"
-		$(container).append(getRootNode("Property for "+bodyLocation, "Proerty"));
-		//$(container).append(getRootNode("Pathology Phenonmenon ", "Patho"));
+		$(container).append(getRootNode("Property for "+value, "Property"));
+		
 		
 		$(container).Treeview({speed: "fast",
 				toggle: function() {
@@ -575,52 +205,14 @@ function loadPathologyTree(container, bodyLocation, bodyID) {
 		//load indicaiton list (from ACR and UMMS reason for study list)
 		loadIndicationSubTree("#Indication", bodyID);
 		
-		//load pathology phenonmenon of Galen
-		//loadPathoSubTree("#Patho", bodyID);
+
 	}
 }
 
 
 
-// get Tree root node for ontology tree
-function getRootNode(rootNodeName, rootNodeID){
-	var stree = "<li id='" + rootNodeID + "li' class='closed'>"+rootNodeName;
-    stree=stree+"<ul id='" + rootNodeID + "'>";
-    stree=stree+"</ul>";
-    stree=stree+"</li>";
-    return stree;
-}
-
-// replace the space by & for bodypart id
-function getRootNodeForCTDI(rootNodeName){
-	var nodeValueForId = rootNodeName;
-	while(nodeValueForId.indexOf(" ") != -1){
-		nodeValueForId = nodeValueForId.substring(0, nodeValueForId.indexOf(" ")) + "1" + nodeValueForId.substring(nodeValueForId.indexOf(" ") + 1, nodeValueForId.length);
-	}
-	var stree = "<li id='" + nodeValueForId + "li' class='closed'>"+rootNodeName;
-    stree=stree+"<ul id='" + nodeValueForId + "'>";
-    stree=stree+"</ul>";
-    stree=stree+"</li>";
-    return stree;
-}
 
 
-
-// append tree method
-function appendTree(node){
-	var nodeElement = node.get(0);
-	if(!nodeElement.hasChildNodes()){
-		getTreeData(node, nodeElement.id);
-	}
-}
-
-// append tree method
-function appendTreeForPathology(node){
-	var nodeElement = node.get(0);
-	if(!nodeElement.hasChildNodes()){
-		getTreeDataForPathology(node, nodeElement.parentNode.childNodes[1].nodeValue);
-	}
-}
 
 //get tree node function value is the node text value
 function getTreeData(node, value){
@@ -648,6 +240,7 @@ function getTreeData(node, value){
 				alert ("There is no sub-items for this node")
 			}	
 			
+			alert (node.id);
 			getTreeView(node);
 			showWait(false);
 			
@@ -741,88 +334,6 @@ function getTreeData(node, value){
 		
 }
 
-function getTreeDataForPathology(node, value){
-	//alert ("value : " + value)
-	if(node.get(0).childNodes.length == 0){
-
-		var ulId = node.get(0).id;
-
-		$("#" + ulId + " li").click(function(){
-			var children = $(this).find(".selectColorForPathology");
-			if(children.length == 0){
-				$("#pathology .selectColorForPathology").each(function(){
-					$(this).removeClass("selectColorForPathology");
-				});
-				
-				// aviod the children select start
-				$(this).removeClass("unselectColorForPathology");
-				var ulChildren = $(this).children("ul");
-				if(ulChildren.length != 0){
-					liChildren = $(ulChildren).children("li");
-					if(liChildren.length != 0){
-						for(var i = 0 ; i < liChildren.length;i++){
-							$(liChildren).addClass("unselectColorForPathology");
-						}
-					}
-				}
-				// aviod the children select end
-				$(this).addClass("selectColorForPathology");
-				selectTimeForPath = new Date().getTime();
-				if(this.lastChild.id != undefined){
-					selectPathologyId = this.lastChild.id;
-				}
-				else{
-					selectPathologyId = this.id;
-				}
-				if(this.childNodes.length > 1){
-					selectPathology = this.childNodes[1].nodeValue;
-				}
-				else{
-					selectPathology = this.childNodes[0].nodeValue;
-				}
-			}
-			else{
-				var flg = 0;
-				$("#pathology .selectColorForPathology").each(function(){
-					var time = new Date().getTime();
-					if(time-selectTimeForPath >= 1000){
-						flg = 1;
-						$(this).removeClass("selectColorForPathology");
-					}
-				});
-				if(flg == 1){
-					// aviod the children select start
-					$(this).removeClass("unselectColorForPathology");
-					var ulChildren = $(this).children("ul");
-					if(ulChildren.length != 0){
-						liChildren = $(ulChildren).children("li");
-						if(liChildren.length != 0){
-							for(var i = 0 ; i < liChildren.length;i++){
-								$(liChildren).addClass("unselectColorForPathology");
-							}
-						}
-					}
-					// aviod the children select end
-					$(this).addClass("selectColorForPathology");
-					selectTimeForPath = new Date().getTime();
-					if(this.lastChild.id != undefined){
-						selectPathologyId = this.lastChild.id;
-					}
-					else{
-						selectPathologyId = this.id;
-					}
-					if(this.childNodes.length > 1){
-						selectPathology = this.childNodes[1].nodeValue;
-					}
-					else{
-						selectPathology = this.childNodes[0].nodeValue;
-					}
-					flg = 0;
-				}
-			}
-		});
-	}
-}
 
 function mouserOverColor(node) 
 {
@@ -886,29 +397,8 @@ function dealTreeColor(flg, obj, className){
 	}
 }
 
-// get Tree view
-function getTreeView(node){
-	node.Treeview({speed: "fast",
-		toggle: function() {
-			if(this.style.display=="block"){
-				appendTree($("#"+this.id));
-			}
-		}
-	});
-	
-}
 
-// get Tree view for pathology
-function getTreeViewForPathology(node){
-	node.Treeview({speed: "fast",
-		toggle: function() {
-			if(this.style.display=="block"){
-				appendTreeForPathology($("#"+this.id));
-			}
-		}
-	});
-	
-}
+
 
 // get temp node string
 function getTempNode(item){
@@ -946,24 +436,16 @@ function selectById(id){
 	trElement.className='codehovered';
 }
 
-function selectProcedureById(id){
-	toggleDetailContainer("#PROCEDUREDETAIL");
-	toggleSectionContainer("#PROCEDURECONTAINER");
-	var trElement = $("#" + id).get(0);
-	$(".codehovered").each(function(){
-			this.className = "codelist";
-		}
-	);
-	trElement.className='codehovered';
-	clearProcedureSelection();
-}
-
 function deleteById(id){
 	$("#"+id).remove();
 }
 
 function searchDrugTree(container, nodeValue){
-
+    
+    if (nodeValue == "") {
+    	alert ("please entry the search keyword");
+    	return false;
+    }
 	showWait(true);
 	
 	try {	
@@ -996,7 +478,7 @@ function processTerms(n3)
 		for (var index = 0; index < foundTerms.length; index++) {		
 			var nodeName = getObject(foundTerms[index]);
 			var nodeID = getSubject(foundTerms[index]);			
-			foundTermsList.push([nodeID, nodeName]);
+			foundTermsList.push([filterPrefix(nodeID), nodeName]);
 		} 
 	}
 	else {
@@ -1015,81 +497,48 @@ function displayTree(container,nodeValue)
 		$(container).append(getRootNode(nodeValue[i][1], nodeValue[i][0]));
 	}
 	
-	$("#BROSWER li").click(function(){
-		var children = $(this).find(".selectColor");
-		if(children.length == 0){
-			$("#BROSWER .selectColor").each(function(){
-				$(this).removeClass("selectColor");
-			});
+	getTreeView(container);	
+}
 
-			$(this).addClass("selectColor");
-			selectTimeForAcr=new Date().getTime();
-			var bodyId = this.id.substring(0, this.id.length-2);
-			loadPathologyTree("#PROPERTY", this.childNodes[1].nodeValue, bodyId);
-					
-			// aviod the children select start
-			$(this).removeClass("unselectColor");
-			var ulChildren = $(this).children("ul");
-			if(ulChildren.length != 0){
-				liChildren = $(ulChildren).children("li");
-				if(liChildren.length != 0){
-					for(var i = 0 ; i < liChildren.length;i++){
-						$(liChildren).addClass("unselectColor");
-					}	
-				}
-			}// aviod the children select end
-		
-			selectAnatomyId = this.lastChild.id;
-			selectAnatomy = this.childNodes[1].nodeValue;
-		
-		} else{
-			var flg = 0;
-			$("#BROSWER .selectColor").each(function(){
-				var time = new Date().getTime();
-				if(time-selectTimeForAcr >= 1000){
-					flg = 1;
-					$(this).removeClass("selectColor");
-				}
-			});
-			
-			if(flg == 1){
-			// aviod the children select start
-				$(this).removeClass("unselectColor");
-				var ulChildren = $(this).children("ul");
-				if(ulChildren.length != 0){
-					liChildren = $(ulChildren).children("li");
-					if(liChildren.length != 0){
-						for(var i = 0 ; i < liChildren.length;i++){
-							$(liChildren).addClass("unselectColor");
-						}
-					}
-				}
-				var bodyId = this.id.substring(0, this.id.length-2);
-				loadPathologyTree("#PROPERTY", this.childNodes[1].nodeValue, bodyId);
-				
-				// aviod the children select end
-				$(this).addClass("selectColor");
-				selectTimeForAcr = new Date().getTime();
-				selectAnatomyId = this.lastChild.id;
-				selectAnatomy = this.childNodes[1].nodeValue;
-				flg = 0;
-			}
-		}
-	});
-    
-    $(container).Treeview({speed: "fast",
+// get Tree view
+function getTreeView(container){
+	$(container).Treeview({speed: "fast",
 		toggle: function() {
 			if(this.style.display=="block"){
 				appendTree($("#"+this.id));
-		    }
+			}
 		}
 	});
+	
 }
+
+// get Tree root node for ontology tree
+function getRootNode(rootNodeName, rootNodeID){
+	var stree = "<li id='" + rootNodeID + "li' class='closed'>"+rootNodeName;
+    stree=stree+"<ul id='" + rootNodeID + "'>";
+    stree=stree+"</ul>";
+    stree=stree+"</li>";
+    return stree;
+}
+
+
+// append tree method
+function appendTree(node){
+
+	var nodeElement = node.get(0);
+	alert ("inside appendTree: " +nodeElement.id);
+	
+	if(!nodeElement.hasChildNodes()){
+		getTreeData(node, nodeElement.id);
+	}
+}
+
+
 
 function searchIndicationTree(container, nodeValue){
 	$(container).empty();
 	alert ("searching indication: "+nodeValue);
-	$.blockUI("<p><img src='js/busy.gif' /> <strong>Please wait...</strong></p> ");
+	$.blockUI("<p><img src='images/busy.gif' /> <strong>Please wait...</strong></p> ");
 	var pquery = 	"@prefix owl: <http://www.w3.org/2002/07/owl#> .\n" +
     				"@prefix : <http://bioontology.org/projects/ontologies/radlex/radlexOwlDlComponent#> .\n"+
     				"@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n" +
@@ -1146,236 +595,6 @@ function loadIndicationTree(node){
 	}
 }
 
-function getTreeDataForIncation(node, ulId){
-	
-	//alert ("getting Tree data for indications: ulId = " + ulId);
-	var IndicationSubData = [["testData1", "testData1"], ["testData2", "testData2"], ["testData3", "testData3"]];
-	for(var i = 0; i < IndicationSubData.length;i++){
-		node.append("<li id ='" + IndicationSubData[i][0] + "'>" + IndicationSubData[i][1] + "</li>");
-	}
-	$("#"+ ulId+" li").click(function(){
-		var children = $(this).find(".selectColorForPathology");
-		if(children.length == 0){
-				$("#"+ ulId + " .selectColorForPathology").each(function(){
-					$(this).removeClass("selectColorForPathology");
-				});
-				$(this).addClass("selectColorForPathology");
-				selectTimeForPath=new Date().getTime();
-				// aviod the children select start
-				$(this).removeClass("unselectColorForPathology");
-				var ulChildren = $(this).children("ul");
-				if(ulChildren.length != 0){
-					liChildren = $(ulChildren).children("li");
-					if(liChildren.length != 0){
-						for(var i = 0 ; i < liChildren.length;i++){
-							$(liChildren).addClass("unselectColorForPathology");
-						}
-					}
-				}
-				// aviod the children select end
-				if(this.lastChild.id != undefined){
-					selectPathologyId = this.lastChild.id;
-				}
-				else{
-					selectPathologyId = this.id;
-				}
-				if(this.childNodes.length > 1){
-					selectPathology = this.childNodes[1].nodeValue;
-				}
-				else{
-					selectPathology = this.childNodes[0].nodeValue;
-				}
-			}
-			else{
-				var flg = 0;
-				$(".selectColorForPathology").each(function(){
-					var time = new Date().getTime();
-					if(time-selectTimeForPath >= 1000){
-						flg = 1;
-						$(this).removeClass("selectColorForPathology");
-					}
-				});
-				if(flg == 1){
-					// aviod the children select start
-					$(this).removeClass("unselectColorForPathology");
-					var ulChildren = $(this).children("ul");
-					if(ulChildren.length != 0){
-						liChildren = $(ulChildren).children("li");
-						if(liChildren.length != 0){
-							for(var i = 0 ; i < liChildren.length;i++){
-								$(liChildren).addClass("unselectColorForPathology");
-							}
-						}
-					}
-					// aviod the children select end
-					$(this).addClass("selectColorForPathology");
-					selectTimeForPath = new Date().getTime();
-					if(this.lastChild.id != undefined){
-						selectPathologyId = this.lastChild.id;
-					}
-					else{
-						selectPathologyId = this.id;
-					}
-					if(this.childNodes.length > 1){
-						selectPathology = this.childNodes[1].nodeValue;
-					}
-					else{
-						selectPathology = this.childNodes[0].nodeValue;
-					}
-					flg = 0;
-				}
-			}
-	});
-	$(node).Treeview({speed: "fast",
-	    toggle: function() {
-		}
-     });
-	
-}
-
-function getProcedures(){
-/**var pquery = 	"@prefix : <http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#> .\n"+
-    				"@prefix owl: <http://www.w3.org/2002/07/owl#> .\n" +
-    				"@prefix radlex: <http://bioontology.org/projects/ontologies/radlex/radlexOwlDlComponent#> .\n"+
-    				"@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n" +
-    				"@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n" +
-    				"@prefix ACR2007: <http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#> .\n" +
-    				"{?A 	:procedureType ?PType;\n" +
-    				"       :bodyPart   ?radName; \n" +
- 			       	"     	:applyToAnatomicLocation    ?B; \n" +
-					"       :hasCPTCode ?Code; \n" +
-					"		rdfs:label ?S}  => \n" +
- 			       	"{?A 	:bodyPart   ?radName; \n" +
- 			       	"     	:radCode    ?B; \n" +
-					"       :procedureType ?PType;\n" +
-					"       :hasCPTCode ?Code; \n" +
-					"		rdfs:label ?S}.\n " 
-					
-  	//alert(pquery);
-  	pquery = "http://localhost/.context" + encodeURIComponent(" " + pquery);				
-  	processRDF("http://localhost/ProcList?query="+encodeURIComponent(pquery), function(rdfXml) {
-  	
-  	globalProcTypes = getObjects(rdfXml,"http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#procedureType");
-  	
-  	var tempProcTypes = getObjects(rdfXml,"http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#procedureType");
-  	globalProcBodyParts = getObjects(rdfXml, "http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#bodyPart");
-  	var tempProcBodyParts = getObjects(rdfXml, "http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#bodyPart");
-	globalProcNames = getObjects(rdfXml, "http://www.w3.org/2000/01/rdf-schema#label");
-	globalProcCPTs = getObjects(rdfXml, "http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#hasCPTCode");
-    globalProcRadIDs = getObjects(rdfXml, "http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#radCode");
-   
-
-     */ 
-	ProcedureTableLoadFlag = 1;
-	var uniqueProcType = tempProcTypes.uniqStr();
-	var uniqueBodyPart = tempProcBodyParts.uniqStr();
-	uniqueProcType = getSortedResults(uniqueProcType);
-	uniqueBodyPart = getSortedResults(uniqueBodyPart);
-	
-	$("#ModalityTable").empty();
-	$("#bodyPartTable").empty();
-	var procTypeLength = uniqueProcType.length;
-	var bodyPartsLength = uniqueBodyPart.length;
-	
-	//add "any" - general type for modality and body parts
-	if(procTypeLength > 0){
-		var appendStr = "<option value=''>Any</option>";
-		for(var i = 0;i < procTypeLength;i++){
-			appendStr = appendStr + "<option value='" + uniqueProcType[i] + "'>" + uniqueProcType[i]+ "</option>"
-		}
-		$("#Modality").append(appendStr);
-		$("#Modality").get(0).options[0].selected = true;
-		
-		$("#Modality").change(function() {
-			searchProcedures();	
-		});
-	}
-	if(bodyPartsLength > 0){
-		var appendStr = "<option value=''>Any</option>";
-		for(var i = 0;i < bodyPartsLength;i++){
-			appendStr = appendStr + "<option value='" + uniqueBodyPart[i] + "'>" + uniqueBodyPart[i]+ "</option>"
-		}
-		$("#bodyPart").append(appendStr);
-		$("#bodyPart").get(0).options[0].selected = true;
-		
-		$("#bodyPart").change(function() {
-			searchProcedures();	
-		});
-	}
-	searchProcedures();
-
-}
-
-function searchProcedures() {
-    var modalityValue=$("#Modality").get(0).value;
-	var bodyPartValue=$("#bodyPart").get(0).value;;  
-	var codeValue = $("#Code").get(0).value;
-	var descriptionValue = $("#Description").get(0).value;
-	
-	$("#PROCEDURELIST tbody").empty();
-
-	for(var i = 0;i < globalProcCPTs.length;i++){
-		if(codeValue != ""){
-			if(globalProcCPTs[i].indexOf(codeValue) != 0){
-				continue;
-			}
-		}
-		if(descriptionValue != ""){
-			if(globalProcNames[i].toUpperCase().indexOf(descriptionValue.toUpperCase()) != 0){
-				continue;
-			}
-		}
-		if(modalityValue != ""){
-			if(globalProcTypes[i].indexOf(modalityValue) != 0){
-				continue;
-			}
-		}
-		if(bodyPartValue != ""){
-			if(globalProcBodyParts[i].toUpperCase().indexOf(bodyPartValue.toUpperCase()) != 0){
-				continue;
-			}
-		}
-		var procId = extractFragmentId(globalProcID[i]);
-		//procId = globalProcID[i];
-		$("#PROCEDURELIST tbody").append("<tr class='procedurelist' id='" + procId + "tr'><td>" + globalProcCPTs[i] + "</td><td>" + globalProcNames[i] + "</td><td>" + globalProcBodyParts[i] + "</td><td>" + extractFragmentId(globalProcRadIDs[i]) + "</td></tr>");
-	}
-	var trs =$("#PROCEDUREBODY tr"); 
-	for(var j=0, len=trs.length; j<len; j++) 
-	{
-		trs[j].onmouseover=function() {
-			if(this.className != "procedureSelected"){
-				this.className='procedurehovered';
-			}
-		}
-		trs[j].onmouseout=function() {
-			if(this.className != "procedureSelected"){
-				this.className='procedurelist';
-			}
-		}
-	}
-	
-	$("#PROCEDUREBODY tr").click(
-		function(){
-			$(".procedureSelected").each(
-				function(){
-					this.className="procedurelist";
-				}
-			)
-			this.className="procedureSelected";
-		}
-	);
- }
-
-function clearProcedureSelection(){
-	$("#Code").get(0).value ="";
-	$("#Description").get(0).value="";
-	//$("#PROCEDUREBODY").empty();
-	$("#PROCEDURELIST .procedureSelected").each(function(){
-		$(this).removeClass("procedureSelected");
-		$(this).addClass("procedurelist");
-	}
-	)
-}
 
 function procedureTreeView() {
 
@@ -1431,116 +650,11 @@ function getProcIndexByProcType(ptype) {
 	}
 	return  procIndex;
 }
-function getProcAttributesByIndex(globalArray, procIndex) {
-	var attributes = new Array();
-	var index = 0, k = procIndex.length;
-	
-	for (var i = 0; i < k; i++) {
-		var m = procIndex[i];
-		attributes[index++] = globalArray[m];		
-	}
-	return attributes;
-}
 
 function getTempNodeForProcedure(item, ptype){
 	return "<ul id='" + item  + ptype + "Procedure'></ul>"
 }
-function getProcedureByType (node, ptype)
-{
 
-	    var procIndex = getProcIndexByProcType(ptype);
-
-	    var procBodyParts = getProcAttributesByIndex(globalProcBodyParts, procIndex);
-	    var tempProcBodyParts = getProcAttributesByIndex(globalProcBodyParts, procIndex);
-	    var unipProcBodyParts = tempProcBodyParts.uniqStr();
-	    
-	    var procedureIds = getProcAttributesByIndex(globalProcID, procIndex);
-	    var procCPT = getProcAttributesByIndex(globalProcCPTs, procIndex);
-	    var procNames = getProcAttributesByIndex(globalProcNames, procIndex);
-	    
-	    
-		for (var i = 0; i < unipProcBodyParts.length; i++)
-		{
-			// get the subItem id
-			var flg = 0;
-			
-			
-			var nodeValue = unipProcBodyParts[i];
-			var nodeID = unipProcBodyParts[i];
-			var nodeValueForId = nodeValue;
-			while(nodeValueForId.indexOf(" ") != -1){
-				nodeValueForId = nodeValueForId.substring(0, nodeValueForId.indexOf(" ")) + nodeValueForId.substring(nodeValueForId.indexOf(" ") + 1, nodeValueForId.length);
-			}
-			for(var j = 0; j < procBodyParts.length;j++){
-				if(procBodyParts[j] == nodeValue){
-					
-					var time = new Date().getTime();
-					var childNodeValue = procNames[j];
-					var ChildNodeID = procCPT[j] + "&" + time;
-					if($("#"+ nodeValueForId+ptype).length == 0){
-						node.append("<li id='" + nodeValueForId + ptype + "' class ='closed'>" + nodeValue + getTempNodeForProcedure(nodeValueForId, ptype) + "</li>");
-					}
-					var leafProcedureId = extractFragmentId(procedureIds[j]);
-					$("#"+nodeValueForId + ptype +"Procedure").append("<li id='" + leafProcedureId + "tree' class='final'>" + childNodeValue + "(" + procCPT[j] + ")</li>");
-				}
-				
-			}
-			/*if($("#"+ nodeValueForId).length == 0){
-				node.append("<li id='" + nodeID + i + "'>" + nodeValue+"</li>");
-			}*/
-			$("#" + nodeValueForId + ptype + "Procedure li").click(function(){
-				$(".selectColor").each(function(){
-					$(this).removeClass("selectColor");
-				});
-				$(this).addClass("selectColor");
-				selectProcId = this.id.substring(0, this.id.length-4);
-				procedureCode = this.textContent.substring(this.textContent.indexOf("(")+1, this.textContent.length-1);
-				procedureDesp = this.textContent.substring(0, this.textContent.indexOf("("));
-				procedureBody = this.parentNode.parentNode.childNodes[1].nodeValue;
-				//alert ("procedureBody: " + procedureBody);
-			});
-		}
-		
-		//getTreeViewForProcedure(node);
-		//$.unblockUI();
-
-}
-
-
-function appendTreeForProcedure(node){
-	var nodeElement = node.get(0);
-	if((nodeElement != undefined) && (!nodeElement.hasChildNodes())){
-		getProcedureByType(node, nodeElement.id);
-	}
-}
-function getTreeDataForProcedure(node, value){
-	// add the get childNodes of the node
-	
-	getTreeViewForProcedure(node);
-	var ulId = node.get(0).id;
-	$("#" + ulId + " li").click(function(){
-		var children = $(this).find(".selectColor");
-		if(children.length == 0){
-			$(".selectColor").each(function(){
-				$(this).removeClass("selectColor");
-			});
-			$(this).addClass("selectColor");
-			procedureCode = this.lastChild.id;
-			procedureDesp = this.childNodes[1].nodeValue;
-		}
-	});
-}
-
-function getTreeViewForProcedure(node, ptype){
-	node.Treeview({speed: "fast"
-		/*,
-		toggle: function() {
-			if(this.style.display=="block"){
-				appendTreeForProcedure($("#"+this.id));
-			}
-		}*/
-	});
-}
 
 
 function getIndexedResults(index, range)
@@ -1611,304 +725,8 @@ function updateValidationPolicies(){
 	}
 }
 
-function showInfoInDetailList(){
-	$("#ACRINFORMATIONSOURCES tbody").empty();
-	var trDetailElements = $("#VALIDATIONPOLICIESDETAIL").children().children();
-	for(var i = 0; i < trDetailElements.length;i++){
-		if(i == 0){
-			var tdElements = $(trDetailElements[i]).children();
-			var tdElement = tdElements.get(1);
-			var checkBoxElement = $(tdElement).children();
-			if(checkBoxElement.get(0).checked==true){
-				var checkBoxShow = checkBoxElement.get(0).nextSibling.nodeValue;
-				var content = "";
-				if(infolink[i].length>50){
-					content+=infolink[i].substring(0,45)+"&#10;"+infolink[i].substring(45,infolink[i].length); 
-				}
-				else{
-					content = infolink[i];
-				}
-				$("#ACRINFORMATIONSOURCES tbody").append("<tr class='list'><td>" + checkBoxShow + "</td><td>" + content + "</td><td>" + "<a href='#'>show</a>" + "</td></tr>");
-			}
-		}
-		else{
-			if($(trDetailElements[i]).children().children().get(0).checked == true){
-				var tdElement = $(trDetailElements[i]).children().get(0);
-				var checkBoxElement = $(tdElement).children();
-				var checkBoxShow = checkBoxElement.get(0).nextSibling.nodeValue;
-				var content = "";
-				if(infolink[i].length>50){
-					content+=infolink[i].substring(0,45)+"&#10;"+infolink[i].substring(45,infolink[i].length); 
-				}
-				else{
-					content = infolink[i];
-				}
-				$("#ACRINFORMATIONSOURCES tbody").append("<tr class='list'><td>" + checkBoxShow + "</td><td>" + content + "</td><td>" + "<a href='#'>show</a>" + "</td></tr>");
-			}
-		}
-	}
-}
-
-//get patietn SCL
-function getPatientSCL(patientId)
-{
-	 processRDF("http://localhost/patientSCL?patientID="+patientId, function(rdfXml) {	  
-	 	var scl = getObjects(getRDFParser(rdfXml), "http://localhost/RPGDemo/tripleStore/patients#scl");
-	 	if (scl.length > 0) globalPatientSCL = scl[0];
-	    else globalPatientSCL = "0";
-	    
-	 });     
-    
-}
-
-// calculate ACR Score, return the highest score
-function calculateACRScore(patientId, procedureId, indicationIds, tdElement){
- // this array contains the policy data
- var policyArray = new Array();
- var policyCount = 0;
- var policies = " ";
-
-//alert ("PID=" + patientId +" , procedure id= "+ procedureId + " ,indicationID = " + indicationIds);
- // get policy selection 
- $("#TPOLICY tbody td input[@type='checkbox']").each(function(){
-	policyArray[policyCount++] = this.nextSibling.nodeValue;	
- });
- 
-// get policy files
-
-  for (var j = 0; j < policyCount; j++)
-  {
-  	var policyName = policyArray[j];
-  	if (policyName.indexOf("ACR") != -1)
-  	   policies += " http://localhost/RPGDemo/tripleStore/validationRules.n3"
-  	else if (policyName.indexOf("Contra-indication") != -1)
-  	   policies += " http://localhost/RPGDemo/tripleStore/contraAlertRules.n3"
-//  	else if (policyName.indexOf("Reimbursement") != -1)
-//  	   policies += " http://localhost/RPGDemo/tripleStore/insuranceRules.n3"
-  	else
-  	   alert ("can not find policy file for validation: " + policyName);
-  }
-  
-  //alert (encodeURIComponent(" "+policies));
- 
-  var selection = "@prefix : <http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#> .\n"+
-    				"@prefix owl: <http://www.w3.org/2002/07/owl#> .\n" +
-    				"@prefix radlex: <http://bioontology.org/projects/ontologies/radlex/radlexOwlDlComponent#> .\n"+
-    				"@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n" +
-    				"@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n"
-	
-	selection +=  ":" + procedureId + "   a :selectedProcedure. \n";
-	for (var i = 0; i < indicationIds.length; i++)
-	 selection +=  ":" + indicationIds[i] + "   a :selectedIndication. \n";
-	 
-	selection = "http://localhost/.context" + encodeURIComponent(" " + selection);	
-	
-	
-	$.blockUI("<p><img src='js/busy.gif' /> <strong>validating order...</strong></p> ");
-		
-	var pquery = 	"@prefix : <http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#> .\n"+
-    				"@prefix owl: <http://www.w3.org/2002/07/owl#> .\n" +
-    				"@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n" +
-    				"@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n" +
-    				"{?P     :applyToIndication  ?indication_m; \n" +
-                    "        :maxACRScore ?score_m;    \n" +
-                    "        :withComments ?comments_m.}   \n" +
-                    " => \n" +
-                    "{?P     :applyToIndication  ?indication_m; \n" +
-                    "        :maxACRScore ?score_m;  \n" +
-                    "        :withComments ?comments_m.}. \n" +
-                    "{?P     :applyToIndication  ?indication_m; \n" +
-                    "        :maxACRScore ?score_m.    }   \n" +
-                    " => \n" +
-                    "{?P     :applyToIndication  ?indication_m; \n" +
-                    "        :maxACRScore ?score_m.}. \n" +
-                    "{?P        :hasSCLWarning ?SCL.} \n" +
-					"	=> \n" +
-					"{?P        :hasSCLWarning ?SCL}.\n"	+
-					"{?P        :hasPregnancyWarning \"true\".} \n" +
-					"	=> \n" +
-					"{?P        :hasPregnancyWarning \"true\"}."	
- 
-
-  	pquery = "http://localhost/.context" + encodeURIComponent(" " + pquery);				
-  	//policies = "http://localhost/.context" + encodeURIComponent(" " + policies);
-  	
-  	processRDF("http://localhost/ACRValidation?selections="+encodeURIComponent(selection)+"&policy="+encodeURIComponent(policies)+"&query="+encodeURIComponent(pquery)+"&patientID="+patientId, function(rdfXml) {	         
-        try {
-       		var parser = getRDFParser(rdfXml);
-       		var acrcomment = getObjects(parser,"http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#withComments");
-       		var score = getObjects(parser,"http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#maxACRScore");
-       		var sclWarning = getObjects(parser,"http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#hasSCLWarning");       		
-       		var pWarning = getObjects(parser,"http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#hasPregnancyWarning");
-
-       		var resultScore="";
-       		
-       		
-       		var trElement = tdElement.get(0).parentNode;
-       		var trElementId = trElement.id;
-       		var remarkHidden = $("#" + trElementId + "remarkHidden");
- 
-            var sWarning = "\n";       		
-       		if (sclWarning.length > 0)
-       		{
-      			var resultSCL = sclWarning[0];
-      			alert ("Contrast Agent Alert! Patient SCL = " + resultSCL)
-      			sWarning += "\nContrast Agent Alert! Patient SCL = " + resultSCL;          		
-       		}
-       		
-       		if (pWarning.length > 0)
-       		{
-      			alert ("Pregnancy Alert! Patient is pregnant")
-      			sWarning += "\n\nPregnancy Alert! Patient is pregnant\n";          		
-       		}
-       		
-       		if (acrcomment.length >0)
-       		   if (acrcomment[0].match("var#_") == null)
-       		      remarkHidden.val(acrcomment[0] + sWarning);
-       		   else
-       		      remarkHidden.val(sWarning);
-       		else
-       		    remarkHidden.val(sWarning);
-       		
-       		//remarkHidden comment
-       		if(score.length > 0) resultScore = score[0];
-       		else resultScore = 0;
-       		
-       		//make the color change with the following range:
-			// acrScore 1-3, red
-			// acrScore 4-6, yellow
-			// acrScore 7-10, green
-			// if there is no score assigned, send alert sign
-			
-			if(resultScore ==0){
-				var aHrefElement = $(tdElement.get(0).childNodes[0]);
-				aHrefElement.empty();
-				aHrefElement.append("<font color='red'> no score </font>");
-			}
-			else if(resultScore >= 1 && resultScore <= 3){
-				//$("#AppropriatenessID").append("<input type='text' size='2' id='appropriatenessValue' readonly><img src='img/warn.png' align='bottom' alt='warn'>")
-				var aHrefElement = $(tdElement.get(0).childNodes[0]);
-				aHrefElement.empty();
-				aHrefElement.append("<font color='red'>" + resultScore + "</font>");
-			}
-			else if(resultScore >= 4 && resultScore <= 6){
-				var aHrefElement = $(tdElement.get(0).childNodes[0]);
-				aHrefElement.empty();
-				aHrefElement.append("<font color='#CC9900'>" + resultScore + "</font>");
-			}
-			else{
-				var aHrefElement = $(tdElement.get(0).childNodes[0]);
-				aHrefElement.empty();
-				aHrefElement.append("<font color='green'>" + resultScore + "</font>");
-			}
-	   }
-       catch (e)
-       {
-       		alert ("ACR appropriateness rating is not available");
-       		alert(e);
-       }
-       $.unblockUI();
-  	}); 
-  	  
-}
 
 
-// calculate CDTI number for radiation dosage monitoring
-function getAverageCTDI(bodyParts,patientID, trId)
-{
-	//get CTDI by body parts
-	var pquery = 	"@prefix : <http://localhost/RPGDemo/tripleStore/patients#> .\n"+
-    				"@prefix owl: <http://www.w3.org/2002/07/owl#> .\n" +
-    				"@prefix radlex: <http://bioontology.org/projects/ontologies/radlex/radlexOwlDlComponent#> .\n"+
-    				"@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n" +
-    				"@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n" +
-    				"{?A 	:anonymized_patient_id :"+ patientID +";\n" +
-    				"        :body_partID  :"+bodyParts +"; \n"+
-    				"		:sum_ctdi ?C.}\n" +
- 			       	"=> \n" +
- 			       	"{?A 	:sum_ctdi   ?C}."
- 			       	
-  	//alert(pquery);
-  	pquery = "http://localhost/.context" + encodeURIComponent(" " + pquery);				
-  	processRDF("http://localhost/patientDosage?query="+encodeURIComponent(pquery), function(rdfXml) {
-  		var parser = getRDFParser(rdfXml);
-	  	var CTDI = getObjects(parser,"http://localhost/RPGDemo/tripleStore/patients#sum_ctdi");
-	  	var sumCTDI = 0;
-	  	if (CTDI.length > 0) sumCTDI = CTDI[0];
-	  	else alert ("no CTDI found for the patient");
-	  	
-	  	
-  	}); 
-}
-
-function loadProcedures() {
-	
-	var pquery = 	"@prefix : <http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#> .\n"+
-    				"@prefix owl: <http://www.w3.org/2002/07/owl#> .\n" +
-    				"@prefix radlex: <http://bioontology.org/projects/ontologies/radlex/radlexOwlDlComponent#> .\n"+
-    				"@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n" +
-    				"@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n" +
-    				"@prefix ACR2007: <http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#> .\n" +
-    				"{?A 	:procedureType ?PType;\n" +
-    				"       :bodyPart   ?radName; \n" +
- 			       	"     	:applyToAnatomicLocation    ?B; \n" +
-					"       :hasCPTCode ?Code; \n" +
-					"		rdfs:label ?S}  => \n" +
- 			       	"{?A 	:procID   ?A; \n" +
- 			       	"		:bodyPart   ?radName; \n" +
- 			       	"     	:applyToAnatomicLocation    ?B; \n" +
-					"       :procedureType ?PType;\n" +
-					"       :hasCPTCode ?Code; \n" +
-					"		rdfs:label ?S}.\n " 
-
-	//using acr db
-	//var pquery = "WHERE predicate==':procedureType' OR predicate==':bodyPart' OR predicate==':applyToAnatomicLocation' OR predicate==':hasCPTCode' OR predicate=='rdfs:label';  "					
-  	//var pquery = "WHERE+predicate%3D%3D%27%3AprocedureType%27+OR+predicate%3D%3D%27%3AbodyPart%27+OR+predicate%3D%3D%27%3AapplyToAnatomicLocation%27+OR+predicate%3D%3D%27%3AhasCPTCode%27+OR+predicate%3D%3D%27rdfs%3Alabel%27%3B"
-//  	alert(encodeURIComponent(pquery));
-  	
-  	pquery = "http://localhost/.context" + encodeURIComponent(" " + pquery); 
-  	//pquery = encodeURIComponent(pquery);				
-  	//alert(pquery);
-  	
-  	
-//  	processRDF("http://localhost/acrListTest?", function(rdfXml) {
-
-  
-   	processRDF("http://localhost/ProcListDB?query="+encodeURIComponent(pquery), function(rdfXml) {
-
-  		procedureParser = getRDFParser(rdfXml);
-	  	var tempGlobalProcID = getSubjectObjects(procedureParser,"http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#procID");
-	  	globalProcID = getProcedureList(tempGlobalProcID);
-	  	//globalProcID = getSubjects(procedureParser,"http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#bodyPart");
-	  	globalProcID.sort();
-	  	//alert ("globalProcID #" + globalProcID.length + "first element: "+globalProcID[0]);
-	  	var tempGlobalProcTypes = getSubjectObjects(procedureParser,"http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#procedureType");
-	  	globalProcTypes = getResults(tempGlobalProcTypes);
-	  	var tempGlobalProcBodyParts = getSubjectObjects(procedureParser, "http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#bodyPart");
-	  	globalProcBodyParts = getResults(tempGlobalProcBodyParts);
-	  	//alert ("globalProcBodyParts #" + globalProcBodyParts.length + "first element: "+globalProcBodyParts[0]);
-	  	tempProcTypes = getSubjectObjects(procedureParser,"http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#procedureType");
-	  	tempProcTypes = getResults(tempProcTypes);
-	  	tempProcTypesForTreeView = getSubjectObjects(procedureParser,"http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#procedureType");
-	  	tempProcTypesForTreeView = getResults(tempProcTypesForTreeView);
-	  	tempProcBodyParts = getSubjectObjects(procedureParser, "http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#bodyPart");
-	  	tempProcBodyParts = getResults(tempProcBodyParts);
-	  	var tempGlobalProcNames = getSubjectObjects(procedureParser, "http://www.w3.org/2000/01/rdf-schema#label");
-	  	globalProcNames = getResults(tempGlobalProcNames);
-		//alert ("globalProcNames #" + globalProcNames.length + "first element: "+globalProcNames[0]);
-	  	
-		tempGlobalProcCPTs = getSubjectObjects(procedureParser, "http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#hasCPTCode");
-		globalProcCPTs = getResults(tempGlobalProcCPTs);
-		//alert ("globalProcCPTs #" + globalProcCPTs.length + "first element: "+globalProcCPTs[0]);
-	  	
-	    tempGlobalProcRadIDs = getSubjectObjects(procedureParser, "http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#applyToAnatomicLocation");
-	    globalProcRadIDs = getResults(tempGlobalProcRadIDs);
-	    //alert ("globalProcRadIDs #" + globalProcRadIDs.length + "first element: "+globalProcRadIDs[0]);
-	    $.unblockUI();
-	    procedureTreeView();
-	    
-  	});
-}
 function getProcedureList(tempGlobalProcID){
 	var length = tempGlobalProcID.length;
 	var globalProcID = new Array();
@@ -2122,7 +940,7 @@ function selectProcedures() {
 					$("#ARGUMENTATIONHIDDEN").append("<input type='hidden' id='" + procId + "bodyParthidden' value='" + trElement.childNodes[2].firstChild.nodeValue + "'>");
 					$("#ARGUMENTATIONHIDDEN").append("<input type='hidden' id='" + procId + "hidden' value=''>");
 					$("#ARGUMENTATIONHIDDEN").append("<input type='hidden' id='" + procId + "remarkHidden' value=''>");
-					$("#procedureListBody").append("<tr id = '" + procId + "'  class='codelist'><td class='showStyle'>CPT-" + code + "</td><td class='showStyle'>" + desp + "</td><td class='showStyle'><a href='javascript:showDetails(\"" + procId + "\")'>" + acr + "</a></td><td class='showStyle'><a href='javascript:showCTDIDetails(\"" + procId + "\")'>details</a></td><td class='showStyle' title='edit'><a href=\"javascript:selectProcedureById('" + procId + "');\"><img alt='edit' border='0' src='img/editicon.png' width='19' height='19'/></a></td><td class='showStyle' title='delete'><a href=\"javascript:deleteById('" + procId + "');\"><img alt='delete' border='0' src='img/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+					$("#procedureListBody").append("<tr id = '" + procId + "'  class='codelist'><td class='showStyle'>CPT-" + code + "</td><td class='showStyle'>" + desp + "</td><td class='showStyle'><a href='javascript:showDetails(\"" + procId + "\")'>" + acr + "</a></td><td class='showStyle'><a href='javascript:showCTDIDetails(\"" + procId + "\")'>details</a></td><td class='showStyle' title='edit'><a href=\"javascript:selectProcedureById('" + procId + "');\"><img alt='edit' border='0' src='editicon.png' width='19' height='19'/></a></td><td class='showStyle' title='delete'><a href=\"javascript:deleteById('" + procId + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
 
 				}
 			}
@@ -2140,7 +958,7 @@ function selectProcedures() {
 				var accu="";
 				var procId = selectProcId;
 				var time = new Date().getTime();
-				//$("#procedureListBody").append("<tr id = '" + time + "'  class='codelist'><td class='showStyle'>" + code + "</td><td class='showStyle'>" + desp + "</td><td class='showStyle'>" + acr + "</td><td class='showStyle'><a href='javascript:showDetails(\"" + time + "\")'>details</a></td><td class='showStyle'>" + accu + "</td><td class='showStyle'><a href='javascript:showCTDIDetails(\"" + time + "\")'>details</a></td><td class='showStyle'><a href=\"javascript:deleteById('" + time + "');\"><img alt='delete' border='0' src='img/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+				//$("#procedureListBody").append("<tr id = '" + time + "'  class='codelist'><td class='showStyle'>" + code + "</td><td class='showStyle'>" + desp + "</td><td class='showStyle'>" + acr + "</td><td class='showStyle'><a href='javascript:showDetails(\"" + time + "\")'>details</a></td><td class='showStyle'>" + accu + "</td><td class='showStyle'><a href='javascript:showCTDIDetails(\"" + time + "\")'>details</a></td><td class='showStyle'><a href=\"javascript:deleteById('" + time + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
 				var select = $(".codehovered");
 				if(select.length!=0){
 					var trElement = select.get(0);
@@ -2152,7 +970,7 @@ function selectProcedures() {
 					$("#ARGUMENTATIONHIDDEN").append("<input type='hidden' id='" + procId + "bodyParthidden' value='" + procedureBody + "'>");
 					$("#ARGUMENTATIONHIDDEN").append("<input type='hidden' id='" + procId + "hidden' value=''>");
 
-					$("#procedureListBody").append("<tr id = '" + procId + "'  class='codelist'><td class='showStyle'>CPT-" + code + "</td><td class='showStyle'>" + desp + "</td><td class='showStyle'><a href='javascript:showDetails(\"" + procId + "\")'>" + acr + "</a></td><td class='showStyle'><a href='javascript:showCTDIDetails(\"" + procId + "\")'>details</a></td><td class='showStyle' title='edit'><a href=\"javascript:selectProcedureById('" + procId + "');\"><img alt='edit' border='0' src='img/editicon.png' width='19' height='19'/></a></td><td class='showStyle' title='delete'><a href=\"javascript:deleteById('" + procId + "');\"><img alt='delete' border='0' src='img/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+					$("#procedureListBody").append("<tr id = '" + procId + "'  class='codelist'><td class='showStyle'>CPT-" + code + "</td><td class='showStyle'>" + desp + "</td><td class='showStyle'><a href='javascript:showDetails(\"" + procId + "\")'>" + acr + "</a></td><td class='showStyle'><a href='javascript:showCTDIDetails(\"" + procId + "\")'>details</a></td><td class='showStyle' title='edit'><a href=\"javascript:selectProcedureById('" + procId + "');\"><img alt='edit' border='0' src='images/editicon.png' width='19' height='19'/></a></td><td class='showStyle' title='delete'><a href=\"javascript:deleteById('" + procId + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
 
 				}
 			}
@@ -2200,10 +1018,80 @@ function selectIndications()
 		}
 		else{
 			//alert ("selectPathologyId: "+selectPathologyId);
-			$("#TINDICATION tbody").append("<tr id='" + selectPathologyId+"-"+time + "' class='codelist'><td class='showStyle'>" + selectAnatomyId + "-" + selectAnatomy + "</td><td class='showStyle'>" + selectPathology + "</td><td class='showStyle'><a href=\"javascript:selectById('" + selectPathologyId+"-"+time + "');\"><img alt='edit' border='0' src='img/editicon.png' width='19' height='19'/></a></td><td class='showStyle'><a href=\"javascript:deleteById('" + selectPathologyId+"-"+time + "');\"><img alt='delete' border='0' src='img/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+			$("#TINDICATION tbody").append("<tr id='" + selectPathologyId+"-"+time + "' class='codelist'><td class='showStyle'>" + selectAnatomyId + "-" + selectAnatomy + "</td><td class='showStyle'>" + selectPathology + "</td><td class='showStyle'><a href=\"javascript:selectById('" + selectPathologyId+"-"+time + "');\"><img alt='edit' border='0' src='images/editicon.png' width='19' height='19'/></a></td><td class='showStyle'><a href=\"javascript:deleteById('" + selectPathologyId+"-"+time + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
 		}
 	
 }
+
+function expandTree(container, type)
+{
+		alert ("expand tree: " + container + ", type = " + type);
+		
+		var children = $("li", container).find(".selectColor");
+		if(children.length == 0){
+			$(container + " .selectColor").each(function(){
+				$(this).removeClass("selectColor");
+			});
+
+			$(this).addClass("selectColor");
+			selectTimeForAcr=new Date().getTime();
+			var bodyId = this.id.substring(0, this.id.length-2);
+			loadPropertyTree("#PROPERTY", this.childNodes[1].nodeValue, bodyId);
+					
+			// aviod the children select start
+			$(this).removeClass("unselectColor");
+			var ulChildren = $(this).children("ul");
+			if(ulChildren.length != 0){
+				liChildren = $(ulChildren).children("li");
+				if(liChildren.length != 0){
+					for(var i = 0 ; i < liChildren.length;i++){
+						$(liChildren).addClass("unselectColor");
+					}	
+				}
+			}// aviod the children select end
+		
+			selectAnatomyId = this.lastChild.id;
+			selectAnatomy = this.childNodes[1].nodeValue;
+		
+		} else{
+			var flg = 0;
+			$("#BROSWER .selectColor").each(function(){
+				var time = new Date().getTime();
+				if(time-selectTimeForAcr >= 1000){
+					flg = 1;
+					$(this).removeClass("selectColor");
+				}
+			});
+			
+			if(flg == 1){
+			// aviod the children select start
+				$(this).removeClass("unselectColor");
+				var ulChildren = $(this).children("ul");
+				if(ulChildren.length != 0){
+					liChildren = $(ulChildren).children("li");
+					if(liChildren.length != 0){
+						for(var i = 0 ; i < liChildren.length;i++){
+							$(liChildren).addClass("unselectColor");
+						}
+					}
+				}
+				var bodyId = this.id.substring(0, this.id.length-2);
+				loadPropertyTree("#PROPERTY", this.childNodes[1].nodeValue, bodyId);
+				
+				// aviod the children select end
+				$(this).addClass("selectColor");
+				selectTimeForAcr = new Date().getTime();
+				selectAnatomyId = this.lastChild.id;
+				selectAnatomy = this.childNodes[1].nodeValue;
+				flg = 0;
+			}
+		}
+	
+    
+}
+
+
+
 
 function selectDemographicCriteria(container, category, value) 
 {   
@@ -2224,7 +1112,7 @@ function selectDemographicCriteria(container, category, value)
   var entry = "<tr id = '" + id + "'  class='codelist'>" +
               "<td class='showStyle'>" + category + "</td>" +
               " <td class='showStyle'>" + value + "</td>" +
-              " <td class='showStyle' title='delete'><a href=\"javascript:deleteById('" + id + "');\"><img alt='delete' border='0' src='img/DeleteIcon.png' width='19' height='19'/></a></td> " + 
+              " <td class='showStyle' title='delete'><a href=\"javascript:deleteById('" + id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td> " + 
               " </tr>";
            
   $(container).append(entry);
@@ -2319,22 +1207,22 @@ $(function() {
 		}
 	});
 
+	$("#BROSWER li").click(function(){
+		alert ("clicking drug tree");
+		expandTree("#BROSWER", "subClass");
+	});
+	
+	$("#PROPERTY li").click(function(){
+		expandTree("#PROPERTY", "subProperty");
+	});
+
 	
 	$("#QUERYEXEC").click(function(){
 		window.open("patientList.html");	
 	});
-	
-	$("#cancel").click(function(){
-		$("#SELECTEDP").get(0).value="";
-		$("#codeListBody").empty();
-		$("#procedureListBody").empty();
-		$("#TPOLICY tbody").empty();
-		$("#indicationINPUT").val("");
-		toggleDetailContainer("#DEFAULTCONT");
-	});
-	
+
 	$("#DisplayAllDrug").click(function(){
-		searchDrugTree("#BROSWER", "IngredientDrug");	
+		searchDrugTree("#BROSWER", "General drug type");	
 	})
 	
 	$("#RESET").click(function(){
