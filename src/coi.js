@@ -1,45 +1,6 @@
-var blockUI = false;
+var blockUI = true;
 var inclusionFlag = false;
-var defaultNameSpace = "http://www.w3.org/2002/07/owl#";
 
-
-
-var dataNode;
-var patientIdList = [];
-var patientNamelist = [];
-var patientBirthdayList = [];
-var patientGenderList = [];
-var selectAnatomy="&nbsp;";
-var selectAnatomyId="&nbsp;";
-var selectPathology="&nbsp;";
-var selectPathologyId="&nbsp;";
-var procedureCode="";
-var procedureDesp="";
-var procedureBody="";
-var selectTimeForAcr="";
-var selectTimeForPath="";
-var selectTimeForProc="";
-var globalProcTypes, tempProcTypes;
-var globalProcID;
-var globalProcBodyParts, tempProcBodyParts;
-var globalProcNames;
-var globalProcCPTs;
-var globalProcRadIDs;
-var globalSelectedBodyParts;
-var ProcedureTableLoadFlag = 0;
-var procedureTreeViewLoadFlag = 0;
-var loadPathologyTreeFlg = 0;
-var loadAnatomyTreeFlg = 0;
-var selectProcId="";
-var idForAnatomyTree;
-var tempProcTypesForTreeView;
-var unBlockUIFlg = "0";
-var treeLoadFlag = "0";
-var searchAnatomy = "";
-
-
-
-	
 /* Show/hide the wait cursor 
  * or show a wait message */
 function showWait(wait) {
@@ -214,16 +175,29 @@ function loadPropertyTree(container, value, id) {
 
 
 
-//get tree node function value is the node text value
-function getTreeData(node, value){
+//get tree sub-nodes 
+function getTreeData(node, value, type){
    
-   alert ("get sub tree data: node" + node +", value ="+value );
-  	
+   	alert ("get sub tree data: node" + node +", value ="+value + "type = " + type );
     showWait(true);
     
-  	process("http://localhost/doSubName?drugClass="+encodeURIComponent(value), function(n3) {
-        
-		try{			
+    var querystr = "";
+    switch (type) 
+    {
+     	case "subPropertyOf": 
+     		querystr += "http://localhost/doSubProperty?propertyName=D:"+encodeURIComponent(value);
+     		break;
+    	case "subClassOf": 
+    		querystr += "http://localhost/doSubName?drugClass="+encodeURIComponent(value);
+    		break;
+    	default:
+    		alert ("not a valid data type for view view");
+    		return false;	
+    }
+    
+    
+  	process(querystr, function(n3) {
+ 		try{			
 			var triples = getStatements(n3, "rdfs:label");
 			//alert ("subitems no "+subItemsName.length)
 			
@@ -414,13 +388,6 @@ function toggleSectionContainer(name) {
 	$(name).attr("class","selected");
 }
 
-function doSearch(){
-	var id = $("#id").val();
-	var birthday = $("#birthday").val();
-	var name = $("#name").val();
-	$("#SPLIST tbody").empty();
-	SearchPatientList(id, name, birthday);
-}
 
 function selectById(id){
 	toggleDetailContainer("#INDICATION");
@@ -454,7 +421,7 @@ function searchDrugTree(container, nodeValue){
 			var foundTerms = processTerms(n3);
  			if (foundTerms.length > 0)
 			{
- 				displayTree(container, foundTerms);
+ 				displayTree(container, foundTerms, "subClassOf");
  			} else  {
  				alert ("no terms found");
  			}
@@ -489,13 +456,17 @@ function processTerms(n3)
 	return foundTermsList;
 }
 
-function displayTree(container,nodeValue)
+function displayTree(container,nodeValue, type)
 {
 	$(container).empty();	
 	
 	for(var i = 0;i < nodeValue.length; i++){		
 		$(container).append(getRootNode(nodeValue[i][1], nodeValue[i][0]));
 	}
+	
+	$("li", container).click(function(){
+		selectTreeItem(container, type);
+	});
 	
 	getTreeView(container);	
 }
@@ -529,7 +500,7 @@ function appendTree(node){
 	alert ("inside appendTree: " +nodeElement.id);
 	
 	if(!nodeElement.hasChildNodes()){
-		getTreeData(node, nodeElement.id);
+		getTreeData(node, nodeElement.id, "subClassOf");
 	}
 }
 
@@ -1023,9 +994,9 @@ function selectIndications()
 	
 }
 
-function expandTree(container, type)
+function selectTreeItem(container, type)
 {
-		alert ("expand tree: " + container + ", type = " + type);
+		alert ("select tree item: " + container + ", type = " + type);
 		
 		var children = $("li", container).find(".selectColor");
 		if(children.length == 0){
@@ -1207,13 +1178,8 @@ $(function() {
 		}
 	});
 
-	$("#BROSWER li").click(function(){
-		alert ("clicking drug tree");
-		expandTree("#BROSWER", "subClass");
-	});
-	
 	$("#PROPERTY li").click(function(){
-		expandTree("#PROPERTY", "subProperty");
+		selectTreeItem("#PROPERTY", "subProperty");
 	});
 
 	
