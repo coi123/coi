@@ -160,6 +160,23 @@
 		overflow: auto;
 	
 	}
+	.searchResult {
+		position: absolute; 
+		padding-left: 1em;
+		top: 50px;
+		left: 0px;
+		height:450px;
+		width: 995px;
+		background-color: RGB(219, 219, 219);
+		border-color: RGB(132,195,156); 
+  		border-style: solid; 
+  		border-right-style: none;
+  		border-width: 1px;
+		text-align: left;
+		outline-width: 5px;
+		overflow: auto;
+	
+	}
 	
 
 	.footer {

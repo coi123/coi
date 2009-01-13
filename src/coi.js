@@ -1,5 +1,9 @@
 var blockUI = true;
 var inclusionFlag = false;
+var selectId="&nbsp;"
+var selectDrugName="&nbsp;"
+var selectProperty="&nbsp;";
+var childSelectDrugName;
 
 /* Show/hide the wait cursor 
  * or show a wait message */
@@ -62,10 +66,7 @@ function doSelect(e)
 
 /* Extract the fragment id from the given URI */
 function extractFragmentId(uri) {
-	var i = uri.indexOf("#")
-    if (i < 0) {
-    	i = uri.indexOf("/");
-    }
+	var i = uri.indexOf(":")
     if (i <0) {
     	return ""
     }
@@ -205,8 +206,8 @@ function getTreeData(node, value, type){
 				var drugList = new Array();
 				for (var i = 0; i < triples.length; i++)
 					{
-						var nodeID = extractFragmentId(getObject(triples[i]));
-						var nodeValue = extractFragmentId(getObject(triples[i]));                
+						var nodeID = extractFragmentId(getSubject(triples[i]));
+						var nodeValue = getObject(triples[i]);                
 						node.append("<li id='" + nodeID + "li' class='closed unselectColor'>" + nodeValue + getTempNode(nodeID) + "</li>");
 					}
 			}
@@ -214,7 +215,6 @@ function getTreeData(node, value, type){
 				alert ("There is no sub-items for this node")
 			}	
 			
-			alert (node.id);
 			getTreeView(node);
 			showWait(false);
 			
@@ -238,21 +238,20 @@ function getTreeData(node, value, type){
 							}
 						}
 						var bodyId = this.id.substring(0, this.id.length-2);
-						loadPathologyTree("#PROPERTY", this.childNodes[1].nodeValue, bodyId);
 						// aviod the children select end
 						$(this).addClass("selectColor");
 						selectTimeForAcr = new Date().getTime();
 						if(this.lastChild.id != undefined){
-							selectAnatomyId = this.lastChild.id;
+							selectId = this.lastChild.id;
 						}
 						else{
-							selectAnatomyId = this.id;
+							selectId = this.id;
 						}
 						if(this.childNodes.length > 1){
-							selectAnatomy = this.childNodes[1].nodeValue;
+							selectDrugName = this.childNodes[1].nodeValue;
 						}
 						else{
-							selectAnatomy = this.childNodes[0].nodeValue;
+							selectDrugName = this.childNodes[0].nodeValue;
 						}
 						
 					}
@@ -278,21 +277,20 @@ function getTreeData(node, value, type){
 								}
 							}
 							var bodyId = this.id.substring(0, this.id.length-2);
-							loadPathologyTree("#PROPERTY", this.childNodes[1].nodeValue, bodyId);
 							// aviod the children select end
 							$(this).addClass("selectColor");
 							selectTimeForAcr = new Date().getTime();
 							if(this.lastChild.id != undefined){
-								selectAnatomyId = this.lastChild.id;
+								selectId = this.lastChild.id;
 							}
 							else{
-								selectAnatomyId = this.id;
+								selectId = this.id;
 							}
 							if(this.childNodes.length > 1){
-								selectAnatomy = this.childNodes[1].nodeValue;
+								selectDrugName = this.childNodes[1].nodeValue;
 							}
 							else{
-								selectAnatomy = this.childNodes[0].nodeValue;
+								selectDrugName = this.childNodes[0].nodeValue;
 							}
 							flg = 0;
 						}
@@ -408,7 +406,7 @@ function deleteById(id){
 }
 
 function searchDrugTree(container, nodeValue){
-    
+    $("#searchValue").text("");
     if (nodeValue == "") {
     	alert ("please entry the search keyword");
     	return false;
@@ -422,6 +420,39 @@ function searchDrugTree(container, nodeValue){
  			if (foundTerms.length > 0)
 			{
  				displayTree(container, foundTerms, "subClassOf");
+ 			} else  {
+ 				alert ("no terms found");
+ 			}
+ 		});
+ 	} 
+ 	catch (e) {
+ 		alert("ERROR [suggest]:" + e.toString());
+		showWait(false);
+	}
+ 	
+}
+
+function searchDrugList(container, nodeValue){
+    
+    if (nodeValue == "") {
+    	alert ("please entry the search keyword");
+    	return false;
+    }
+	showWait(true);
+	container.empty();
+	try {	
+  		process("http://localhost/doNames?drugName="+encodeURIComponent(nodeValue), function(n3) {  		
+
+			var foundTerms = processTerms(n3);
+ 			if (foundTerms.length > 0)
+			{
+ 				for(var i =0;i < foundTerms.length;i++){
+ 					//var drugId = foundTerms[i][0];
+ 					var drugName = foundTerms[i][1];
+ 					container.append("<option value='" + drugName + "'>" + drugName + "</option>").attr("selected", false);
+ 					$("#drugSelectBox").get(0).childNodes[i].selected = false;
+ 				}
+ 				
  			} else  {
  				alert ("no terms found");
  			}
@@ -967,36 +998,22 @@ function getSelectionIds(container, element) {
 function selectIndications()
 {
 		var time = new Date().getTime();
-		var select = $(".codehovered");
-		if(select.length!=0){
-			var trElement = select.get(0);
-			if(selectAnatomyId == "&nbsp;" && selectAnatomy == "&nbsp;"){
-				trElement.childNodes[0].firstChild.nodeValue=" ";
-			}
-			else{
-				trElement.childNodes[0].firstChild.nodeValue=selectAnatomyId + "-" + selectAnatomy;
-			}
-			if(selectPathology == "&nbsp;"){
-				trElement.childNodes[1].firstChild.nodeValue=" ";
-			}
-			else{
-				trElement.childNodes[1].firstChild.nodeValue=selectPathology;
-				trElement.childNodes[1].id=selectPathologyId;
-			}
-			trElement.childNodes[2].firstChild.href="javascript:selectById('" + selectPathologyId + "-" +time + "')";;
-			trElement.childNodes[3].firstChild.href="javascript:deleteById('" + selectPathologyId + "-" +time + "')";;
-			trElement.id=selectPathologyId+"-"+time;
+		var select;
+		var selectPlace = $(".selected").get(0);
+		if(selectPlace.id == "INCLUSIONGRP"){
+			select = $("#inListBody");
 		}
 		else{
-			//alert ("selectPathologyId: "+selectPathologyId);
-			$("#TINDICATION tbody").append("<tr id='" + selectPathologyId+"-"+time + "' class='codelist'><td class='showStyle'>" + selectAnatomyId + "-" + selectAnatomy + "</td><td class='showStyle'>" + selectPathology + "</td><td class='showStyle'><a href=\"javascript:selectById('" + selectPathologyId+"-"+time + "');\"><img alt='edit' border='0' src='images/editicon.png' width='19' height='19'/></a></td><td class='showStyle'><a href=\"javascript:deleteById('" + selectPathologyId+"-"+time + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+			select = $("#exListBody");
 		}
+		
+		select.append("<tr id='"+time + "' class='codelist'><td class='showStyle'>" + selectDrugName + "</td><td class='showStyle'>" + selectProperty + "</td><td class='showStyle'><a href=\"javascript:deleteById('" + time + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
 	
 }
 
 function selectTreeItem(container, type)
 {
-		alert ("select tree item: " + container + ", type = " + type);
+		//alert ("select tree item: " + container + ", type = " + type);
 		
 		var children = $("li", container).find(".selectColor");
 		if(children.length == 0){
@@ -1021,8 +1038,8 @@ function selectTreeItem(container, type)
 				}
 			}// aviod the children select end
 		
-			selectAnatomyId = this.lastChild.id;
-			selectAnatomy = this.childNodes[1].nodeValue;
+			selectId = this.lastChild.id;
+			selectDrugName = this.childNodes[1].nodeValue;
 		
 		} else{
 			var flg = 0;
@@ -1052,8 +1069,8 @@ function selectTreeItem(container, type)
 				// aviod the children select end
 				$(this).addClass("selectColor");
 				selectTimeForAcr = new Date().getTime();
-				selectAnatomyId = this.lastChild.id;
-				selectAnatomy = this.childNodes[1].nodeValue;
+				selectId = this.lastChild.id;
+				selectDrugName = this.childNodes[1].nodeValue;
 				flg = 0;
 			}
 		}
@@ -1132,6 +1149,16 @@ function isNumeric(form_value)
         return true; 
 } 
 
+function loadDrugTreeData() 
+{
+    // pre-load drug ontology
+    
+    
+
+
+}
+
+
 
 /* Bootstrap */
 $(function() {
@@ -1149,9 +1176,28 @@ $(function() {
 		clearCriteriaContainer();	
 
 	});
+	$("#APPLYBUTTON").click(function() {			
+		selectIndications();
+	});
+	
+	$("#drugListSearch").click(function(){
+		searchDrugList($("#drugSelectBox"), $("#drugName").val());	
+	});
 	
 	$("#drugSearch").click(function(){
-		searchDrugTree("#BROSWER", $("#drugName").val());			
+		//searchDrugTree("#BROSWER", $("#drugName").val());
+		window.open("search.html","newWindow" ,"height=510, width=500, top=400, left=500,toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no");		
+	});
+	
+	$("#conformSelectValue").click(function(){
+		var selectBox = $("#drugSelectBox").get(0);
+		if(selectBox.value == ""){
+			alert("please select the drug!");
+		}
+		else{
+			opener.location='javascript:searchDrugTree("#BROSWER","' + selectBox.value+ '");';
+			window.close();
+		}
 	});
 	
 	$("#CLEAR").click(function(){
@@ -1200,6 +1246,7 @@ $(function() {
 	toggleDetailContainer("#DEFAULTCONT");
 	inclusionFlag = false;
 	clearCriteriaContainer();	
+	loadDrugTreeData();
 		
 });
 

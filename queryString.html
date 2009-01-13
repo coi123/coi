@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="PRAGMA" content="NO-CACHE" > 
+		<meta http-equiv="CACHE-CONTROL" content="NO-CACHE" > 
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF8"> 
+      	<meta name="keywords" content="COI Demo"> 
+        <title>COI PList</title>
+
+        <link rel="stylesheet" href="coi.css" type="text/css" >
+        <link rel="stylesheet" href="treeview.css" type="text/css" > 
+		
+ 	</head>
+    
+    <body>    
+ 
+    
+    <DIV class="second">
+		Clinical Observations Interoperability Demo : SPARQL Query String
+	</DIV>
+	
+	
+		<quote>
+		
+		SELECT ?patient
+        WHERE {
+                ?patient rdf:type sdtm:Patient .
+                ?patient sdtm:hasAge ?age .
+                 FILTER ( ?age >= 18 && ?age < 75 ) 
+                ?patient sdtm:gender :Female .
+                ?patient sdtm:gender :Male .
+                ?x sdtm:subject ?patient . 
+		        ?x1 sdtm:subject ?patient .
+                ?x1 rdf:type sdtm:Metformin .
+                ?x1 rdf:type sdtm:Warfarin .
+                ?x1 sdtm:dosePerAdministration ?doseX1 .
+                ?x1 sdtm:maxDosage ?maxDose .
+                ?x1 sdtm:endDateTime ?dateTimeX1 .
+		}
+		</quotee>
+	 
+	
+    </body>
+     
+</html>
