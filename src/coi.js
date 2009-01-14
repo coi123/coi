@@ -404,7 +404,13 @@ function selectById(id){
 function deleteById(id){
 	$("#"+id).remove();
 }
-
+function searchDrugTreeForHighlight(container, nodeValue){
+	$(container+" .selectColor").each(function(){
+		$(this).removeClass("selectColor");
+	});
+	$("#"+nodeValue+"li").removeClass("unselectColor");
+	$("#"+nodeValue+"li").addClass("selectColor");
+}
 function searchDrugTree(container, nodeValue){
     $("#searchValue").text("");
     if (nodeValue == "") {
@@ -447,9 +453,9 @@ function searchDrugList(container, nodeValue){
  			if (foundTerms.length > 0)
 			{
  				for(var i =0;i < foundTerms.length;i++){
- 					//var drugId = foundTerms[i][0];
+ 					var drugId = foundTerms[i][0];
  					var drugName = foundTerms[i][1];
- 					container.append("<option value='" + drugName + "'>" + drugName + "</option>").attr("selected", false);
+ 					container.append("<option value='" + drugId + "'>" + drugName + "</option>");
  					$("#drugSelectBox").get(0).childNodes[i].selected = false;
  				}
  				
@@ -1192,10 +1198,10 @@ $(function() {
 	$("#conformSelectValue").click(function(){
 		var selectBox = $("#drugSelectBox").get(0);
 		if(selectBox.value == ""){
-			alert("please select the drug!");
+			alert("please select the item!");
 		}
 		else{
-			opener.location='javascript:searchDrugTree("#BROSWER","' + selectBox.value+ '");';
+			opener.location='javascript:searchDrugTreeForHighlight("#BROSWER","' + selectBox.value+ '");';
 			window.close();
 		}
 	});
