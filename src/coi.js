@@ -1,3 +1,5 @@
+var server = location.protocol + "//" + location.hostname + ":" + location.port;
+
 var blockUI = true;
 var inclusionFlag = false;
 var selectId="&nbsp;"
@@ -185,10 +187,10 @@ function getTreeData(node, value, type){
     switch (type) 
     {
      	case "subPropertyOf": 
-     		querystr += "http://localhost/doSubProperty?propertyName=D:"+encodeURIComponent(value);
+     		querystr += server + "/doSubProperty?propertyName=D:"+encodeURIComponent(value);
      		break;
     	case "subClassOf": 
-    		querystr += "http://localhost/doSubName?drugClass="+encodeURIComponent(value);
+    		querystr += server + "/doSubName?drugClass="+encodeURIComponent(value);
     		break;
     	default:
     		alert ("not a valid data type for view view");
@@ -401,7 +403,7 @@ function searchDrugTree(container, nodeValue){
 	showWait(true);
 	
 	try {	
-  		process("http://localhost/doNames?drugName="+encodeURIComponent(nodeValue), function(n3) {  		
+  		process(server + "/doNames?drugName="+encodeURIComponent(nodeValue), function(n3) {  		
 
 			var foundTerms = processTerms(n3);
  			if (foundTerms.length > 0)
@@ -546,8 +548,8 @@ function searchIndicationTree(container, nodeValue){
  			       	"{?A 	:Preferred_Name "+ nodeValue + ".}\n";
     //alert (pquery);
     
-    pquery = "http://localhost/.context" + encodeURIComponent(" " + pquery);				
-  	processRDF("http://localhost/radlexBodyParts?query="+encodeURIComponent(pquery), function(rdfXml) {
+    pquery = server + "/.context" + encodeURIComponent(" " + pquery);				
+  	processRDF(server + "/radlexBodyParts?query="+encodeURIComponent(pquery), function(rdfXml) {
   		var parser = getRDFParser(rdfXml);
   		var foundTerms = getSubjectObjects(parser,"http://bioontology.org/projects/ontologies/radlex/radlexOwlDlComponent#Preferred_Name");
 		
@@ -806,7 +808,7 @@ function getAllIndicationTreeData(node, ulId){
 	
 	// get all indication by body parts
 	
-  	processRDF("http://localhost/acrListByBodyPart?", function(rdfXml) {	       
+  	processRDF(server + "/acrListByBodyPart?", function(rdfXml) {	       
        var indUniqueBodyParts = getObjects(getRDFParser(rdfXml),"http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#applyToAnatomicLocation");
 	   
 	   var RIDs = [];
