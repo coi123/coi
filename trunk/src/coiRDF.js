@@ -139,7 +139,7 @@ function itemHasChild(uri) {
 /* Transform the N3 retrieved from the URL to RDF/XML and process it in the callback function. */
 /**function processRDF(url, callback) {
 	try {
-		$.post("/JENA2", { URL: url, CONVERSION: "N3 RDF/XML" }, function(rdfXml) {
+		$.post(server + "/JENA2", { URL: url, CONVERSION: "N3 RDF/XML" }, function(rdfXml) {
 			callback(rdfXml);
 		});
 	} catch (e) {
@@ -151,7 +151,7 @@ function itemHasChild(uri) {
 //sync execution of callback
 function processRDF(url, callback) {
 	try {
-		$.ajaxSync({url: "/JENA2", type: "POST", data: { URL: url, CONVERSION: "N3 RDF/XML" }, success: function(rdfXml) {
+		$.ajaxSync({url: server + "/JENA2", type: "POST", data: { URL: url, CONVERSION: "N3 RDF/XML" }, success: function(rdfXml) {
 			try {
 				callback(rdfXml);
 			} catch (e) {

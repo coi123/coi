@@ -83,7 +83,7 @@ function filterPrefix(pname) {
 /* Transform the N3 retrieved from the URL to RDF/XML and process it in the callback function. */
 function processRDF(url, callback) {
 	try {
-		$.post("/JENA2", { URL: url, CONVERSION: "N3 RDF/XML" }, function(rdfXml) {
+		$.post(server + "/JENA2", { URL: url, CONVERSION: "N3 RDF/XML" }, function(rdfXml) {
 			callback(rdfXml);
 		});
 	} catch (e) {
@@ -94,7 +94,7 @@ function processRDF(url, callback) {
 // direct processing the N3 string using pattern matching
 function process(url, callback) {
 	try {
-		$.ajaxSync({url: "/POST", type: "POST", data: { URL: url }, success: function(n3) {
+		$.ajaxSync({url: server + "/POST", type: "POST", data: { URL: url }, success: function(n3) {
 			try {
 				callback(n3);
 			} catch (e) {
