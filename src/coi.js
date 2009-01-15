@@ -1014,10 +1014,10 @@ function selectIndications()
 		}
 		var liElement = $("#BROSWER .selectColor").find("li");
 		if(liElement.length != 0){
-			select.append("<tr id='"+time + "' class='codelist'><td class='showStyle'>" + selectDrugName + "<a onclick='openDetailInfo(\"" + selectDrug.id + "\")' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td class='showStyle'>" + selectProperty + "</td><td class='showStyle'><a href=\"javascript:deleteById('" + time + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+			select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td class='showStyle'>" + selectDrugName + "<a onclick='openDetailInfo(\"" + selectDrug.id + "\")' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td class='showStyle'>" + selectProperty + "</td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
 		}
 		else{
-			select.append("<tr id='"+time + "' class='codelist'><td class='showStyle'>" + selectDrugName + "</td><td class='showStyle'>" + selectProperty + "</td><td class='showStyle'><a href=\"javascript:deleteById('" + time + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+			select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td class='showStyle'>" + selectDrugName + "</td><td class='showStyle'>" + selectProperty + "</td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
 		}
 }
 function openDetailInfo(id){
@@ -1191,6 +1191,10 @@ $(function() {
 	});
 	$("#APPLYBUTTON").click(function() {			
 		selectIndications();
+	});
+	
+	$("#querysql").click(function(){
+		window.open("queryString.html","newWindow" ,"height=510, width=800, top=400, left=500,toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no");
 	});
 	
 	$("#drugListSearch").click(function(){
