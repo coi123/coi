@@ -1214,7 +1214,6 @@ $(function() {
 		else{
 			var divElement = window.opener.document.getElementById("BROSWER");
   			var liElement = $(divElement).find("li");
-  			
 			$(liElement).each(
 	  			function(){
 	  				$(this).removeClass("selectColor");
@@ -1229,6 +1228,20 @@ $(function() {
 	  				//while($(this).get(0).offsetTop > 200){
 	  				//	divElement.doScroll();
 	  				//}
+	  				var parentUL = $(this).get(0).parentNode;
+	  				var parentLi;
+	  				//alert(parent);
+	  				while((parentUL.tagName == "UL") && (parentUL.style.display="none")){
+	  					parentUL.style.display="block";
+	  					parentLi = parentUL.parentNode;
+	  					if(parentLi.tagName == "LI"){
+	  						$(parentLi).removeClass("expandable");
+	  						$(parentLi).addClass("collapsable");
+	  					}
+	  					parentUL = parentLi.parentNode;
+	  				}
+	  				$(parentLi).removeClass("expandable");
+	  				$(parentLi).addClass("collapsable");
 	  				var selectedId = window.opener.document.getElementById(selectBox.value);
 	  				var selectedValue = $(selectedId).get(0).textContent;
 	  				window.opener.document.selectDrugName=selectedValue;
