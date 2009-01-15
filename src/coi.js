@@ -1005,9 +1005,23 @@ function selectIndications()
 			select = $("#exListBody");
 		}
 		var selectDrug = $("#BROSWER .selectColor").get(0);
-		var selectDrugName = selectDrug.textContent;
-		select.append("<tr id='"+time + "' class='codelist'><td class='showStyle'>" + selectDrugName + "</td><td class='showStyle'>" + selectProperty + "</td><td class='showStyle'><a href=\"javascript:deleteById('" + time + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
-	
+		var selectDrugName;
+		if(selectDrug.childNodes[1] != undefined){
+			selectDrugName = selectDrug.childNodes[1].nodeValue;
+		}
+		else{
+			selectDrugName = selectDrug.textContent;
+		}
+		var liElement = $("#BROSWER .selectColor").find("li");
+		if(liElement.length != 0){
+			select.append("<tr id='"+time + "' class='codelist'><td class='showStyle'>" + selectDrugName + "<a onclick='openDetailInfo(\"" + selectDrug.id + "\")' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td class='showStyle'>" + selectProperty + "</td><td class='showStyle'><a href=\"javascript:deleteById('" + time + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+		}
+		else{
+			select.append("<tr id='"+time + "' class='codelist'><td class='showStyle'>" + selectDrugName + "</td><td class='showStyle'>" + selectProperty + "</td><td class='showStyle'><a href=\"javascript:deleteById('" + time + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+		}
+}
+function openDetailInfo(id){
+	window.open("drugList.html?id="+id,"newWindow" ,"height=510, width=500, top=400, left=500,toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no");
 }
 
 function selectTreeItem(container, type)
@@ -1222,6 +1236,7 @@ $(function() {
 			window.close();
 		}
 	});
+	
 	
 	$("#CLEAR").click(function(){
 		clearCriteriaContainer();	

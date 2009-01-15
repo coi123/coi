@@ -15,30 +15,29 @@
     <body>    
  
     
-    <DIV class="second">
-		Clinical Observations Interoperability Demo : SPARQL Query String
-	</DIV>
-	
-	
-		<quote>
+    	<DIV class="second">
+			Clinical Observations Interoperability Demo : SPARQL Query String
+		</DIV>
 		
-		SELECT ?patient
-        WHERE {
-                ?patient rdf:type sdtm:Patient .
-                ?patient sdtm:hasAge ?age .
-                 FILTER ( ?age >= 18 && ?age < 75 ) 
-                ?patient sdtm:gender :Female .
-                ?patient sdtm:gender :Male .
-                ?x sdtm:subject ?patient . 
-		        ?x1 sdtm:subject ?patient .
-                ?x1 rdf:type sdtm:Metformin .
-                ?x1 rdf:type sdtm:Warfarin .
-                ?x1 sdtm:dosePerAdministration ?doseX1 .
-                ?x1 sdtm:maxDosage ?maxDose .
-                ?x1 sdtm:endDateTime ?dateTimeX1 .
-		}
-		</quotee>
-	 
+		<DIV class="presql">
+		<pre>
+	SELECT ?patient
+	WHERE {
+		?patient rdf:type sdtm:Patient .
+		?patient sdtm:hasAge ?age .
+		FILTER ( ?age >= 18 && ?age < 75 ) 
+		?patient sdtm:gender :Female .
+		?patient sdtm:gender :Male .
+		?x sdtm:subject ?patient . 
+		?x1 sdtm:subject ?patient .
+		?x1 rdf:type sdtm:Metformin .
+		?x1 rdf:type sdtm:Warfarin .
+		?x1 sdtm:dosePerAdministration ?doseX1 .
+		?x1 sdtm:maxDosage ?maxDose .
+		?x1 sdtm:endDateTime ?dateTimeX1 .
+	}
+		</pre>
+	 	</DIV>
 	
     </body>
      
