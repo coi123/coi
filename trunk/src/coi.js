@@ -1021,7 +1021,7 @@ function selectIndications()
 		}
 }
 function openDetailInfo(id){
-	window.open("drugList.html?id="+id,"newWindow" ,"height=510, width=500, top=400, left=500,toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no");
+	window.open("drugList.html?id="+id,"newWindow" ,"height=510, width=500, top=400, left=500,toolbar=no, menubar=no, scrollbars=auto, resizable=no, location=no, status=no");
 }
 
 function selectTreeItem(container, type)
@@ -1280,11 +1280,14 @@ $(function() {
 		clearCriteriaContainer();
 		clearCriteriaList();
 	})
-	
-	toggleDetailContainer("#DEFAULTCONT");
-	inclusionFlag = false;
-	clearCriteriaContainer();	
-	loadDrugTreeData();
+	$(document).ready(
+		function(){
+			toggleDetailContainer("#DEFAULTCONT");
+			inclusionFlag = false;
+			clearCriteriaContainer();	
+			loadDrugTreeData();
+		}
+	);
 		
 });
 
