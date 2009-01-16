@@ -420,68 +420,10 @@ function searchAllDrugTree(container, nodeValue){
     }
 	//showWait(true);
 	
-	try {	
-  		//process(server + "/doSubAll?, function(n3) {  	//now you get all sub tree data	
-			// add by lixiaodong for test
- 			n3="@prefix str: <http://www.w3.org/2000/10/swap/string#>.\n"+
-				"@prefix var: <http://localhost/var#>.\n"+
-				"@prefix q: <http://www.w3.org/2004/ql#>.\n"+
-				"@prefix list: <http://www.w3.org/2000/10/swap/list#>.\n"+
-				"@prefix e: <http://eulersharp.sourceforge.net/2003/03swap/log-rules#>.\n"+
-				"@prefix fn: <http://www.w3.org/2006/xpath-functions#>.\n"+
-				"@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"+
-				"@prefix : <http://www.owl-ontologies.com/DrugOntology.owl#>.\n"+
-				"@prefix nsp0: <http://www.owl-ontologies.com/>.\n"+
-				"@prefix time: <http://www.w3.org/2000/10/swap/time#>.\n"+
-				"@prefix log: <http://www.w3.org/2000/10/swap/log#>.\n"+
-				"@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.\n"+
-				"@prefix n3: <http://www.w3.org/2004/06/rei#>.\n"+
-				"@prefix math: <http://www.w3.org/2000/10/swap/math#>.\n"+
-				"@prefix owl: <http://www.w3.org/2002/07/owl#>.\n"+
-				"@prefix r: <http://www.w3.org/2000/10/swap/reason#>.\n"+
-				"@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n"+
-				":C0001962 rdfs:subClassOf :C1690586.\n"+
-				":C0017951 rdfs:subClassOf :C1690586.\n"+
-				":C0037556 rdfs:subClassOf :C1690586.\n"+
-				":C1563032 rdfs:subClassOf :C1690586.\n"+
-				":C1623735 rdfs:subClassOf :C1690586.\n"+
-				":C0719741 rdfs:subClassOf :C0001962.\n"+
-				":C0032483 rdfs:subClassOf :C0017951.\n"+
-				":C0072225 rdfs:subClassOf :C0017951.\n"+
-				":C0017861 rdfs:subClassOf :C1563032.\n"+
-				":C0028053 rdfs:subClassOf :C1563032.\n"+
-				":C1562418 rdfs:subClassOf :C1563032.\n"+
-				":C0022237 rdfs:subClassOf :C1623735.\n"+
-				":C0001962 :level 1.\n"+
-				":C0017951 :level 1.\n"+
-				":C0037556 :level 1.\n"+
-				":C1563032 :level 1.\n"+
-				":C1623735 :level 1.\n"+
-				":C0719741 :level 2.\n"+
-				":C0032483 :level 2.\n"+
-				":C0072225 :level 2.\n"+
-				":C0017861 :level 2.\n"+
-				":C0028053 :level 2.\n"+
-				":C1562418 :level 2.\n"+
-				":C0022237 :level 2.\n"+
-				":C0001962 rdfs:label \"Ethanol\".\n"+  
-				":C0017951 rdfs:label \"Glycol\".\n"+
-				":C0037556 rdfs:label \"Sodium Tetradecyl Sulfate\".\n"+
-				":C1563032 rdfs:label \"Alcohol derivative\".\n"+
-				":C1623735 rdfs:label \"Alcohol disinfectant\".\n"+
-				":C0719741 rdfs:label \"denatured ethanol\".\n"+
-				":C0032483 rdfs:label \"Polyethylene Glycols\".\n"+
-				":C0072225 rdfs:label \"Propylene glycol\".\n"+
-				":C0017861 rdfs:label \"Glycerol\".\n"+
-				":C0028053 rdfs:label \"Nicotinyl Alcohol\".\n"+
-				":C1562418 rdfs:label \"Alkanol\".\n"+
-				":C0022237 rdfs:label \"Isopropanol\".\n"+
-				":C0991869 rdfs:subClassOf :C0072225.\n"+
-				":C0215278 rdfs:subClassOf :C1562418.\n"+
-				":C0991869 :level 3.\n"+
-				":C0215278 :level 3.\n"+
-				":C0991869 rdfs:label \"PROPYLENE GLYCOL DIACETATE\".\n"+
-				":C0215278 rdfs:label \"policosanol\".\n";
+	try {
+  		//process(server + "/doSubAll?a=1", function(n3) {
+  			//now you get all sub tree data
+  			var n3="";
 			var drugInfoArray = getAllTreeInfo(n3);
 			displayAllTree("#BROSWER", drugInfoArray);
 			//var foundTerms = processTerms(n3);
@@ -491,13 +433,15 @@ function searchAllDrugTree(container, nodeValue){
  			//} else  {
  			//	alert ("no terms found");
  			//}
+ 			//showWait(false);
  		//});
  	} 
  	catch (e) {
- 		//alert("ERROR [suggest]:" + e.toString());
+ 		alert("ERROR [suggest]:" + e.toString());
 		//showWait(false);
 		throw e;
 	}
+	
 }
 
 function displayAllTree(container, drugInfoArray){
@@ -638,11 +582,71 @@ function getFirstLevelDrug(drugInfoArray){
 	return drugArr;
 }
 function getAllTreeInfo(n3){
+	n3="@prefix str: <http://www.w3.org/2000/10/swap/string#>.\n"+
+				"@prefix var: <http://localhost/var#>.\n"+
+				"@prefix q: <http://www.w3.org/2004/ql#>.\n"+
+				"@prefix list: <http://www.w3.org/2000/10/swap/list#>.\n"+
+				"@prefix e: <http://eulersharp.sourceforge.net/2003/03swap/log-rules#>.\n"+
+				"@prefix fn: <http://www.w3.org/2006/xpath-functions#>.\n"+
+				"@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"+
+				"@prefix : <http://www.owl-ontologies.com/DrugOntology.owl#>.\n"+
+				"@prefix nsp0: <http://www.owl-ontologies.com/>.\n"+
+				"@prefix time: <http://www.w3.org/2000/10/swap/time#>.\n"+
+				"@prefix log: <http://www.w3.org/2000/10/swap/log#>.\n"+
+				"@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.\n"+
+				"@prefix n3: <http://www.w3.org/2004/06/rei#>.\n"+
+				"@prefix math: <http://www.w3.org/2000/10/swap/math#>.\n"+
+				"@prefix owl: <http://www.w3.org/2002/07/owl#>.\n"+
+				"@prefix r: <http://www.w3.org/2000/10/swap/reason#>.\n"+
+				"@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n"+
+				"D:C0001962 rdfs:subClassOf D:C1690586.\n"+
+				"D:C0017951 rdfs:subClassOf D:C1690586.\n"+
+				"D:C0037556 rdfs:subClassOf D:C1690586.\n"+
+				"D:C1563032 rdfs:subClassOf D:C1690586.\n"+
+				"D:C1623735 rdfs:subClassOf D:C1690586.\n"+
+				"D:C0719741 rdfs:subClassOf D:C0001962.\n"+
+				"D:C0032483 rdfs:subClassOf D:C0017951.\n"+
+				"D:C0072225 rdfs:subClassOf D:C0017951.\n"+
+				"D:C0017861 rdfs:subClassOf D:C1563032.\n"+
+				"D:C0028053 rdfs:subClassOf D:C1563032.\n"+
+				"D:C1562418 rdfs:subClassOf D:C1563032.\n"+
+				"D:C0022237 rdfs:subClassOf D:C1623735.\n"+
+				"D:C0001962 D:level 1.\n"+
+				"D:C0017951 D:level 1.\n"+
+				"D:C0037556 D:level 1.\n"+
+				"D:C1563032 D:level 1.\n"+
+				"D:C1623735 D:level 1.\n"+
+				"D:C0719741 D:level 2.\n"+
+				"D:C0032483 D:level 2.\n"+
+				"D:C0072225 D:level 2.\n"+
+				"D:C0017861 D:level 2.\n"+
+				"D:C0028053 D:level 2.\n"+
+				"D:C1562418 D:level 2.\n"+
+				"D:C0022237 D:level 2.\n"+
+				"D:C0001962 rdfs:label \"Ethanol\".\n"+  
+				"D:C0017951 rdfs:label \"Glycol\".\n"+
+				"D:C0037556 rdfs:label \"Sodium Tetradecyl Sulfate\".\n"+
+				"D:C1563032 rdfs:label \"Alcohol derivative\".\n"+
+				"D:C1623735 rdfs:label \"Alcohol disinfectant\".\n"+
+				"D:C0719741 rdfs:label \"denatured ethanol\".\n"+
+				"D:C0032483 rdfs:label \"Polyethylene Glycols\".\n"+
+				"D:C0072225 rdfs:label \"Propylene glycol\".\n"+
+				"D:C0017861 rdfs:label \"Glycerol\".\n"+
+				"D:C0028053 rdfs:label \"Nicotinyl Alcohol\".\n"+
+				"D:C1562418 rdfs:label \"Alkanol\".\n"+
+				"D:C0022237 rdfs:label \"Isopropanol\".\n"+
+				"D:C0991869 rdfs:subClassOf :C0072225.\n"+
+				"D:C0215278 rdfs:subClassOf :C1562418.\n"+
+				"D:C0991869 :level 3.\n"+
+				"D:C0215278 :level 3.\n"+
+				"D:C0991869 rdfs:label \"PROPYLENE GLYCOL DIACETATE\".\n"+
+				"D:C0215278 rdfs:label \"policosanol\".\n";
+	//var time1 = new Date().getTime();
 	var statements = n3.split("\n");
-	
-	var levelpattern = "\\:\\w+\\s+\\:level.*";
-	var labelpattern = "\\:\\w+\\s+rdfs\\:label\\s+.*";
-	var subclasspattern = "\\:\\w+\\s+rdfs\\:subClassOf\\s+.*";
+	alert(statements.length);
+	var levelpattern = "D{1}\\:\\w+\\s+\\D{1}:level.*";
+	var labelpattern = "D{1}\\:\\w+\\s+rdfs\\:label\\s+.*";
+	var subclasspattern = "D{1}\\:\\w+\\s+rdfs\\:subClassOf\\s+.*";
 	var levelRegex = new RegExp(levelpattern, "g");
 	var labelRegex = new RegExp(labelpattern, "g");
 	var subclassRegex = new RegExp(subclasspattern, "g");
@@ -708,11 +712,11 @@ function getAllTreeInfo(n3){
 }
 
 function getDrugId(str){
-	return str.substring(1, str.indexOf(" "));
+	return str.substring(2, str.indexOf(" "));
 }
 
 function getDrugLevel(str){
-	return str.substring(str.length-2, str.length-1);
+	return str.substring(str.lastIndexOf(" ")+1, str.length-1);
 }
 
 function getDrugName(str){

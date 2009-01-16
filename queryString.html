@@ -41,12 +41,22 @@
 		?x sdtm:subject ?patient . 
 		?x1 sdtm:subject ?patient .
 		<div id="drugCond">
-		?x1 rdf:type sdtm:Metformin .
-		?x1 rdf:type sdtm:Warfarin .
 		</div>
 		?x1 sdtm:dosePerAdministration ?doseX1 .
 		?x1 sdtm:maxDosage ?maxDose .
 		?x1 sdtm:endDateTime ?dateTimeX1 .
+		<div id="exclution">
+		OPTIONAL {
+		<div id="ageExtCond">
+		</div>
+		<div id = "genderExtCond">
+		</div>
+		<div id="drugExtCond">
+		</div>
+		}
+		FILTER (!bound(?x1).
+		</div>
+		
 	}
 		</pre>
 	 	</DIV>
