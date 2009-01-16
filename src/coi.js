@@ -1587,6 +1587,7 @@ $(function() {
 	  					parentLi = parentUL.parentNode;
 	  					if(parentLi.tagName == "LI"){
 	  						$(parentLi).removeClass("expandable");
+	  						$(parentLi).removeClass("lastExpandable");
 	  						$(parentLi).addClass("collapsable");
 	  					}
 	  					parentUL = parentLi.parentNode;
