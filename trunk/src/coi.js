@@ -5,6 +5,7 @@ var inclusionFlag = false;
 var selectId="&nbsp;"
 var selectProperty="&nbsp;";
 var childSelectDrugName;
+var drugParentStr;
 
 /* Show/hide the wait cursor 
  * or show a wait message */
@@ -132,6 +133,23 @@ function getObject(statement) {
 function getStatements(n3, property) {
 	var statements = [];
 	
+	//replace : with \\: for matching expression
+	var p = property.replace(/:/,"\\\:");
+	var pattern = "\\w*\\:\\w*\\s+" + p + "+\\s.*";
+	
+	
+	var regex = new RegExp(pattern, "g");
+	statements = n3.match(regex);
+	
+	if (statements == null) {
+		alert ("no statement found");
+		statements = [];
+	}
+	return statements;
+}
+
+function getStatementsForLoadAllTree(n3, property) {
+	var statements = [];
 	//replace : with \\: for matching expression
 	var p = property.replace(/:/,"\\\:");
 	var pattern = "\\w*\\:\\w*\\s+" + p + "+\\s.*";
@@ -393,9 +411,333 @@ function selectById(id){
 function deleteById(id){
 	$("#"+id).remove();
 }
+function searchAllDrugTree(container, nodeValue){
+    $("#searchValue").text("");
+    if (nodeValue == "") {
+    	alert ("please entry the search keyword");
+    	return false;
+    }
+	//showWait(true);
+	
+	try {	
+  		//process(server + "/doNames?drugName="+encodeURIComponent(nodeValue), function(n3) {  		
+			// add by lixiaodong for test
+ 			n3="@prefix str: <http://www.w3.org/2000/10/swap/string#>.\n"+
+				"@prefix var: <http://localhost/var#>.\n"+
+				"@prefix q: <http://www.w3.org/2004/ql#>.\n"+
+				"@prefix list: <http://www.w3.org/2000/10/swap/list#>.\n"+
+				"@prefix e: <http://eulersharp.sourceforge.net/2003/03swap/log-rules#>.\n"+
+				"@prefix fn: <http://www.w3.org/2006/xpath-functions#>.\n"+
+				"@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.\n"+
+				"@prefix : <http://www.owl-ontologies.com/DrugOntology.owl#>.\n"+
+				"@prefix nsp0: <http://www.owl-ontologies.com/>.\n"+
+				"@prefix time: <http://www.w3.org/2000/10/swap/time#>.\n"+
+				"@prefix log: <http://www.w3.org/2000/10/swap/log#>.\n"+
+				"@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.\n"+
+				"@prefix n3: <http://www.w3.org/2004/06/rei#>.\n"+
+				"@prefix math: <http://www.w3.org/2000/10/swap/math#>.\n"+
+				"@prefix owl: <http://www.w3.org/2002/07/owl#>.\n"+
+				"@prefix r: <http://www.w3.org/2000/10/swap/reason#>.\n"+
+				"@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.\n"+
+				":C0001962 rdfs:subClassOf :C1690586.\n"+
+				":C0017951 rdfs:subClassOf :C1690586.\n"+
+				":C0037556 rdfs:subClassOf :C1690586.\n"+
+				":C1563032 rdfs:subClassOf :C1690586.\n"+
+				":C1623735 rdfs:subClassOf :C1690586.\n"+
+				":C0719741 rdfs:subClassOf :C0001962.\n"+
+				":C0032483 rdfs:subClassOf :C0017951.\n"+
+				":C0072225 rdfs:subClassOf :C0017951.\n"+
+				":C0017861 rdfs:subClassOf :C1563032.\n"+
+				":C0028053 rdfs:subClassOf :C1563032.\n"+
+				":C1562418 rdfs:subClassOf :C1563032.\n"+
+				":C0022237 rdfs:subClassOf :C1623735.\n"+
+				":C0001962 :level 1.\n"+
+				":C0017951 :level 1.\n"+
+				":C0037556 :level 1.\n"+
+				":C1563032 :level 1.\n"+
+				":C1623735 :level 1.\n"+
+				":C0719741 :level 2.\n"+
+				":C0032483 :level 2.\n"+
+				":C0072225 :level 2.\n"+
+				":C0017861 :level 2.\n"+
+				":C0028053 :level 2.\n"+
+				":C1562418 :level 2.\n"+
+				":C0022237 :level 2.\n"+
+				":C0001962 rdfs:label \"Ethanol\".\n"+  
+				":C0017951 rdfs:label \"Glycol\".\n"+
+				":C0037556 rdfs:label \"Sodium Tetradecyl Sulfate\".\n"+
+				":C1563032 rdfs:label \"Alcohol derivative\".\n"+
+				":C1623735 rdfs:label \"Alcohol disinfectant\".\n"+
+				":C0719741 rdfs:label \"denatured ethanol\".\n"+
+				":C0032483 rdfs:label \"Polyethylene Glycols\".\n"+
+				":C0072225 rdfs:label \"Propylene glycol\".\n"+
+				":C0017861 rdfs:label \"Glycerol\".\n"+
+				":C0028053 rdfs:label \"Nicotinyl Alcohol\".\n"+
+				":C1562418 rdfs:label \"Alkanol\".\n"+
+				":C0022237 rdfs:label \"Isopropanol\".\n"+
+				":C0991869 rdfs:subClassOf :C0072225.\n"+
+				":C0215278 rdfs:subClassOf :C1562418.\n"+
+				":C0991869 :level 3.\n"+
+				":C0215278 :level 3.\n"+
+				":C0991869 rdfs:label \"PROPYLENE GLYCOL DIACETATE\".\n"+
+				":C0215278 rdfs:label \"policosanol\".\n";
+			var drugInfoArray = getAllTreeInfo(n3);
+			displayAllTree("#BROSWER", drugInfoArray);
+			//var foundTerms = processTerms(n3);
+ 			//if (foundTerms.length > 0)
+			//{
+ 			//	displayTree(container, foundTerms, "subClassOf");
+ 			//} else  {
+ 			//	alert ("no terms found");
+ 			//}
+ 		//});
+ 	} 
+ 	catch (e) {
+ 		//alert("ERROR [suggest]:" + e.toString());
+		//showWait(false);
+		throw e;
+	}
+}
 
+function displayAllTree(container, drugInfoArray){
+	// append firstLevel node
+	var rootNodeId = "C1690586";
+	var rootNodeValue = "General drug type";
+	
+	$(container).append("<li id='" + rootNodeId + "li' class='closed unselectColor'>" + rootNodeValue + getTempNode(rootNodeId) + "</li>");
+	
+	// apend second level node
+	var firstLevelDrug = getFirstLevelDrug(drugInfoArray);
+	//for(var i=0;i<firstLevelDrug.length;i++){
+	//	$("#"+rootNodeId).append("<li id='" + drugInfoArray[i][0] + "li' class='closed unselectColor'>" + drugInfoArray[i][1] + getTempNode(drugInfoArray[i][0]) + "</li>");
+	//	appendAllChild(new Array(drugInfoArray[i][0]), drugInfoArray);
+	//}
+	appendAllChild(rootNodeId, firstLevelDrug, drugInfoArray);
+	//var a = $("#" + rootNodeId+"li");
+	//alert(a);
+	$(container).Treeview({
+			speed: "fast",
+          	toggle: function() {}
+    });
+	$("#" + rootNodeId + " li").click(function(){
+			var children = $(this).find(".selectColor");
+			if(children.length == 0){
+				$("#BROSWER .selectColor").each(function(){
+					$(this).removeClass("selectColor");
+				});
+				
+				// aviod the children select start
+				$(this).removeClass("unselectColor");
+				var ulChildren = $(this).children("ul");
+				if(ulChildren.length != 0){
+					liChildren = $(ulChildren).children("li");
+					if(liChildren.length != 0){
+						for(var i = 0 ; i < liChildren.length;i++){
+							$(liChildren).addClass("unselectColor");
+						}
+					}
+				}
+				var bodyId = this.id.substring(0, this.id.length-2);
+				// aviod the children select end
+				$(this).addClass("selectColor");
+				selectTimeForAcr = new Date().getTime();
+				if(this.lastChild.id != undefined){
+					selectId = this.lastChild.id;
+				}
+				else{
+					selectId = this.id;
+				}
+				
+			}
+			else{
+				var flg = 0;
+				$("BROSWER .selectColor").each(function(){
+					var time = new Date().getTime();
+					if(time-selectTimeForAcr >= 1000){
+						flg = 1;
+						$(this).removeClass("selectColor");
+					}
+				});
+				if(flg == 1){
+					// aviod the children select start
+					$(this).removeClass("unselectColor");
+					var ulChildren = $(this).children("ul");
+					if(ulChildren.length != 0){
+						liChildren = $(ulChildren).children("li");
+						if(liChildren.length != 0){
+							for(var i = 0 ; i < liChildren.length;i++){
+								$(liChildren).addClass("unselectColor");
+							}
+						}
+					}
+					var bodyId = this.id.substring(0, this.id.length-2);
+					// aviod the children select end
+					$(this).addClass("selectColor");
+					selectTimeForAcr = new Date().getTime();
+					if(this.lastChild.id != undefined){
+						selectId = this.lastChild.id;
+					}
+					else{
+						selectId = this.id;
+					}
+					flg = 0;
+				}
+			}
+	});
+}
+
+function appendAllChild(parentNodeId, childIds, drugInfoArray){
+	if(childIds != undefined){
+		for(var childIndex = 0 ; childIndex < childIds.length;childIndex++){
+			var drugId = drugInfoArray[childIds[childIndex]][0];
+			var drugIndex = getDrugIndexById(drugInfoArray, drugId);
+			if(hasChild(drugId)){
+				$("#"+parentNodeId).append("<li id='" + drugId + "li' class='closed unselectColor'>" + drugInfoArray[drugIndex][1] + getTempNode(drugId) + "</li>");
+				var ids = getAllChildIds(drugId, drugInfoArray);
+				appendAllChild(drugId, ids, drugInfoArray);
+			}
+			else{
+				$("#"+parentNodeId).append("<li id='" + drugId + "li' class='closed unselectColor'>" + drugInfoArray[drugIndex][1] + "</li>");
+				//return;
+			}
+		}
+	}
+}
+
+function getAllChildIds(drugId, drugInfoArray){
+	var drugChildIds = new Array();
+	var j = 0;
+	for(var i =0;i < drugInfoArray.length;i++){
+		if(drugInfoArray[i][2] == drugId){
+			drugChildIds[j++]=i;
+		}
+	}
+	return drugChildIds;
+}
+
+function hasChild(drugId){
+	if(drugParentStr.indexOf(drugId)==-1){
+		return false;
+	}
+	else{
+		return true;
+	}
+}
+
+function getFirstLevelDrug(drugInfoArray){
+	// default startLevel
+	var firstLevel = 1;
+	var drugArr = new Array();
+	var j = 0;
+	for(var i = 0; i < drugInfoArray.length;i++){
+		if(drugInfoArray[i][3] == firstLevel){
+			drugArr[j++] = i;
+		}
+	}
+	return drugArr;
+}
+function getAllTreeInfo(n3){
+	var statements = n3.split("\n");
+	
+	var levelpattern = "\\:\\w+\\s+\\:level.*";
+	var labelpattern = "\\:\\w+\\s+rdfs\\:label\\s+.*";
+	var subclasspattern = "\\:\\w+\\s+rdfs\\:subClassOf\\s+.*";
+	var levelRegex = new RegExp(levelpattern, "g");
+	var labelRegex = new RegExp(labelpattern, "g");
+	var subclassRegex = new RegExp(subclasspattern, "g");
+	var drugArr = new Array();
+	var j = 0;
+	var drugParentIndex=0;
+	var drugParentIdArr=new Array();
+	for(var i = 0;i < statements.length;i++){
+		var drugId = getDrugId(statements[i]);
+		var drugIndex = getDrugIndexById(drugArr, drugId);
+		if(statements[i].match(levelRegex)!=null){
+			var drugLevel = getDrugLevel(statements[i]);
+			if(drugIndex != -1){
+				drugArr[drugIndex][3] = drugLevel;
+			}
+			else{
+				if(drugArr[j] == undefined){
+					drugArr[j] = new Array();
+				}
+				drugArr[j][0] = drugId;
+				drugArr[j][3] = drugLevel;
+				j++;
+			}
+		}		
+		else if(statements[i].match(labelRegex)!=null){
+			var drugName = getDrugName(statements[i]);
+			if(drugIndex != -1){
+				drugArr[drugIndex][1] = drugName;
+			}
+			else{
+				if(drugArr[j] == undefined){
+					drugArr[j] = new Array();
+				}
+				drugArr[j][0] = drugId;
+				drugArr[j][1] = drugName;
+				j++;
+			}
+		}
+		else if(statements[i].match(subclassRegex)!=null){
+			var drugParentId = getDrugParentId(statements[i]);
+			if(drugIndex != -1){
+				drugArr[drugIndex][2] = drugParentId;
+				drugParentIdArr[drugParentIndex] = drugParentId;
+				drugParentIndex++;
+			}
+			else{
+				if(drugArr[j] == undefined){
+					drugArr[j] = new Array();
+				}
+				drugArr[j][0] = drugId;
+				drugArr[j][2] = drugParentId;
+				drugParentIdArr[drugParentIndex] = drugParentId;
+				drugParentIndex++;
+				j++;
+			}
+		}
+		else{
+			continue;
+		}
+	}
+	drugParentStr = drugParentIdArr.join(",");
+	return drugArr;
+}
+
+function getDrugId(str){
+	return str.substring(1, str.indexOf(" "));
+}
+
+function getDrugLevel(str){
+	return str.substring(str.length-2, str.length-1);
+}
+
+function getDrugName(str){
+	return str.substring(str.indexOf("\"")+1, str.lastIndexOf("\""));
+}
+
+function getDrugParentId(str){
+	return str.substring(str.lastIndexOf(":")+1, str.length-1);
+}
+
+function getDrugIndexById(drugArr, drugId){
+	var result = -1;
+	var length = drugArr.length;
+	var array = new Array();
+	for(var i = 0;i < length;i++){
+		if(drugArr[i][0] == drugId){
+			result = i;
+			break;
+		}
+	}
+	return result;
+}
 function searchDrugTree(container, nodeValue){
     $("#searchValue").text("");
+    $("#BROSWER").empty();
+    $("#PROPERTY").empty();
     if (nodeValue == "") {
     	alert ("please entry the search keyword");
     	return false;
@@ -439,13 +781,7 @@ function searchDrugList(container, nodeValue){
   				var element = $(this).get(0);
   				if(element != undefined){
 	  				var drugId = element.id;
-	  				var drugName;
-	  				if(element.childNodes[1] != undefined){
-	  					drugName = element.childNodes[1].nodeValue;
-	  				}
-	  				else{
-	  					rugName = element.textContent;
-	  				}
+	  				var drugName= getDrugNameForSearch(element);
 	  				if(drugName != undefined && drugName != ""){
 	  					if(drugName.toLowerCase().indexOf(nodeValue.toLowerCase())!=-1){
 	  						container.append("<option value='" + drugId + "'>" + drugName + "</option>");
@@ -459,8 +795,23 @@ function searchDrugList(container, nodeValue){
   	}
  	catch (e) {
  		alert("ERROR [suggest]:" + e.toString());
+ 		throw e;
 	}
  	
+}
+
+function getDrugNameForSearch(element){
+ 	var drugName;
+	if(element.childNodes.length >1){
+		drugName = element.childNodes[1].nodeValue;
+	}
+	else if(element.childNodes.length ==1){
+		drugName = element.childNodes[0].nodeValue;
+	}
+	else{
+		drugName = element.textContent;
+	}
+	return drugName;
 }
 
 function processTerms(n3)
@@ -1134,8 +1485,8 @@ function clearCriteriaContainer()
       this.checked = false;
     });
     
-    $("#BROSWER").empty();
-    $("#PROPERTY").empty();
+    //$("#BROSWER").empty();
+    //$("#PROPERTY").empty();
    
 }
 
@@ -1289,7 +1640,8 @@ $(function() {
 	});
 
 	$("#DisplayAllDrug").click(function(){
-		searchDrugTree("#BROSWER", "General drug type");	
+		//searchDrugTree("#BROSWER", "General drug type");
+		searchAllDrugTree("#BROSWER", "General drug type");
 	})
 	
 	$("#RESET").click(function(){
