@@ -6,6 +6,7 @@ var selectId="&nbsp;"
 var selectProperty="&nbsp;";
 var childSelectDrugName;
 var drugParentStr;
+var selectTimeForAcr="";
 
 /* Show/hide the wait cursor 
  * or show a wait message */
@@ -202,7 +203,6 @@ function getTreeData(node, value, type){
     showWait(true);
     
     var querystr = "";
-    
     switch (type) 
     {
      	case "subPropertyOf": 
@@ -520,7 +520,7 @@ function displayAllTree(container, drugInfoArray){
 			speed: "fast",
           	toggle: function() {}
     });
-	$("#" + rootNodeId + " li").click(function(){
+	$(container + " li").click(function(){
 			var children = $(this).find(".selectColor");
 			if(children.length == 0){
 				$("#BROSWER .selectColor").each(function(){
@@ -552,7 +552,7 @@ function displayAllTree(container, drugInfoArray){
 			}
 			else{
 				var flg = 0;
-				$("BROSWER .selectColor").each(function(){
+				$("#BROSWER .selectColor").each(function(){
 					var time = new Date().getTime();
 					if(time-selectTimeForAcr >= 1000){
 						flg = 1;
