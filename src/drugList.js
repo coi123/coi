@@ -8,7 +8,12 @@ function showDetailInfo(){
 	$(liElements).each(
 		function(){
 			var liElement = $(this).get(0);
-			var value = liElement.childNodes[1].nodeValue;
+			if(liElement.childNodes.length >1){
+				var value = liElement.childNodes[1].nodeValue;
+			}
+			else{
+				var value = liElement.childNodes[0].nodeValue;
+			}
 			$("#drugListId").append("<tr nowrap><td>" + value + "</td></tr>");
 		}
 	);
