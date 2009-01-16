@@ -421,7 +421,7 @@ function searchAllDrugTree(container, nodeValue){
 	//showWait(true);
 	
 	try {	
-  		//process(server + "/doNames?drugName="+encodeURIComponent(nodeValue), function(n3) {  		
+  		//process(server + "/doSubAll?, function(n3) {  	//now you get all sub tree data	
 			// add by lixiaodong for test
  			n3="@prefix str: <http://www.w3.org/2000/10/swap/string#>.\n"+
 				"@prefix var: <http://localhost/var#>.\n"+
