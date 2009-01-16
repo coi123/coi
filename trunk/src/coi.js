@@ -202,6 +202,7 @@ function getTreeData(node, value, type){
     showWait(true);
     
     var querystr = "";
+    
     switch (type) 
     {
      	case "subPropertyOf": 
