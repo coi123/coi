@@ -17556,7 +17556,7 @@ function appendTreeNew(parentNodeId){
 				}
 			}
    	});
-   	$(container + " li").click(function(){
+   	$("#"+parentNodeId + " li").click(function(){
 			var children = $(this).find(".selectColor");
 			if(children.length == 0){
 				$("#BROSWER .selectColor").each(function(){
