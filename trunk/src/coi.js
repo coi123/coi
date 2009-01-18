@@ -9,6 +9,7 @@ var drugParentStr="";
 var selectTimeForAcr="";
 var treeStr="";
 var relationArr = new Array();
+var nodeStr="";
 var n3="@prefix owl: <http://www.w3.org/2002/07/owl#>.\n"+
 "@prefix D: <http://www.owl-ontologies.com/DrugOntology.owl#>.\n"+
 "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.\n"+
@@ -17486,23 +17487,28 @@ function displayAllTree(container){
 	
 	// apend second level node
 	//var firstLevelDrug = getAllChildIds(rootNodeId, drugInfoArray);
-	//var firstLevelDrug = getAllChildIds(rootNodeId);
+	var firstLevelDrug = getAllChildIds(rootNodeId);
 	//alert(firstLevelDrug.length);
-	//var nodeStr="";
-	//for(var i=0;i<firstLevelDrug.length;i++){
+	var rootStr="";
+	for(var i=0;i<firstLevelDrug.length;i++){
 		//var time = new Date().getTime();
-		//$("#"+rootNodeId).append("<li id='" + firstLevelDrug[i][0] + "li' class='closed unselectColor'>" + firstLevelDrug[i][1] + getTempNode(firstLevelDrug[i][0]) + "</li>");
-		//nodeStr = nodeStr+"<li id='" + firstLevelDrug[i][0] + "li' class='closed unselectColor'>" + firstLevelDrug[i][1] + getTempNode(firstLevelDrug[i][0]) + "</li>";
+		//("#"+rootNodeId).append("<li id='" + firstLevelDrug[i][0] + "li' class='closed unselectColor'>" + firstLevelDrug[i][1] + getTempNode(firstLevelDrug[i][0]) + "</li>");
+		rootStr = rootStr+"<li id='" + firstLevelDrug[i][0] + "li' class='closed unselectColor'>" + firstLevelDrug[i][1] + getTempNode(firstLevelDrug[i][0]) + "</li>";
 		//var time2 = new Date().getTime();
 		//alert((time2-time)/1000+"s");
-	//}
-	//$("#"+rootNodeId).append(nodeStr);
+		//setTimeout("appendAllChildNew('" + firstLevelDrug[i][0] + "')", i*100);
+	}
+	$("#"+rootNodeId).append(rootStr);
 	$(container).Treeview({
 			speed: "fast",
 			toggle: function() {
 				if(this.style.display=="block"){
 					if($(this).find("li").size()==0){
-						appendTreeNew(this.id);
+						//appendTreeNew(this.id);
+						appendAllChild(this.id, getAllChildIds(this.id));
+						$(this).append(nodeStr);
+						getTreeViewForNode(this.id);
+						nodeStr="";
 					}
 					//appendAllChild(this.id, getAllChildIds(this.id));
 					
@@ -17527,6 +17533,83 @@ function displayAllTree(container){
 	//$(container).append(treeStr);
 	
 	
+}
+function appendAllChildNew(id){
+		//alert(id);
+		appendAllChild(id, getAllChildIds(id));
+		$("#"+id).append(nodeStr);
+		getTreeViewForNode(this.id);
+		nodeStr="";
+}
+function getTreeViewForNode(parentNodeId){
+		$("#"+parentNodeId).Treeview({
+			speed: "fast",
+   	});
+   	$("#"+parentNodeId + " li").click(function(){
+			var children = $(this).find(".selectColor");
+			if(children.length == 0){
+				$("#BROSWER .selectColor").each(function(){
+					$(this).removeClass("selectColor");
+				});
+				
+				// aviod the children select start
+				$(this).removeClass("unselectColor");
+				var ulChildren = $(this).children("ul");
+				if(ulChildren.length != 0){
+					liChildren = $(ulChildren).children("li");
+					if(liChildren.length != 0){
+						for(var i = 0 ; i < liChildren.length;i++){
+							$(liChildren).addClass("unselectColor");
+						}
+					}
+				}
+				var bodyId = this.id.substring(0, this.id.length-2);
+				// aviod the children select end
+				$(this).addClass("selectColor");
+				selectTimeForAcr = new Date().getTime();
+				if(this.lastChild.id != undefined){
+					selectId = this.lastChild.id;
+				}
+				else{
+					selectId = this.id;
+				}
+				
+			}
+			else{
+				var flg = 0;
+				$("#BROSWER .selectColor").each(function(){
+					var time = new Date().getTime();
+					if(time-selectTimeForAcr >= 1000){
+						flg = 1;
+						$(this).removeClass("selectColor");
+					}
+				});
+				if(flg == 1){
+					// aviod the children select start
+					$(this).removeClass("unselectColor");
+					var ulChildren = $(this).children("ul");
+					if(ulChildren.length != 0){
+						liChildren = $(ulChildren).children("li");
+						if(liChildren.length != 0){
+							for(var i = 0 ; i < liChildren.length;i++){
+								$(liChildren).addClass("unselectColor");
+							}
+						}
+					}
+					var bodyId = this.id.substring(0, this.id.length-2);
+					// aviod the children select end
+					$(this).addClass("selectColor");
+					selectTimeForAcr = new Date().getTime();
+					if(this.lastChild.id != undefined){
+						selectId = this.lastChild.id;
+					}
+					else{
+						selectId = this.id;
+					}
+					flg = 0;
+				}
+			}
+	});
 }
 
 function appendTreeNew(parentNodeId){
@@ -17625,30 +17708,21 @@ function appendTreeNew(parentNodeId){
 }
 function appendAllChild(parentNodeId, childIds){
 	if(childIds != undefined){
-		var nodeStr="";
 		for(var childIndex = 0 ; childIndex < childIds.length;childIndex++){
 			var drugId = childIds[childIndex][0];
 			var drugName = childIds[childIndex][1];
 			if(hasChild(drugId)){
 				//$("#"+parentNodeId).append("<li id='" + drugId + "li' class='closed unselectColor'>" + drugName + getTempNode(drugId)+ "</li>");
-				nodeStr=nodeStr+"<li id='" + drugId + "li' class='closed unselectColor'>" + drugName + getTempNode(drugId)+ "</li>";
+				nodeStr=nodeStr+"<li id='" + drugId + "li' class='closed unselectColor'>" + drugName + getStartTempNode(drugId)+ "</li>";
+				if(hasChild(drugId)){
+					var ids = getAllChildIds(drugId);
+					appendAllChild(drugId, ids);
+				}
+				nodeStr=nodeStr+getEndTempNode();
 			}
 			else{
 				//$("#"+parentNodeId).append("<li id='" + drugId + "li' class='closed unselectColor'>" + drugName + "</li>");
 				nodeStr=nodeStr+"<li id='" + drugId + "li' class='closed unselectColor'>" + drugName + "</li>";
-			}
-		}
-		$("#"+parentNodeId).append(nodeStr);
-		$("#"+parentNodeId).Treeview({
-			speed: "fast",
-   	});
-		
-		
-		for(var childIndex = 0 ; childIndex < childIds.length;childIndex++){
-			var drugId = childIds[childIndex][0];
-			if(hasChild(drugId)){
-				var ids = getAllChildIds(drugId);
-				appendAllChild(drugId, ids);
 			}
 		}
 	}
