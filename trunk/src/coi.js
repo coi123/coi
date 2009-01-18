@@ -17486,7 +17486,7 @@ function displayAllTree(container){
 	
 	// apend second level node
 	//var firstLevelDrug = getAllChildIds(rootNodeId, drugInfoArray);
-	var firstLevelDrug = getAllChildIds(rootNodeId);
+	//var firstLevelDrug = getAllChildIds(rootNodeId);
 	//alert(firstLevelDrug.length);
 	//var nodeStr="";
 	//for(var i=0;i<firstLevelDrug.length;i++){
@@ -17501,7 +17501,9 @@ function displayAllTree(container){
 			speed: "fast",
 			toggle: function() {
 				if(this.style.display=="block"){
-					appendTreeNew(this.id);
+					if($(this).find("li").size()==0){
+						appendTreeNew(this.id);
+					}
 					//appendAllChild(this.id, getAllChildIds(this.id));
 					
 				}
@@ -17548,7 +17550,9 @@ function appendTreeNew(parentNodeId){
 			speed: "fast",
 			toggle: function() {
 				if(this.style.display=="block"){
-					appendTreeNew(this.id);
+					if($(this).find("li").size()==0){
+						appendTreeNew(this.id);
+					}
 				}
 			}
    	});
