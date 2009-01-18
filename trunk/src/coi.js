@@ -17455,11 +17455,8 @@ function searchAllDrugTree(){
 		//showWait(true);
   		//process(server + "/doSubAll?a=1", function(n3) {
   			//now you get all sub tree data
-  			var time = new Date().getTime();
 			var drugInfoArray = getAllTreeInfo(n3);
-			var time1 = new Date().getTime();
-			alert(((time1-time)/1000)+"s");
-			displayAllTree("#BROSWER", drugInfoArray);
+			displayAllTree("#BROSWER");
 			//var foundTerms = processTerms(n3);
  			//if (foundTerms.length > 0)
 			//{
@@ -17478,35 +17475,84 @@ function searchAllDrugTree(){
 	
 }
 
-function displayAllTree(container, drugInfoArray){
+function displayAllTree(container){
 	// append firstLevel node
 	var rootNodeId = "C0013227";
-	//var rootNodeId = "C0002771";
+	//var rootNodeId = "C0005522";
 	//var rootNodeId = "C1690586";
 	var rootNodeValue = "General drug type";
-	//$(container).append("<li id='" + rootNodeId + "li' class='closed unselectColor'>" + rootNodeValue + getTempNode(rootNodeId) + "</li>");
-	treeStr=treeStr+"<li id='" + rootNodeId + "li' class='closed unselectColor'>" + rootNodeValue + getStartTempNode(rootNodeId);
+	$(container).append("<li id='" + rootNodeId + "li' class='closed unselectColor'>" + rootNodeValue + getTempNode(rootNodeId) + "</li>");
+	//treeStr=treeStr+"<li id='" + rootNodeId + "li' class='closed unselectColor'>" + rootNodeValue + getStartTempNode(rootNodeId);
 	
 	// apend second level node
-	var firstLevelDrug = getAllChildIds(rootNodeId, drugInfoArray);
+	//var firstLevelDrug = getAllChildIds(rootNodeId, drugInfoArray);
+	var firstLevelDrug = getAllChildIds(rootNodeId);
 	//alert(firstLevelDrug.length);
+	//var nodeStr="";
 	//for(var i=0;i<firstLevelDrug.length;i++){
-	//	$("#"+rootNodeId).append("<li id='" + drugInfoArray[i][0] + "li' class='closed unselectColor'>" + drugInfoArray[i][1] + getTempNode(drugInfoArray[i][0]) + "</li>");
-	//	appendAllChild(new Array(drugInfoArray[i][0]), drugInfoArray);
+		//var time = new Date().getTime();
+		//$("#"+rootNodeId).append("<li id='" + firstLevelDrug[i][0] + "li' class='closed unselectColor'>" + firstLevelDrug[i][1] + getTempNode(firstLevelDrug[i][0]) + "</li>");
+		//nodeStr = nodeStr+"<li id='" + firstLevelDrug[i][0] + "li' class='closed unselectColor'>" + firstLevelDrug[i][1] + getTempNode(firstLevelDrug[i][0]) + "</li>";
+		//var time2 = new Date().getTime();
+		//alert((time2-time)/1000+"s");
 	//}
-	appendAllChild(rootNodeId, firstLevelDrug, drugInfoArray);
-	//var a = $("#" + rootNodeId+"li");
-	//alert(a);
-	treeStr = treeStr+getEndTempNode();
-	alert(treeStr);
-	
-	$(container).append(treeStr);
-	alert("OK!");
+	//$("#"+rootNodeId).append(nodeStr);
 	$(container).Treeview({
 			speed: "fast",
-          	toggle: function() {}
-    });
-	$(container + " li").click(function(){
+			toggle: function() {
+				if(this.style.display=="block"){
+					appendTreeNew(this.id);
+					//appendAllChild(this.id, getAllChildIds(this.id));
+					
+				}
+		}
+   });
+	//for(var i=0;i<firstLevelDrug.length;i++){
+		//var time = new Date().getTime();
+		//appendAllChild(firstLevelDrug[i][0],getAllChildIds(firstLevelDrug[i][0]), drugInfoArray);
+		
+		//var time2 = new Date().getTime();
+		//alert((time2-time)/1000+"s");
+	//}
+	
+	
+	//appendAllChild(rootNodeId, firstLevelDrug, drugInfoArray);
+	//var a = $("#" + rootNodeId+"li");
+	//alert(a);
+	//treeStr = treeStr+getEndTempNode();
+	//alert(treeStr);
+	
+	//$(container).append(treeStr);
+	
+	
+}
+
+function appendTreeNew(parentNodeId){
+	childIds = getAllChildIds(parentNodeId);
+	if(childIds != undefined){
+		var nodeStr="";
+		for(var childIndex = 0 ; childIndex < childIds.length;childIndex++){
+			var drugId = childIds[childIndex][0];
+			var drugName = childIds[childIndex][1];
+			if(hasChild(drugId)){
+				//$("#"+parentNodeId).append("<li id='" + drugId + "li' class='closed unselectColor'>" + drugName + getTempNode(drugId)+ "</li>");
+				nodeStr=nodeStr+"<li id='" + drugId + "li' class='closed unselectColor'>" + drugName + getTempNode(drugId)+ "</li>";
+			}
+			else{
+				//$("#"+parentNodeId).append("<li id='" + drugId + "li' class='closed unselectColor'>" + drugName + "</li>");
+				nodeStr=nodeStr+"<li id='" + drugId + "li' class='closed unselectColor'>" + drugName + "</li>";
+			}
+		}
+		$("#"+parentNodeId).append(nodeStr);
+		$("#"+parentNodeId).Treeview({
+			speed: "fast",
+			toggle: function() {
+				if(this.style.display=="block"){
+					appendTreeNew(this.id);
+				}
+			}
+   	});
+   	$(container + " li").click(function(){
 			var children = $(this).find(".selectColor");
 			if(children.length == 0){
 				$("#BROSWER .selectColor").each(function(){
@@ -17571,53 +17617,54 @@ function displayAllTree(container, drugInfoArray){
 				}
 			}
 	});
+	}
 }
-
-function appendAllChild(parentNodeId, childIds, drugInfoArray){
+function appendAllChild(parentNodeId, childIds){
 	if(childIds != undefined){
+		var nodeStr="";
 		for(var childIndex = 0 ; childIndex < childIds.length;childIndex++){
 			var drugId = childIds[childIndex][0];
 			var drugName = childIds[childIndex][1];
 			if(hasChild(drugId)){
-				treeStr = treeStr + "<li id='" + drugId + "li' class='closed unselectColor'>" + drugName + getStartTempNode(drugId);
-				var ids = getAllChildIds(drugId, drugInfoArray);
-				appendAllChild(drugId, ids, drugInfoArray);
-				treeStr = treeStr+getEndTempNode();
+				//$("#"+parentNodeId).append("<li id='" + drugId + "li' class='closed unselectColor'>" + drugName + getTempNode(drugId)+ "</li>");
+				nodeStr=nodeStr+"<li id='" + drugId + "li' class='closed unselectColor'>" + drugName + getTempNode(drugId)+ "</li>";
 			}
 			else{
-				treeStr = treeStr + "<li id='" + drugId + "li' class='closed unselectColor'>" + drugName + "</li>";
-				//alert(treeStr);
-				//return;
+				//$("#"+parentNodeId).append("<li id='" + drugId + "li' class='closed unselectColor'>" + drugName + "</li>");
+				nodeStr=nodeStr+"<li id='" + drugId + "li' class='closed unselectColor'>" + drugName + "</li>";
 			}
 		}
-		return;
-	}
-	else{
-		return;
-	}
-}
-function getDrugIndexById(drugArr, drugId, drugParentId){
-	var result = -1;
-	var length = drugArr.length;
-	var array = new Array();
-	for(var i = 0;i < length;i++){
-		if(drugArr[i][0] == drugId&&drugArr[i][2]==drugParentId){
-			result = i;
-			break;
+		$("#"+parentNodeId).append(nodeStr);
+		$("#"+parentNodeId).Treeview({
+			speed: "fast",
+   	});
+		
+		
+		for(var childIndex = 0 ; childIndex < childIds.length;childIndex++){
+			var drugId = childIds[childIndex][0];
+			if(hasChild(drugId)){
+				var ids = getAllChildIds(drugId);
+				appendAllChild(drugId, ids);
+			}
 		}
 	}
-	return result;
 }
+
 function getAllChildIds(drugId){
 	var drugChildIds = new Array();
 	var index = hasParentId(drugId);
-	var length = relationArr[index][1].length;
-	for(var i =0;i < length;i++){
-		drugChildIds[i] = new Array();
-		drugChildIds[i][0] = relationArr[index][1][i].substring(0, relationArr[index][1][i].indexOf("_"));
-		drugChildIds[i][1] = relationArr[index][1][i].substring(relationArr[index][1][i].indexOf("_")+1, relationArr[index][1][i].length);
+	if(index != -1){
+		var length = relationArr[index][1].length;
+		for(var i =0;i < length;i++){
+			drugChildIds[i] = new Array();
+			drugChildIds[i][0] = relationArr[index][1][i].substring(0, relationArr[index][1][i].indexOf("_"));
+			drugChildIds[i][1] = relationArr[index][1][i].substring(relationArr[index][1][i].indexOf("_")+1, relationArr[index][1][i].length);
+		}
+		return drugChildIds;
 	}
-	return drugChildIds;
+	else{
+		return drugChildIds;
+	}
 }
 
 function hasChild(drugId){
@@ -17646,8 +17693,6 @@ function getAllTreeInfo(n3){
 	n3="";
 	//alert(statements.length);
 	
-	var drugArr = new Array();
-	var j = 0;
 	var k = 0;
 	var drugParentIdArr=new Array();
 	var pattern = "D:.*rdfs:subClassOf.*D:label.*";
@@ -17658,10 +17703,6 @@ function getAllTreeInfo(n3){
 			var drugId = getDrugId(drugInfoArray[0]);
 			var drugName = getDrugName(drugInfoArray[2]);
 			var drugParentId = getDrugParentId(drugInfoArray[0]);
-			drugArr[j] = new Array();
-			drugArr[j][0]=drugId;
-			drugArr[j][1]=drugName;
-			drugArr[j][2]=drugParentId;
 			
 			if(relationArr.length == 0){
 				relationArr[k] = new Array();
@@ -17699,7 +17740,6 @@ function getAllTreeInfo(n3){
 	}
 	//drugParentIdArr = drugParentIdArr.uniqStr();
 	//alert(drugParentIdArr.length);
-	return drugArr;
 }
 
 function getDrugId(str){
