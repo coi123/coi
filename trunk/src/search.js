@@ -1,14 +1,16 @@
-﻿function searchDrugList(container, nodeValue){
-    
+﻿var nodeStr="";
+function searchDrugList(container, nodeValue){
     if (nodeValue == "") {
     	alert ("please entry the search keyword");
     	return false;
     }
+    loadParentChildNode($("#firstSelect").get(0).value);
 	container.empty();
 	try {	
   		//$("#BROSWER li")
   		var searchResult = new Array();
-  		var divElement = window.opener.document.getElementById("BROSWER");
+  		var idValue= $("#firstSelect").get(0).value;
+  		var divElement = window.opener.document.getElementById(idValue.substring(0, idValue.length-2));
   		var liElement = $(divElement).find("li");
   		var i = 0;
   		$(liElement).each(
@@ -35,16 +37,32 @@
  	
 }
 
-
+function getDrugNameForSearch(element){
+ 	var drugName;
+	if(element.childNodes.length >1){
+		drugName = element.childNodes[1].nodeValue;
+	}
+	else if(element.childNodes.length ==1){
+		drugName = element.childNodes[0].nodeValue;
+	}
+	else{
+		drugName = element.textContent;
+	}
+	return drugName;
+}
 function loadSelectElements(){
 		var browser = window.opener.document.getElementById("BROSWER");
 		$(browser).children("li").children("ul").children("li").each(function(){
 				$("#firstSelect").append("<option value='" + $(this).get(0).id + "'>" +
 								$(this).get(0).childNodes[1].nodeValue + "</option>");
 		});
-		$("#firstSelect").get(0).childNodes[0].selected = true;
+		$("#firstSelect").get(0).childNodes[0].selected = true;;
 }
 
+function loadParentChildNode(nodeId){
+		var id = nodeId.substring(0, nodeId.length-2);
+		window.opener.loadChildForOpenerPage(id);
+}
 /* Bootstrap */
 $(function() {
 	$("#drugListSearch").click(function(){
@@ -55,6 +73,7 @@ $(function() {
 		//});
 		searchDrugList($("#drugSelectBox"), $("#drugName").val());	
 	});
+	
 	
 	$("#conformSelectValue").click(function(){
 		var selectBox = $("#drugSelectBox").get(0);

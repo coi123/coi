@@ -511,6 +511,15 @@ function displayAllTree(container){
 	
 	
 }
+
+function loadChildForOpenerPage(id){
+		if($("#"+id).find("li").size()==0){
+			appendAllChild(id, getAllChildIds(id));
+			$("#"+id).append(nodeStr);
+			getTreeViewForNode(id);
+			nodeStr="";
+		}
+}
 function appendAllChildNew(id){
 		//alert(id);
 		appendAllChild(id, getAllChildIds(id));
@@ -1595,9 +1604,6 @@ function isNumeric(form_value)
 function loadDrugTreeData() 
 {
     // pre-load drug ontology
-    
-    
-
 
 }
 
