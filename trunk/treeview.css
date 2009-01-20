@@ -96,8 +96,13 @@ background-image:url(images/tv-expandable-last.gif);
 
 .treeview li {
 background:url(images/tv-item.gif) 0 0 no-repeat;
+cursor: pointer;
 margin:0;
 padding:3px 0 3px 16px;
+}
+
+.treeview li:hover{
+color:rgb(150,150,150);
 }
 
 .treeview,.treeview ul {
