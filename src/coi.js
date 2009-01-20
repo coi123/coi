@@ -595,9 +595,55 @@ function getTreeViewForNode(parentNodeId){
 					flg = 0;
 				}
 			}
+			getPropertyFromServer($(this).get(0).id, $(this).get(0).parentNode.id);
 	});
 }
 
+function getPropertyFromStatement(term){
+	return term.substring(term.lastIndexOf("D:")+2, term.length);
+}
+function showProperty(foundTerms, id){
+	var termStr = "";
+	for(var i =0;i < foundTerms.length;i++){
+		if(foundTerms[i].indexOf(id) != -1){
+				termStr = termStr + getPropertyFromStatement(foundTerms[i]) + "<br>";
+		}
+	}
+	$("#PROPERTY").get(0).innerHTML=termStr;
+}
+function processProperty(n3){
+	var statements = [];
+	
+	//replace : with \\: for matching expression
+	var pattern = ".*D:hasProperty.*";
+	
+	
+	var regex = new RegExp(pattern, "g");
+	statements = n3.match(regex);
+	
+	if (statements == null) {
+		statements = [];
+	}
+	return statements;
+}
+
+// get node properties from server
+function getPropertyFromServer(id, parentNodeId){
+		//process(server + "doProperty?pnode="+encodeURIComponent(parentNodeId), function(n3) {
+		process("http://localhost/coi/kb/property.n3", function(n3) {
+			// add by lixiaodong for test
+			parentNodeId = "C0007066";
+			id="C1533643";
+			var foundTerms = processProperty(n3);
+ 			if (foundTerms.length > 0)
+			{
+ 				showProperty(foundTerms, id.substring(0, id.length-2));
+ 			} 
+ 			else  {
+ 				alert ("no properties found");
+ 			}
+ 		});
+}
 function appendTreeNew(parentNodeId){
 	childIds = getAllChildIds(parentNodeId);
 	if(childIds != undefined){
