@@ -5,11 +5,11 @@
   <meta http-equiv="PRAGMA" content="NO-CACHE">
   <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
   <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
-  <meta name="keywords" content="COI Demo">
 
   <title>COI Demo</title>
   <link rel="stylesheet" href="coi.css" type="text/css">
   <link rel="stylesheet" href="treeview.css" type="text/css">
+  <link rel="stylesheet" href="jquery.tabs.css" type="text/css" media="print, projection, screen">
   <script src="src/jquery-latest.js" type="text/javascript"></script>
   <script src="src/coi.js" type="text/javascript"></script>
   <script src="src/jquery.blockUI.js" type="text/javascript"></script>
@@ -119,23 +119,53 @@
     <hr>
 
     <h3>Medication:</h3>
-
-    <table>
-      <tr>
-        <td width="50%">Drug Ingredient <!--button id="DisplayAllDrug" class="search">All</button--></td>
-        <td>Property</td>
-      </tr>
-
-      <tr>
-        <td><!--  input type="text" id="drugName">--><button id="drugSearch" class="search"><img src="images/search.png" alt="drug search"></button></td>
-        <td></td>
-      </tr>
-    </table>
-
-    <div id="BROSWER" class="drugname"></div>
-
-    <div id="PROPERTY" class="property"></div><button id="APPLYBUTTON" class="applyCode">Apply Criteria</button>
-    <input id="CLEAR" class="clear" type="image" src="images/reload.gif">
+	<DIV ID="tabContainer">
+		<ul>
+           <li><a href="#DrugOntology"><span>Drug Ontology</span></a></li>
+           <li><a href="#STDM"><span>STDM</span></a></li>
+           <li><a href="#MappingRule"><span>Mapping Rule</span></a></li>
+        </ul>
+        
+        <DIV id ="DrugOntology">
+	       	<table>
+		      <tr>
+		        <td width="50%">Drug Ingredient <!--button id="DisplayAllDrug" class="search">All</button--></td>
+		        <td>Property</td>
+		      </tr>
+		
+		      <tr>
+		        <td><!--  input type="text" id="drugName">--><button id="drugSearch" class="search"><img src="images/search.png" alt="drug search"></button></td>
+		        <td></td>
+		      </tr>
+		    </table>
+		    <div id="BROSWER" class="drugname"></div>
+		
+		    <div id="PROPERTY" class="property"></div><button id="APPLYBUTTON" class="applyCode">Apply Criteria</button>
+		    <input id="CLEAR" class="clear" type="image" src="images/reload.gif">
+        </DIV>
+        <DIV id ="STDM">
+        	<table id="Inclusion" style="table-layout:fixed">
+          <thead class="title">
+            <tr nowrap>
+              <th width="40%">Inclusion Category</th>
+              <th width="40%">Constraint</th>
+              <th width="10%">&nbsp;</th>
+            </tr>
+          </thead>
+        </table>
+        </DIV>
+        <DIV id ="MappingRule">
+        	<table id="Inclusion" style="table-layout:fixed">
+	          <thead class="title">
+	            <tr nowrap>
+	              <th width="40%">Inclusion Category</th>
+	              <th width="40%">Constraint</th>
+	              <th width="10%">&nbsp;</th>
+	            </tr>
+	          </thead>
+        	</table>
+        </DIV>
+     </DIV>
   </div>
 
   <div class="footer">

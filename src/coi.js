@@ -1794,6 +1794,7 @@ $(function() {
 			clearCriteriaContainer();	
 			//loadDrugTreeData();
 			searchAllDrugTree();
+			$("#tabContainer").tabs();
 		}
 	);
 		
