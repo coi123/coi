@@ -1,7 +1,7 @@
 function loadSPARQL(){
 	var tbody = window.opener.document.getElementById("inListBody");
 	var genderStr="";
-	var ageStr="\t\t?patient sdtm:hasAge ?age .\n";
+	var ageStr="\t?patient sdtm:hasAge ?age .\n";
 	var drugStr="";
 	var flg=0;
 	var maxAge=0;
@@ -11,12 +11,12 @@ function loadSPARQL(){
 			var tdValue = tr.childNodes[1].childNodes[0].nodeValue;
 			if(tdValue == "Male"){
 				if(tr.childNodes[3].childNodes[0].nodeValue == "true"){
-					genderStr = genderStr + "\t\t?patient sdtm:gender :Male .\n"
+					genderStr = genderStr + "\t?patient sdtm:gender :Male .\n"
 				}
 			}
 			else if(tdValue == "Female"){
 				if(tr.childNodes[3].childNodes[0].nodeValue == "true"){
-					genderStr = genderStr + "\t\t?patient sdtm:gender :Female .\n"
+					genderStr = genderStr + "\t?patient sdtm:gender :Female .\n"
 				}
 			}
 			else if(tdValue == "AgeMin"){
@@ -31,7 +31,7 @@ function loadSPARQL(){
 				var index = tr.id.indexOf("_");
 				var drugType = tr.childNodes[0].childNodes[0].nodeValue;
 				var constraint = tr.childNodes[2].childNodes[0].value;
-				drugStr = drugStr + "\t\t?x1 rdf:type " + drugType +  ":"+ tr.id.substring(index+1, tr.id.length-2)+ ";" + drugType + ":" + constraint + "\n";
+				drugStr = drugStr + "\t?x1 rdf:type " + drugType +  ":"+ tr.id.substring(index+1, tr.id.length-2)+ ";" + drugType + ":" + constraint + "\n";
 				if(index != -1){
 					drugId = tr.id.substring(index+1, tr.id.length);
 					var durgInfo = window.opener.document.getElementById(drugId);
@@ -40,7 +40,7 @@ function loadSPARQL(){
 						//	var drugName = $(this).get(0).childNodes[1].nodeValue;
 						//	drugStr = drugStr + "\t\t?x1 rdf:type sdtm:"+ drugName + "\n";
 						var childId = $(this).get(0).id.substring(0, $(this).get(0).id.length-2);
-						drugStr = drugStr + "\t\t?x1 rdf:type " + drugType +  ":"+ childId + ";" + drugType + ":" + constraint + "\n";
+						drugStr = drugStr + "\t?x1 rdf:type " + drugType +  ":"+ childId + ";" + drugType + ":" + constraint + "\n";
 						//}
 					});
 				}
@@ -53,16 +53,16 @@ function loadSPARQL(){
 	// add one conditon
 	if(flg == 1){
 		if(maxAge!=0){
-			ageStr = ageStr + "\t\tFILTER ( ?age <= " + maxAge + " )\n";
+			ageStr = ageStr + "\tFILTER ( ?age <= " + maxAge + " )\n";
 		}
 		else{
-			ageStr = ageStr + "\t\tFILTER ( ?age >= " + minAge + " )\n";
+			ageStr = ageStr + "\tFILTER ( ?age >= " + minAge + " )\n";
 		}
 	}
 	
 	// add two condition
 	if(flg == 2){
-		ageStr = ageStr + "\t\tFILTER ( ?age >= " + minAge + " && ?age <= " + maxAge + " )\n";
+		ageStr = ageStr + "\tFILTER ( ?age >= " + minAge + " && ?age <= " + maxAge + " )\n";
 	}
 	
 	if(flg != 0){
@@ -84,7 +84,7 @@ function loadSPARQL(){
 function loadExtSPARQL(){
 	var tbody = window.opener.document.getElementById("exListBody");
 	var genderStr="";
-	var ageStr="\t\t?patient sdtm:hasAge ?age .\n";
+	var ageStr="\t?patient sdtm:hasAge ?age .\n";
 	var drugStr="";
 	var flg=0;
 	var maxAge=0;
@@ -94,12 +94,12 @@ function loadExtSPARQL(){
 			var tdValue = tr.childNodes[1].childNodes[0].nodeValue;
 			if(tdValue == "Male"){
 				if(tr.childNodes[3].childNodes[0].nodeValue == "true"){
-					genderStr = genderStr + "\t\t?patient sdtm:gender :Male .\n"
+					genderStr = genderStr + "\t?patient sdtm:gender :Male .\n"
 				}
 			}
 			else if(tdValue == "Female"){
 				if(tr.childNodes[3].childNodes[0].nodeValue == "true"){
-					genderStr = genderStr + "\t\t?patient sdtm:gender :Female .\n"
+					genderStr = genderStr + "\t?patient sdtm:gender :Female .\n"
 				}
 			}
 			else if(tdValue == "AgeMin"){
@@ -114,13 +114,13 @@ function loadExtSPARQL(){
 				var index = tr.id.indexOf("_");
 				var drugType = tr.childNodes[0].childNodes[0].nodeValue;
 				var constraint = tr.childNodes[2].childNodes[0].value;
-				drugStr = drugStr + "\t\t?x1 rdf:type " + drugType +  ":"+ tr.id.substring(index+1, tr.id.length-2)+ ";" + drugType + ":" + constraint + "\n";
+				drugStr = drugStr + "\t?x1 rdf:type " + drugType +  ":"+ tr.id.substring(index+1, tr.id.length-2)+ ";" + drugType + ":" + constraint + "\n";
 				if(index != -1){
 					drugId = tr.id.substring(index+1, tr.id.length);
 					var durgInfo = window.opener.document.getElementById(drugId);
 					$(durgInfo).find("li").each(function(){
 						var childId = $(this).get(0).id.substring(0, $(this).get(0).id.length-2);
-						drugStr = drugStr + "\t\t?x1 rdf:type " + drugType +  ":"+ childId + ";" + drugType + ":" + constraint + "\n";
+						drugStr = drugStr + "\t?x1 rdf:type " + drugType +  ":"+ childId + ";" + drugType + ":" + constraint + "\n";
 						//}
 					});
 				}
@@ -133,16 +133,16 @@ function loadExtSPARQL(){
 	// add one conditon
 	if(flg == 1){
 		if(maxAge!=0){
-			ageStr = ageStr + "\t\tFILTER ( ?age <= " + maxAge + " )\n";
+			ageStr = ageStr + "\tFILTER ( ?age <= " + maxAge + " )\n";
 		}
 		else{
-			ageStr = ageStr + "\t\tFILTER ( ?age >= " + minAge + " )\n";
+			ageStr = ageStr + "\tFILTER ( ?age >= " + minAge + " )\n";
 		}
 	}
 	
 	// add two condition
 	if(flg == 2){
-		ageStr = ageStr + "\t\tFILTER ( ?age >= " + minAge + " && ?age <= " + maxAge + " )\n";
+		ageStr = ageStr + "\tFILTER ( ?age >= " + minAge + " && ?age <= " + maxAge + " )\n";
 	}
 	
 	if(flg != 0){
