@@ -1867,19 +1867,24 @@ function selectIndications(tabValue, container)
 		var liElement = $(container+" .selectColor").find("li");
 		if(tabValue == "do"){
 			if(liElement.length != 0){
-				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "<a onclick='openDetailInfo(\"" + selectDrug.id + "\")' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td><input type='text' length='10' value='dose < 10mg'/></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "<a onclick='openDetailInfo(\"" + selectDrug.id + "\", 0)' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td><input type='text' length='10' value='dose < 10mg'/></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
 			}
 			else{
 				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "</td><td class='showStyle'><input type='text' length='10' value='dose < 10mg'/></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
 			}
 		}
 		else{
-			select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "</td><td class='showStyle'></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+			if(liElement.length != 0){
+				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "<a onclick='openDetailInfo(\"" + selectDrug.id + "\", 1)' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+			}
+			else{
+				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "</td><td class='showStyle'></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+			}
 		}
 	}
 }
-function openDetailInfo(id){
-	window.open("drugList.html?id="+id,"newWindow" ,"height=510, width=500, top=400, left=500,toolbar=no, menubar=no, scrollbars=auto, resizable=no, location=no, status=no");
+function openDetailInfo(id, flg){
+	window.open("drugList.html?id="+id+"&flg="+flg,"newWindow" ,"height=510, width=500, top=400, left=500,toolbar=no, menubar=no, scrollbars=auto, resizable=no, location=no, status=no");
 }
 
 function selectTreeItem(container, type)
@@ -2046,22 +2051,11 @@ $(function() {
 
 	});
 	$("#APPLYBUTTON").click(function() {
-		var tabValue = "";
-		var container;
-		$("#tabContainer .tabs-container").each(function(){
-			if($(this).get(0).className.indexOf("tabs-hide") == -1){
-				if(this.id == "DrugOntology"){
-					tabValue="do";
-					container="#BROSWER"
-				}
-				else if(this.id == "SDTM"){
-					tabValue="sdtm";
-					container="#SDTMTree"
-				}
-				else{}
-			}
-		});
-		selectIndications(tabValue, container);
+		selectIndications("do", "#BROSWER");
+	});
+	
+	$("#APPLYBUTTONSDTM").click(function() {
+		selectIndications("sdtm", "#SDTMTree");
 	});
 	
 	$("#querysql").click(function(){
