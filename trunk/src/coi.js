@@ -476,6 +476,7 @@ function displayAllTree(container){
 		//setTimeout("appendAllChildNew('" + firstLevelDrug[i][0] + "')", i*100);
 	}
 	$("#"+rootNodeId).append(rootStr);
+	
 	$(container).Treeview({
 			speed: "fast",
 			toggle: function() {
@@ -492,6 +493,72 @@ function displayAllTree(container){
 				}
 		}
    });
+   $("#"+rootNodeId + " li").click(function(){
+			var children = $(this).find(".selectColor");
+			if(children.length == 0){
+				$("#BROSWER .selectColor").each(function(){
+					$(this).removeClass("selectColor");
+				});
+				
+				// aviod the children select start
+				$(this).removeClass("unselectColor");
+				var ulChildren = $(this).children("ul");
+				if(ulChildren.length != 0){
+					liChildren = $(ulChildren).children("li");
+					if(liChildren.length != 0){
+						for(var i = 0 ; i < liChildren.length;i++){
+							$(liChildren).addClass("unselectColor");
+						}
+					}
+				}
+				var bodyId = this.id.substring(0, this.id.length-2);
+				// aviod the children select end
+				$(this).addClass("selectColor");
+				selectTimeForAcr = new Date().getTime();
+				if(this.lastChild.id != undefined){
+					selectId = this.lastChild.id;
+				}
+				else{
+					selectId = this.id;
+				}
+				
+			}
+			else{
+				var flg = 0;
+				$("#BROSWER .selectColor").each(function(){
+					var time = new Date().getTime();
+					if(time-selectTimeForAcr >= 1000){
+						flg = 1;
+						$(this).removeClass("selectColor");
+					}
+				});
+				if(flg == 1){
+					// aviod the children select start
+					$(this).removeClass("unselectColor");
+					var ulChildren = $(this).children("ul");
+					if(ulChildren.length != 0){
+						liChildren = $(ulChildren).children("li");
+						if(liChildren.length != 0){
+							for(var i = 0 ; i < liChildren.length;i++){
+								$(liChildren).addClass("unselectColor");
+							}
+						}
+					}
+					var bodyId = this.id.substring(0, this.id.length-2);
+					// aviod the children select end
+					$(this).addClass("selectColor");
+					selectTimeForAcr = new Date().getTime();
+					if(this.lastChild.id != undefined){
+						selectId = this.lastChild.id;
+					}
+					else{
+						selectId = this.id;
+					}
+					flg = 0;
+				}
+			}
+			getPropertyFromServer($(this).get(0).id, $(this).get(0).parentNode.id);
+	});
 	//for(var i=0;i<firstLevelDrug.length;i++){
 		//var time = new Date().getTime();
 		//appendAllChild(firstLevelDrug[i][0],getAllChildIds(firstLevelDrug[i][0]), drugInfoArray);
@@ -629,19 +696,18 @@ function processProperty(n3){
 
 // get node properties from server
 function getPropertyFromServer(id, parentNodeId){
-		process(server + "/doPropertySEM?pnode="+encodeURIComponent(parentNodeId), function(n3) {
+		//showWait(true);
+		process(server + "doPropertySEM?pnode="+encodeURIComponent(parentNodeId), function(n3) {
 		//process("http://localhost/coi/kb/property.n3", function(n3) {
 			// add by lixiaodong for test
-			parentNodeId = "C0007066";
-			id="C1533643";
+			//parentNodeId = "C0007066";
+			//id="C1533643";
 			var foundTerms = processProperty(n3);
  			if (foundTerms.length > 0)
 			{
  				showProperty(foundTerms, id.substring(0, id.length-2));
- 			} 
- 			else  {
- 				alert ("no properties found");
  			}
+ 			//showWait(false);
  		});
 }
 function appendTreeNew(parentNodeId){
@@ -1480,17 +1546,18 @@ function getSelectionIds(container, element) {
 
 function selectIndications()
 {
-		var time = new Date().getTime();
-		var select;
-		var selectPlace = $(".selected").get(0);
-		if(selectPlace.id == "INCLUSIONGRP"){
-			select = $("#inListBody");
-		}
-		else{
-			select = $("#exListBody");
-		}
-		var selectDrug = $("#BROSWER .selectColor").get(0);
-		var selectDrugName;
+	var time = new Date().getTime();
+	var select;
+	var selectPlace = $(".selected").get(0);
+	if(selectPlace.id == "INCLUSIONGRP"){
+		select = $("#inListBody");
+	}
+	else{
+		select = $("#exListBody");
+	}
+	var selectDrug = $("#BROSWER .selectColor").get(0);
+	var selectDrugName;
+	if(selectDrug !=undefined){
 		if(selectDrug.childNodes[1] != undefined){
 			selectDrugName = selectDrug.childNodes[1].nodeValue;
 		}
@@ -1499,11 +1566,12 @@ function selectIndications()
 		}
 		var liElement = $("#BROSWER .selectColor").find("li");
 		if(liElement.length != 0){
-			select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td class='showStyle'>" + selectDrugName + "<a onclick='openDetailInfo(\"" + selectDrug.id + "\")' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td class='showStyle'>" + selectProperty + "</td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+			select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>do</td><td class='showStyle'>" + selectDrugName + "<a onclick='openDetailInfo(\"" + selectDrug.id + "\")' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td><input type='text' length='10' value='dose < 10mg'/></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
 		}
 		else{
-			select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td class='showStyle'>" + selectDrugName + "</td><td class='showStyle'>" + selectProperty + "</td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+			select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>do</td><td class='showStyle'>" + selectDrugName + "</td><td class='showStyle'><input type='text' length='10' value='dose < 10mg'/></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
 		}
+	}
 }
 function openDetailInfo(id){
 	window.open("drugList.html?id="+id,"newWindow" ,"height=510, width=500, top=400, left=500,toolbar=no, menubar=no, scrollbars=auto, resizable=no, location=no, status=no");
@@ -1596,6 +1664,7 @@ function selectDemographicCriteria(container, category, value)
   });
   
   var entry = "<tr id = '" + id + "'  class='codelist'>" +
+  			  "<td class='showStyle'>sdtm</td>" +
               "<td class='showStyle'>" + category + "</td>" +
               " <td class='showStyle'>" + value + "</td>" +
               " <td class='showStyle' title='delete'><a href=\"javascript:deleteById('" + id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td> " + 
