@@ -629,7 +629,7 @@ function processProperty(n3){
 
 // get node properties from server
 function getPropertyFromServer(id, parentNodeId){
-		process(server + "doPropertySEM?pnode="+encodeURIComponent(parentNodeId), function(n3) {
+		process(server + "/doPropertySEM?pnode="+encodeURIComponent(parentNodeId), function(n3) {
 		//process("http://localhost/coi/kb/property.n3", function(n3) {
 			// add by lixiaodong for test
 			parentNodeId = "C0007066";
