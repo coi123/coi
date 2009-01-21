@@ -46,6 +46,23 @@ function loadSPARQL(){
 						});
 					}
 				}
+				else if(tr.childNodes[0].childNodes[0].nodeValue == "sdtm"){
+					var index = tr.id.indexOf("_");
+					var sdtmType = tr.childNodes[0].childNodes[0].nodeValue;
+					drugStr = drugStr + "\t?x1 rdf:type " + sdtmType +  ":"+ tr.id.substring(index+1, tr.id.length-2)+".\n";
+					if(index != -1){
+						sdtmId = tr.id.substring(index+1, tr.id.length);
+						var sdtmInfo = window.opener.document.getElementById(sdtmId);
+						$(sdtmInfo).find("li").each(function(){
+							//if($(this).get(0).childNodes[1] != undefined){
+							//	var drugName = $(this).get(0).childNodes[1].nodeValue;
+							//	drugStr = drugStr + "\t\t?x1 rdf:type sdtm:"+ drugName + "\n";
+							var childId = $(this).get(0).id.substring(0, $(this).get(0).id.length-2);
+							drugStr = drugStr + "\t?x1 rdf:type " + sdtmType +  ":"+ childId + ".\n";
+							//}
+						});
+					}
+				}
 			}
 			
 			$("#genderCond").get(0).innerHTML=genderStr;
@@ -124,6 +141,23 @@ function loadExtSPARQL(){
 						$(durgInfo).find("li").each(function(){
 							var childId = $(this).get(0).id.substring(0, $(this).get(0).id.length-2);
 							drugStr = drugStr + "\t?x1 rdf:type " + drugType +  ":"+ childId + ";" + drugType + ":" + constraint + "\n";
+							//}
+						});
+					}
+				}
+				else if(tr.childNodes[0].childNodes[0].nodeValue == "sdtm"){
+					var index = tr.id.indexOf("_");
+					var sdtmType = tr.childNodes[0].childNodes[0].nodeValue;
+					drugStr = drugStr + "\t?x1 rdf:type " + sdtmType +  ":"+ tr.id.substring(index+1, tr.id.length-2)+".\n";
+					if(index != -1){
+						sdtmId = tr.id.substring(index+1, tr.id.length);
+						var sdtmInfo = window.opener.document.getElementById(sdtmId);
+						$(sdtmInfo).find("li").each(function(){
+							//if($(this).get(0).childNodes[1] != undefined){
+							//	var drugName = $(this).get(0).childNodes[1].nodeValue;
+							//	drugStr = drugStr + "\t\t?x1 rdf:type sdtm:"+ drugName + "\n";
+							var childId = $(this).get(0).id.substring(0, $(this).get(0).id.length-2);
+							drugStr = drugStr + "\t?x1 rdf:type " + sdtmType +  ":"+ childId + ".\n";
 							//}
 						});
 					}
