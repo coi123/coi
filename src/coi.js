@@ -10,6 +10,8 @@ var selectTimeForAcr="";
 var treeStr="";
 var relationArr = new Array();
 var nodeStr="";
+var relationSdtmArr = new Array();
+var sdtmLevelOne = new Array();
 
 /* Show/hide the wait cursor 
  * or show a wait message */
@@ -422,12 +424,6 @@ function deleteById(id){
 	$("#"+id).remove();
 }
 function searchAllDrugTree(){
-    //$("#searchValue").text("");
-    //if (nodeValue == "") {
-    //	alert ("please entry the search keyword");
-    //	return false;
-    //}
-	
 	try {
 		showWait(true);
   		process(server + "/coi/kb/DOClassTreeA.n3", function(n3) {
@@ -577,6 +573,310 @@ function displayAllTree(container){
 	//$(container).append(treeStr);
 	
 	
+}
+function getAllSDTMTreeInfo(n3){
+	var statements = n3.split("\n");
+	n3="";
+	
+	var k = 0;
+	var m = 0;
+	var pattern = ".*rdfs:subClassOf.*";
+	var patternRegex = new RegExp(pattern, "g");
+	for(var i = 0;i < statements.length;i++){
+		if(statements[i].match(patternRegex)!=null){
+			var sdtmInfoArray = statements[i].split(".");
+			var sdtmId = getSdtmId(sdtmInfoArray[0]);
+			var sdtmName = getSdtmName(sdtmInfoArray[2]);
+			var sdtmParentId = getSdtmParentId(sdtmInfoArray[0]);
+			var levelOne = sdtmInfoArray[1].indexOf("level 1") == -1?false:true;
+			if(levelOne){
+				sdtmLevelOne[m] = new Array();
+				sdtmLevelOne[m][0] = sdtmId;
+				sdtmLevelOne[m][1] = sdtmName;
+				m++;
+			}
+			else{
+				if(relationSdtmArr.length == 0){
+					relationSdtmArr[k] = new Array();
+					relationSdtmArr[k][0] = sdtmParentId;
+					relationSdtmArr[k][1] = new Array();
+					relationSdtmArr[k][1][0] = sdtmId+"_"+sdtmName;
+					k++;
+				}
+				else{
+					var sdtmParentIndex = hasSdtmParentId(sdtmParentId);
+					if(sdtmParentIndex == -1){
+						relationSdtmArr[k] = new Array();
+						relationSdtmArr[k][0] = sdtmParentId;
+						relationSdtmArr[k][1] = new Array();
+						relationSdtmArr[k][1][0] = sdtmId+"_"+sdtmName;
+						k++;
+					}
+					else{
+						//alert(drugParentIndex);
+						var length = relationSdtmArr[sdtmParentIndex][1].length;
+						if(relationSdtmArr[sdtmParentIndex][1].toString().indexOf(sdtmId+"_"+sdtmName) ==-1){
+							relationSdtmArr[sdtmParentIndex][1][length] = sdtmId+"_"+sdtmName;
+						}
+					}
+				}
+			}
+		}
+		else{
+			continue;
+		}
+	}
+}
+function hasSdtmParentId(parentId){
+	for(var i = 0;i < relationSdtmArr.length;i++){
+		if(relationSdtmArr[i][0] == parentId){
+			return i;
+		}
+	}
+	return -1;
+}
+function getSdtmId(str){
+	return str.substring(str.indexOf(":")+1, str.indexOf(" "));
+}
+function getSdtmName(str){
+	return str.substring(str.lastIndexOf(":")+1, str.length);
+}
+function getSdtmParentId(str){
+	return str.substring(str.lastIndexOf(":")+1, str.length);
+}
+function loadSdtmAllTree(){
+	try {
+  		process(server + "/coi/kb/SDTMTree.n3", function(n3) {
+  		//process(server + "/doSubAll?a=1", function(n3) {
+  			//now you get all sub tree data
+			getAllSDTMTreeInfo(n3);
+			loadSdtmAllShow();
+ 		});
+ 	} 
+ 	catch (e) {
+ 		alert("ERROR [suggest]:" + e.toString());
+		throw e;
+	}	
+}
+function loadSdtmAllShow(){
+	var container = $("#SDTMTree");
+	for(var i =0;i<sdtmLevelOne.length;i++){
+		container.append("<li id='" + sdtmLevelOne[i][0] + "li' class='closed unselectColor'>" + sdtmLevelOne[i][1] + getTempNode(sdtmLevelOne[i][0]) + "</li>");
+	}
+	container.Treeview({
+			speed: "fast",
+			toggle: function() {
+				if(this.style.display=="block"){
+					if($(this).find("li").size()==0){
+						appendSdtmAllChild(this.id, getAllSdtmChildIds(this.id));
+						$(this).append(nodeStr);
+						getSdtmTreeViewForNode(this.id);
+						nodeStr="";
+					}
+				}
+		}
+   });
+}
+function getAllSdtmChildIds(sdtmId){
+	var sdtmChildIds = new Array();
+	var index = hasSdtmParentId(sdtmId);
+	if(index != -1){
+		var length = relationSdtmArr[index][1].length;
+		for(var i =0;i < length;i++){
+			sdtmChildIds[i] = new Array();
+			sdtmChildIds[i][0] = relationSdtmArr[index][1][i].substring(0, relationSdtmArr[index][1][i].indexOf("_"));
+			sdtmChildIds[i][1] = relationSdtmArr[index][1][i].substring(relationSdtmArr[index][1][i].indexOf("_")+1, relationSdtmArr[index][1][i].length);
+		}
+		return sdtmChildIds;
+	}
+	else{
+		return sdtmChildIds;
+	}
+}
+function appendSdtmAllChild(parentNodeId, childIds){
+	if(childIds != undefined){
+		for(var childIndex = 0 ; childIndex < childIds.length;childIndex++){
+			var sdtmId = childIds[childIndex][0];
+			var sdtmName = childIds[childIndex][1];
+			var childSdtmIds = getAllSdtmChildIds(sdtmId);
+			if(childSdtmIds.length != 0){
+				//$("#"+parentNodeId).append("<li id='" + drugId + "li' class='closed unselectColor'>" + drugName + getTempNode(drugId)+ "</li>");
+				nodeStr=nodeStr+"<li id='" + sdtmId + "li' class='closed unselectColor'>" + sdtmName + getStartTempNode(sdtmId)+ "</li>";
+				appendSdtmAllChild(sdtmId, childSdtmIds);
+				nodeStr=nodeStr+getEndTempNode();
+			}
+			else{
+				//$("#"+parentNodeId).append("<li id='" + drugId + "li' class='closed unselectColor'>" + drugName + "</li>");
+				nodeStr=nodeStr+"<li id='" + sdtmId + "li' class='closed unselectColor'>" + sdtmName + "</li>";
+			}
+		}
+	}
+}
+
+function getSdtmTreeViewForNode(parentNodeId){
+	$("#"+parentNodeId).Treeview({
+			speed: "fast",
+   	});
+   	$("#"+parentNodeId + " li").click(function(){
+			var children = $(this).find(".selectColor");
+			if(children.length == 0){
+				$("#SDTMTree .selectColor").each(function(){
+					$(this).removeClass("selectColor");
+				});
+				
+				// aviod the children select start
+				$(this).removeClass("unselectColor");
+				var ulChildren = $(this).children("ul");
+				if(ulChildren.length != 0){
+					liChildren = $(ulChildren).children("li");
+					if(liChildren.length != 0){
+						for(var i = 0 ; i < liChildren.length;i++){
+							$(liChildren).addClass("unselectColor");
+						}
+					}
+				}
+				var bodyId = this.id.substring(0, this.id.length-2);
+				// aviod the children select end
+				$(this).addClass("selectColor");
+				selectTimeForAcr = new Date().getTime();
+				if(this.lastChild.id != undefined){
+					selectId = this.lastChild.id;
+				}
+				else{
+					selectId = this.id;
+				}
+				
+			}
+			else{
+				var flg = 0;
+				$("#SDTMTree .selectColor").each(function(){
+					var time = new Date().getTime();
+					if(time-selectTimeForAcr >= 1000){
+						flg = 1;
+						$(this).removeClass("selectColor");
+					}
+				});
+				if(flg == 1){
+					// aviod the children select start
+					$(this).removeClass("unselectColor");
+					var ulChildren = $(this).children("ul");
+					if(ulChildren.length != 0){
+						liChildren = $(ulChildren).children("li");
+						if(liChildren.length != 0){
+							for(var i = 0 ; i < liChildren.length;i++){
+								$(liChildren).addClass("unselectColor");
+							}
+						}
+					}
+					var bodyId = this.id.substring(0, this.id.length-2);
+					// aviod the children select end
+					$(this).addClass("selectColor");
+					selectTimeForAcr = new Date().getTime();
+					if(this.lastChild.id != undefined){
+						selectId = this.lastChild.id;
+					}
+					else{
+						selectId = this.id;
+					}
+					flg = 0;
+				}
+			}
+			//getPropertyFromServer($(this).get(0).id, $(this).get(0).parentNode.id);
+	});
+}
+function displaySDTMAllTree(container){
+	// append firstLevel node
+	hasSdtmParentId
+	var rootNodeValue = "General drug type";
+	$(container).append("<li id='" + rootNodeId + "li' class='closed unselectColor'>" + rootNodeValue + getTempNode(rootNodeId) + "</li>");
+	// apend second level node
+	var firstLevelDrug = getAllChildIds(rootNodeId);
+	var rootStr="";
+	for(var i=0;i<firstLevelDrug.length;i++){
+		rootStr = rootStr+"<li id='" + firstLevelDrug[i][0] + "li' class='closed unselectColor'>" + firstLevelDrug[i][1] + getTempNode(firstLevelDrug[i][0]) + "</li>";
+	}
+	$("#"+rootNodeId).append(rootStr);
+	
+	$(container).Treeview({
+			speed: "fast",
+			toggle: function() {
+				if(this.style.display=="block"){
+					if($(this).find("li").size()==0){
+						//appendTreeNew(this.id);
+						appendAllChild(this.id, getAllChildIds(this.id));
+						$(this).append(nodeStr);
+						getTreeViewForNode(this.id);
+						nodeStr="";
+					}
+				}
+		}
+   });
+   $("#"+rootNodeId + " li").click(function(){
+			var children = $(this).find(".selectColor");
+			if(children.length == 0){
+				$("#BROSWER .selectColor").each(function(){
+					$(this).removeClass("selectColor");
+				});
+				
+				// aviod the children select start
+				$(this).removeClass("unselectColor");
+				var ulChildren = $(this).children("ul");
+				if(ulChildren.length != 0){
+					liChildren = $(ulChildren).children("li");
+					if(liChildren.length != 0){
+						for(var i = 0 ; i < liChildren.length;i++){
+							$(liChildren).addClass("unselectColor");
+						}
+					}
+				}
+				var bodyId = this.id.substring(0, this.id.length-2);
+				// aviod the children select end
+				$(this).addClass("selectColor");
+				selectTimeForAcr = new Date().getTime();
+				if(this.lastChild.id != undefined){
+					selectId = this.lastChild.id;
+				}
+				else{
+					selectId = this.id;
+				}
+				
+			}
+			else{
+				var flg = 0;
+				$("#BROSWER .selectColor").each(function(){
+					var time = new Date().getTime();
+					if(time-selectTimeForAcr >= 1000){
+						flg = 1;
+						$(this).removeClass("selectColor");
+					}
+				});
+				if(flg == 1){
+					// aviod the children select start
+					$(this).removeClass("unselectColor");
+					var ulChildren = $(this).children("ul");
+					if(ulChildren.length != 0){
+						liChildren = $(ulChildren).children("li");
+						if(liChildren.length != 0){
+							for(var i = 0 ; i < liChildren.length;i++){
+								$(liChildren).addClass("unselectColor");
+							}
+						}
+					}
+					var bodyId = this.id.substring(0, this.id.length-2);
+					// aviod the children select end
+					$(this).addClass("selectColor");
+					selectTimeForAcr = new Date().getTime();
+					if(this.lastChild.id != undefined){
+						selectId = this.lastChild.id;
+					}
+					else{
+						selectId = this.id;
+					}
+					flg = 0;
+				}
+			}
+			getPropertyFromServer($(this).get(0).id, $(this).get(0).parentNode.id);
+	});
 }
 
 function loadChildForOpenerPage(id){
@@ -1544,7 +1844,7 @@ function getSelectionIds(container, element) {
 }
 
 
-function selectIndications()
+function selectIndications(tabValue, container)
 {
 	var time = new Date().getTime();
 	var select;
@@ -1555,7 +1855,7 @@ function selectIndications()
 	else{
 		select = $("#exListBody");
 	}
-	var selectDrug = $("#BROSWER .selectColor").get(0);
+	var selectDrug = $(container+" .selectColor").get(0);
 	var selectDrugName;
 	if(selectDrug !=undefined){
 		if(selectDrug.childNodes[1] != undefined){
@@ -1564,12 +1864,17 @@ function selectIndications()
 		else{
 			selectDrugName = selectDrug.textContent;
 		}
-		var liElement = $("#BROSWER .selectColor").find("li");
-		if(liElement.length != 0){
-			select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>do</td><td class='showStyle'>" + selectDrugName + "<a onclick='openDetailInfo(\"" + selectDrug.id + "\")' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td><input type='text' length='10' value='dose < 10mg'/></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+		var liElement = $(container+" .selectColor").find("li");
+		if(tabValue == "do"){
+			if(liElement.length != 0){
+				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "<a onclick='openDetailInfo(\"" + selectDrug.id + "\")' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td><input type='text' length='10' value='dose < 10mg'/></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+			}
+			else{
+				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "</td><td class='showStyle'><input type='text' length='10' value='dose < 10mg'/></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+			}
 		}
 		else{
-			select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>do</td><td class='showStyle'>" + selectDrugName + "</td><td class='showStyle'><input type='text' length='10' value='dose < 10mg'/></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+			select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "</td><td class='showStyle'></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
 		}
 	}
 }
@@ -1740,8 +2045,23 @@ $(function() {
 		clearCriteriaContainer();	
 
 	});
-	$("#APPLYBUTTON").click(function() {			
-		selectIndications();
+	$("#APPLYBUTTON").click(function() {
+		var tabValue = "";
+		var container;
+		$("#tabContainer .tabs-container").each(function(){
+			if($(this).get(0).className.indexOf("tabs-hide") == -1){
+				if(this.id == "DrugOntology"){
+					tabValue="do";
+					container="#BROSWER"
+				}
+				else if(this.id == "SDTM"){
+					tabValue="sdtm";
+					container="#SDTMTree"
+				}
+				else{}
+			}
+		});
+		selectIndications(tabValue, container);
 	});
 	
 	$("#querysql").click(function(){
@@ -1863,6 +2183,7 @@ $(function() {
 			clearCriteriaContainer();	
 			//loadDrugTreeData();
 			searchAllDrugTree();
+			loadSdtmAllTree();
 			$("#tabContainer").tabs();
 		}
 	);
