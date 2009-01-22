@@ -1,5 +1,3 @@
-var server = location.protocol + "//" + location.hostname + ":" + location.port;
-
 var inclusionFlag = false;
 var exclusionFlag = false;
 var blockUI = false;
@@ -139,7 +137,7 @@ function itemHasChild(uri) {
 /* Transform the N3 retrieved from the URL to RDF/XML and process it in the callback function. */
 /**function processRDF(url, callback) {
 	try {
-		$.post(server + "/JENA2", { URL: url, CONVERSION: "N3 RDF/XML" }, function(rdfXml) {
+		$.post(host + path + "/JENA2", { URL: url, CONVERSION: "N3 RDF/XML" }, function(rdfXml) {
 			callback(rdfXml);
 		});
 	} catch (e) {
@@ -151,7 +149,7 @@ function itemHasChild(uri) {
 //sync execution of callback
 function processRDF(url, callback) {
 	try {
-		$.ajaxSync({url: server + "/JENA2", type: "POST", data: { URL: url, CONVERSION: "N3 RDF/XML" }, success: function(rdfXml) {
+		$.ajaxSync({url: host + path + "/JENA2", type: "POST", data: { URL: url, CONVERSION: "N3 RDF/XML" }, success: function(rdfXml) {
 			try {
 				callback(rdfXml);
 			} catch (e) {
@@ -337,7 +335,7 @@ function loadIndicationSubTree(container, bodyID) {
 	
 	//alert('loading indication: selection = '+selection)
 	
-	selection = server + "/.context" + encodeURIComponent(" " + selection);	
+	selection = host + path + "/.context" + encodeURIComponent(" " + selection);	
 	
 	
 	var pquery = 	"@prefix : <http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#> .\n"+
@@ -352,13 +350,13 @@ function loadIndicationSubTree(container, bodyID) {
  			       	"{?B 	rdfs:label   ?C}. \n"  
 
     //alert('loading indication: query = '+pquery)
-  	pquery = server + "/.context" + encodeURIComponent(" " + pquery);				
+  	pquery = host + path + "/.context" + encodeURIComponent(" " + pquery);				
   	
-  	processRDF(server + "/Indication?location="+encodeURIComponent(selection)+"&query="+encodeURIComponent(pquery), function(rdfXml) {	       
+  	processRDF(host + path + "/Indication?location="+encodeURIComponent(selection)+"&query="+encodeURIComponent(pquery), function(rdfXml) {	       
 
        */
     //get indication from acr database   
-    processRDF(server + "/acrIndicationByBodyPart?RID="+bodyID, function(rdfXml) {	          
+    processRDF(host + path + "/acrIndicationByBodyPart?RID="+bodyID, function(rdfXml) {	          
                var pathoItem = getSubjectObjects(getRDFParser(rdfXml),"http://www.w3.org/2000/01/rdf-schema#label");
 	    
        
@@ -473,7 +471,7 @@ function loadPathoSubTree(container, bodyID)  {
 	
 	//alert('loading indication: selection = '+selection)
 	
-	selection = server + "/.context" + encodeURIComponent(" " + selection);	
+	selection = host + path + "/.context" + encodeURIComponent(" " + selection);	
 	
 	
 	var pquery = 	"@prefix : <http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#> .\n"+
@@ -488,9 +486,9 @@ function loadPathoSubTree(container, bodyID)  {
  			       	"{?B 	rdfs:label   ?C}. \n"  
 
     //alert('loading indication: query = '+pquery)
-  	pquery = server + "/.context" + encodeURIComponent(" " + pquery);				
+  	pquery = host + path + "/.context" + encodeURIComponent(" " + pquery);				
   	
-  	processRDF(server + "/Indication?location="+encodeURIComponent(selection)+"&query="+encodeURIComponent(pquery), function(rdfXml) {	       
+  	processRDF(host + path + "/Indication?location="+encodeURIComponent(selection)+"&query="+encodeURIComponent(pquery), function(rdfXml) {	       
        var pathoItem = getSubjectObjects(getRDFParser(rdfXml),"http://www.w3.org/2000/01/rdf-schema#label");
 	    
        
@@ -662,7 +660,7 @@ function getTreeData(node, value){
    //alert ("get sub tree data: node" + node +", value ="+value );
   	$.blockUI("<p><img src='js/busy.gif' /> <strong>Please wait...</strong></p> ");	
     
-  	processRDF(server + "/doSubName?drugClass="+value, function(rdfXml) {
+  	processRDF(host + path + "/doSubName?drugClass="+value, function(rdfXml) {
 
 		try{
 			var parser = getRDFParser(rdfXml);
@@ -1015,7 +1013,7 @@ function searchTree(container, nodeValue){
 	$.blockUI("<p><img src='js/busy.gif' /> <strong>Please wait...</strong></p> ");	
     
    		
-  	processRDF(server + "/doNames?drugName="+encodeURIComponent(nodeValue), function(rdfXml) {
+  	processRDF(host + path + "/doNames?drugName="+encodeURIComponent(nodeValue), function(rdfXml) {
   		var parser = getRDFParser(rdfXml);
   		var foundTerms = getSubjectObjects(parser,"http://www.w3.org/2000/01/rdf-schema#label");
 		
@@ -1118,8 +1116,8 @@ function searchIndicationTree(container, nodeValue){
  			       	"{?A 	:Preferred_Name "+ nodeValue + ".}\n";
     //alert (pquery);
     
-    pquery = server + "/.context" + encodeURIComponent(" " + pquery);				
-  	processRDF(server + "/radlexBodyParts?query="+encodeURIComponent(pquery), function(rdfXml) {
+    pquery = host + path + "/.context" + encodeURIComponent(" " + pquery);				
+  	processRDF(host + path + "/radlexBodyParts?query="+encodeURIComponent(pquery), function(rdfXml) {
   		var parser = getRDFParser(rdfXml);
   		var foundTerms = getSubjectObjects(parser,"http://bioontology.org/projects/ontologies/radlex/radlexOwlDlComponent#Preferred_Name");
 		
@@ -1271,8 +1269,8 @@ function getProcedures(){
 					"		rdfs:label ?S}.\n " 
 					
   	//alert(pquery);
-  	pquery = server + "/.context" + encodeURIComponent(" " + pquery);				
-  	processRDF(server + "/ProcList?query="+encodeURIComponent(pquery), function(rdfXml) {
+  	pquery = host + path + "/.context" + encodeURIComponent(" " + pquery);				
+  	processRDF(host + path + "/ProcList?query="+encodeURIComponent(pquery), function(rdfXml) {
   	
   	globalProcTypes = getObjects(rdfXml,"http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#procedureType");
   	
@@ -1671,8 +1669,8 @@ function showInfoInDetailList(){
 //get patietn SCL
 function getPatientSCL(patientId)
 {
-	 processRDF(server + "/patientSCL?patientID="+patientId, function(rdfXml) {	  
-	 	var scl = getObjects(getRDFParser(rdfXml), server + "/RPGDemo/tripleStore/patients#scl");
+	 processRDF(host + path + "/patientSCL?patientID="+patientId, function(rdfXml) {	  
+	 	var scl = getObjects(getRDFParser(rdfXml), host + path + "/RPGDemo/tripleStore/patients#scl");
 	 	if (scl.length > 0) globalPatientSCL = scl[0];
 	    else globalPatientSCL = "0";
 	    
@@ -1699,11 +1697,11 @@ function calculateACRScore(patientId, procedureId, indicationIds, tdElement){
   {
   	var policyName = policyArray[j];
   	if (policyName.indexOf("ACR") != -1)
-  	   policies += " " + server + "/RPGDemo/tripleStore/validationRules.n3"
+  	   policies += " " + host + path + "/RPGDemo/tripleStore/validationRules.n3"
   	else if (policyName.indexOf("Contra-indication") != -1)
-  	   policies += " " + server + "/RPGDemo/tripleStore/contraAlertRules.n3"
+  	   policies += " " + host + path + "/RPGDemo/tripleStore/contraAlertRules.n3"
 //  	else if (policyName.indexOf("Reimbursement") != -1)
-//  	   policies += " " + server + "/RPGDemo/tripleStore/insuranceRules.n3"
+//  	   policies += " " + host + path + "/RPGDemo/tripleStore/insuranceRules.n3"
   	else
   	   alert ("can not find policy file for validation: " + policyName);
   }
@@ -1720,7 +1718,7 @@ function calculateACRScore(patientId, procedureId, indicationIds, tdElement){
 	for (var i = 0; i < indicationIds.length; i++)
 	 selection +=  ":" + indicationIds[i] + "   a :selectedIndication. \n";
 	 
-	selection = server + "/.context" + encodeURIComponent(" " + selection);	
+	selection = host + path + "/.context" + encodeURIComponent(" " + selection);	
 	
 	
 	$.blockUI("<p><img src='js/busy.gif' /> <strong>validating order...</strong></p> ");
@@ -1749,10 +1747,10 @@ function calculateACRScore(patientId, procedureId, indicationIds, tdElement){
 					"{?P        :hasPregnancyWarning \"true\"}."	
  
 
-  	pquery = server + "/.context" + encodeURIComponent(" " + pquery);				
-  	//policies = server + "/.context" + encodeURIComponent(" " + policies);
+  	pquery = host + path + "/.context" + encodeURIComponent(" " + pquery);				
+  	//policies = host + path + "/.context" + encodeURIComponent(" " + policies);
   	
-  	processRDF(server + "/ACRValidation?selections="+encodeURIComponent(selection)+"&policy="+encodeURIComponent(policies)+"&query="+encodeURIComponent(pquery)+"&patientID="+patientId, function(rdfXml) {	         
+  	processRDF(host + path + "/ACRValidation?selections="+encodeURIComponent(selection)+"&policy="+encodeURIComponent(policies)+"&query="+encodeURIComponent(pquery)+"&patientID="+patientId, function(rdfXml) {	         
         try {
        		var parser = getRDFParser(rdfXml);
        		var acrcomment = getObjects(parser,"http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#withComments");
@@ -1836,7 +1834,7 @@ function calculateACRScore(patientId, procedureId, indicationIds, tdElement){
 function getAverageCTDI(bodyParts,patientID, trId)
 {
 	//get CTDI by body parts
-	var pquery = 	"@prefix : <" + server + "/RPGDemo/tripleStore/patients#> .\n"+
+	var pquery = 	"@prefix : <" + host + path + "/RPGDemo/tripleStore/patients#> .\n"+
     				"@prefix owl: <http://www.w3.org/2002/07/owl#> .\n" +
     				"@prefix radlex: <http://bioontology.org/projects/ontologies/radlex/radlexOwlDlComponent#> .\n"+
     				"@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . \n" +
@@ -1848,10 +1846,10 @@ function getAverageCTDI(bodyParts,patientID, trId)
  			       	"{?A 	:sum_ctdi   ?C}."
  			       	
   	//alert(pquery);
-  	pquery = server + "/.context" + encodeURIComponent(" " + pquery);				
-  	processRDF(server + "/patientDosage?query="+encodeURIComponent(pquery), function(rdfXml) {
+  	pquery = host + path + "/.context" + encodeURIComponent(" " + pquery);				
+  	processRDF(host + path + "/patientDosage?query="+encodeURIComponent(pquery), function(rdfXml) {
   		var parser = getRDFParser(rdfXml);
-	  	var CTDI = getObjects(parser,server + "/RPGDemo/tripleStore/patients#sum_ctdi");
+	  	var CTDI = getObjects(parser,host + path + "/RPGDemo/tripleStore/patients#sum_ctdi");
 	  	var sumCTDI = 0;
 	  	if (CTDI.length > 0) sumCTDI = CTDI[0];
 	  	else alert ("no CTDI found for the patient");
@@ -1885,15 +1883,15 @@ function loadProcedures() {
   	//var pquery = "WHERE+predicate%3D%3D%27%3AprocedureType%27+OR+predicate%3D%3D%27%3AbodyPart%27+OR+predicate%3D%3D%27%3AapplyToAnatomicLocation%27+OR+predicate%3D%3D%27%3AhasCPTCode%27+OR+predicate%3D%3D%27rdfs%3Alabel%27%3B"
 //  	alert(encodeURIComponent(pquery));
   	
-  	pquery = server + "/.context" + encodeURIComponent(" " + pquery); 
+  	pquery = host + path + "/.context" + encodeURIComponent(" " + pquery); 
   	//pquery = encodeURIComponent(pquery);				
   	//alert(pquery);
   	
   	
-//  	processRDF(server + "/acrListTest?", function(rdfXml) {
+//  	processRDF(host + path + "/acrListTest?", function(rdfXml) {
 
   
-   	processRDF(server + "/ProcListDB?query="+encodeURIComponent(pquery), function(rdfXml) {
+   	processRDF(host + path + "/ProcListDB?query="+encodeURIComponent(pquery), function(rdfXml) {
 
   		procedureParser = getRDFParser(rdfXml);
 	  	var tempGlobalProcID = getSubjectObjects(procedureParser,"http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#procID");
@@ -2020,7 +2018,7 @@ function getAllIndicationTreeData(node, ulId){
 	
 	// get all indication by body parts
 	
-  	processRDF(server + "/acrListByBodyPart?", function(rdfXml) {	       
+  	processRDF(host + path + "/acrListByBodyPart?", function(rdfXml) {	       
        var indUniqueBodyParts = getObjects(getRDFParser(rdfXml),"http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#applyToAnatomicLocation");
 	   
 	   var RIDs = [];
