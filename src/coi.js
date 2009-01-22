@@ -1,5 +1,3 @@
-var server = location.protocol + "//" + location.hostname + ":" + location.port;
-
 var blockUI = true;
 var inclusionFlag = false;
 var selectId="&nbsp;"
@@ -90,7 +88,7 @@ function filterPrefix(pname) {
 /* Transform the N3 retrieved from the URL to RDF/XML and process it in the callback function. */
 function processRDF(url, callback) {
 	try {
-		$.post(server + "/JENA2", { URL: url, CONVERSION: "N3 RDF/XML" }, function(rdfXml) {
+		$.post(host + path + "/JENA2", { URL: url, CONVERSION: "N3 RDF/XML" }, function(rdfXml) {
 			callback(rdfXml);
 		});
 	} catch (e) {
@@ -101,7 +99,7 @@ function processRDF(url, callback) {
 // direct processing the N3 string using pattern matching
 function process(url, callback) {
 	try {
-		$.ajaxSync({url: server + "/POST", type: "POST", data: { URL: url }, success: function(n3) {
+		$.ajaxSync({url: host + path + "/POST", type: "POST", data: { URL: url }, success: function(n3) {
 			try {
 				callback(n3);
 			} catch (e) {
@@ -211,10 +209,10 @@ function getTreeData(node, value, type){
     switch (type) 
     {
      	case "subPropertyOf": 
-     		querystr += server + "/doSubProperty?propertyName=D:"+encodeURIComponent(value);
+     		querystr += host + path + "/doSubProperty?propertyName=D:"+encodeURIComponent(value);
      		break;
     	case "subClassOf": 
-    		querystr += server + "/doSubName?drugClass="+encodeURIComponent(value);
+    		querystr += host + path + "/doSubName?drugClass="+encodeURIComponent(value);
     		break;
     	default:
     		alert ("not a valid data type for view view");
@@ -426,8 +424,8 @@ function deleteById(id){
 function searchAllDrugTree(){
 	try {
 		showWait(true);
-  		process(server + "/coi/kb/DOClassTreeA.n3", function(n3) {
-  		//process(server + "/doSubAll?a=1", function(n3) {
+  		process(host + path + "/coi/kb/DOClassTreeA.n3", function(n3) {
+  		//process(host + path + "/doSubAll?a=1", function(n3) {
   			//now you get all sub tree data
 			var drugInfoArray = getAllTreeInfo(n3);
 			displayAllTree("#BROSWER");
@@ -646,8 +644,8 @@ function getSdtmParentId(str){
 }
 function loadSdtmAllTree(){
 	try {
-  		process(server + "/coi/kb/SDTMTree.n3", function(n3) {
-  		//process(server + "/doSubAll?a=1", function(n3) {
+  		process(host + path + "/coi/kb/SDTMTree.n3", function(n3) {
+  		//process(host + path + "/doSubAll?a=1", function(n3) {
   			//now you get all sub tree data
 			getAllSDTMTreeInfo(n3);
 			loadSdtmAllShow();
@@ -1067,8 +1065,8 @@ function processProperty(n3){
 // get node properties from server
 function getPropertyFromServer(id, parentNodeId){
 		//showWait(true);
-		process(server + "doPropertySEM?pnode="+encodeURIComponent(parentNodeId), function(n3) {
-		//process("http://localhost/coi/kb/property.n3", function(n3) {
+		process(host + path + "/doPropertySEM?pnode="+encodeURIComponent(parentNodeId), function(n3) {
+		//process(host + path + "/coi/kb/property.n3", function(n3) {
 			// add by lixiaodong for test
 			//parentNodeId = "C0007066";
 			//id="C1533643";
@@ -1315,7 +1313,7 @@ function searchDrugTree(container, nodeValue){
 	showWait(true);
 	
 	try {	
-  		process(server + "/doNames?drugName="+encodeURIComponent(nodeValue), function(n3) {  		
+  		process(host + path + "/doNames?drugName="+encodeURIComponent(nodeValue), function(n3) {  		
 
 			var foundTerms = processTerms(n3);
  			if (foundTerms.length > 0)
@@ -1469,8 +1467,8 @@ function searchIndicationTree(container, nodeValue){
  			       	"{?A 	:Preferred_Name "+ nodeValue + ".}\n";
     //alert (pquery);
     
-    pquery = server + "/.context" + encodeURIComponent(" " + pquery);				
-  	processRDF(server + "/radlexBodyParts?query="+encodeURIComponent(pquery), function(rdfXml) {
+    pquery = host + path + "/.context" + encodeURIComponent(" " + pquery);				
+  	processRDF(host + path + "/radlexBodyParts?query="+encodeURIComponent(pquery), function(rdfXml) {
   		var parser = getRDFParser(rdfXml);
   		var foundTerms = getSubjectObjects(parser,"http://bioontology.org/projects/ontologies/radlex/radlexOwlDlComponent#Preferred_Name");
 		
@@ -1729,7 +1727,7 @@ function getAllIndicationTreeData(node, ulId){
 	
 	// get all indication by body parts
 	
-  	processRDF(server + "/acrListByBodyPart?", function(rdfXml) {	       
+  	processRDF(host + path + "/acrListByBodyPart?", function(rdfXml) {	       
        var indUniqueBodyParts = getObjects(getRDFParser(rdfXml),"http://wopeg.he.agfa.be/RPGDemo/tripleStore/ACR2007#applyToAnatomicLocation");
 	   
 	   var RIDs = [];
