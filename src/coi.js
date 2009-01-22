@@ -661,7 +661,12 @@ function loadSdtmAllTree(){
 function loadSdtmAllShow(){
 	var container = $("#SDTMTree");
 	for(var i =0;i<sdtmLevelOne.length;i++){
-		container.append("<li id='" + sdtmLevelOne[i][0] + "li' class='closed unselectColor'>" + sdtmLevelOne[i][1] + getTempNode(sdtmLevelOne[i][0]) + "</li>");
+		if(hasSdtmParentId(sdtmLevelOne[i][0])!=-1){
+			container.append("<li id='" + sdtmLevelOne[i][0] + "li' class='closed unselectColor'>" + sdtmLevelOne[i][1] + getTempNode(sdtmLevelOne[i][0]) + "</li>");
+		}
+		else{
+			container.append("<li id='" + sdtmLevelOne[i][0] + "li' class='closed unselectColor'>" + sdtmLevelOne[i][1] + "</li>");
+		}
 	}
 	container.Treeview({
 			speed: "fast",
@@ -676,6 +681,71 @@ function loadSdtmAllShow(){
 				}
 		}
    });
+   $("#SDTMTree li").click(function(){
+			var children = $(this).find(".selectColor");
+			if(children.length == 0){
+				$("#SDTMTree .selectColor").each(function(){
+					$(this).removeClass("selectColor");
+				});
+				
+				// aviod the children select start
+				$(this).removeClass("unselectColor");
+				var ulChildren = $(this).children("ul");
+				if(ulChildren.length != 0){
+					liChildren = $(ulChildren).children("li");
+					if(liChildren.length != 0){
+						for(var i = 0 ; i < liChildren.length;i++){
+							$(liChildren).addClass("unselectColor");
+						}
+					}
+				}
+				var bodyId = this.id.substring(0, this.id.length-2);
+				// aviod the children select end
+				$(this).addClass("selectColor");
+				selectTimeForAcr = new Date().getTime();
+				if(this.lastChild.id != undefined){
+					selectId = this.lastChild.id;
+				}
+				else{
+					selectId = this.id;
+				}
+				
+			}
+			else{
+				var flg = 0;
+				$("#SDTMTree .selectColor").each(function(){
+					var time = new Date().getTime();
+					if(time-selectTimeForAcr >= 1000){
+						flg = 1;
+						$(this).removeClass("selectColor");
+					}
+				});
+				if(flg == 1){
+					// aviod the children select start
+					$(this).removeClass("unselectColor");
+					var ulChildren = $(this).children("ul");
+					if(ulChildren.length != 0){
+						liChildren = $(ulChildren).children("li");
+						if(liChildren.length != 0){
+							for(var i = 0 ; i < liChildren.length;i++){
+								$(liChildren).addClass("unselectColor");
+							}
+						}
+					}
+					var bodyId = this.id.substring(0, this.id.length-2);
+					// aviod the children select end
+					$(this).addClass("selectColor");
+					selectTimeForAcr = new Date().getTime();
+					if(this.lastChild.id != undefined){
+						selectId = this.lastChild.id;
+					}
+					else{
+						selectId = this.id;
+					}
+					flg = 0;
+				}
+			}
+		});
 }
 function getAllSdtmChildIds(sdtmId){
 	var sdtmChildIds = new Array();
