@@ -209,7 +209,7 @@ function getTreeData(node, value, type){
     switch (type) 
     {
      	case "subPropertyOf": 
-     		querystr += host + path + "/doSubProperty?propertyName=D:"+encodeURIComponent(value);
+     		querystr += host + path + "/doSubProperty?node=value";
      		break;
     	case "subClassOf": 
     		querystr += host + path + "/doSubName?drugClass="+encodeURIComponent(value);
@@ -1065,7 +1065,9 @@ function processProperty(n3){
 // get node properties from server
 function getPropertyFromServer(id, parentNodeId){
 		//showWait(true);
-		process(host + path + "/doPropertySEM?pnode="+encodeURIComponent(parentNodeId), function(n3) {
+		pnode = id.substring(0,id.length-2);
+		alert ("id = " + pnode);
+		process(host + path + "/doSubProperty?node="+pnode, function(n3) {
 		//process(host + path + "/coi/kb/property.n3", function(n3) {
 			// add by lixiaodong for test
 			//parentNodeId = "C0007066";
