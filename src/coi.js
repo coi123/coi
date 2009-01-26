@@ -1937,7 +1937,7 @@ function selectIndications(tabValue, container)
 		var liElement = $(container+" .selectColor").find("li");
 		if(tabValue == "do"){
 			if(liElement.length != 0){
-				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "<a onclick='openDetailInfo(\"" + selectDrug.id + "\", 0)' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td><input type='text' length='10' value='dose < 10mg'/></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "&nbsp;<a onclick='openDetailInfo(\"" + selectDrug.id + "\", 0)' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td><input type='text' length='10' value='dose < 10mg'/></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
 			}
 			else{
 				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "</td><td class='showStyle'><input type='text' length='10' value='dose < 10mg'/></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
@@ -1945,7 +1945,7 @@ function selectIndications(tabValue, container)
 		}
 		else{
 			if(liElement.length != 0){
-				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "<a onclick='openDetailInfo(\"" + selectDrug.id + "\", 1)' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "&nbsp;<a onclick='openDetailInfo(\"" + selectDrug.id + "\", 1)' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
 			}
 			else{
 				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "</td><td class='showStyle'></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
