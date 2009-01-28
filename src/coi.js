@@ -1040,19 +1040,27 @@ function getPropertyFromStatement(term){
 function showProperty(foundTerms, id){
 	var termStr = "";
 	for(var i =0;i < foundTerms.length;i++){
-		if(foundTerms[i].indexOf(id) != -1){
-				termStr = termStr + getPropertyFromStatement(foundTerms[i]) + "<br>";
-		}
+		
+		//if(foundTerms[i].indexOf(id) != -1){				
+				//termStr = termStr + getPropertyFromStatement(foundTerms[i]) + "<br>";
+		//}
+		var s = foundTerms[i].split(" ");
+        k = s[1].length;  //get ride of D: in display
+		alert (urldecode(s[3]));
+		
+		termStr += s[1].substring(2,k) + " <font color=red>" + s[2] + "</font> " + urldecode(s[3]) + " <br>";
+		alert (s[1] + " " + s[2] + " " + s[3] + " <br>");
 	}
 	$("#PROPERTY").get(0).innerHTML=termStr;
 }
-function processProperty(n3){
+function processProperty(n3, pnode){
 	var statements = [];
 	
 	//replace : with \\: for matching expression
-	var pattern = ".*D:hasProperty.*";
+	//var pattern = ".*D:hasProperty.*";
+	var pattern = "D:*.*";
 	
-	
+	alert (pattern);
 	var regex = new RegExp(pattern, "g");
 	statements = n3.match(regex);
 	
@@ -1061,6 +1069,8 @@ function processProperty(n3){
 	}
 	return statements;
 }
+
+
 
 // get node properties from server
 function getPropertyFromServer(id, parentNodeId){
@@ -1073,9 +1083,11 @@ function getPropertyFromServer(id, parentNodeId){
 			//parentNodeId = "C0007066";
 			//id="C1533643";
 			var foundTerms = processProperty(n3);
+ 			
  			if (foundTerms.length > 0)
 			{
- 				showProperty(foundTerms, id.substring(0, id.length-2));
+ 				alert ("found property No " +  foundTerms.length); 
+ 				showProperty(foundTerms, pnode);
  			}
  			//showWait(false);
  		});
@@ -1937,7 +1949,7 @@ function selectIndications(tabValue, container)
 		var liElement = $(container+" .selectColor").find("li");
 		if(tabValue == "do"){
 			if(liElement.length != 0){
-				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "&nbsp;<a onclick='openDetailInfo(\"" + selectDrug.id + "\", 0)' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td><input type='text' length='10' value='dose < 10mg'/></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "<a onclick='openDetailInfo(\"" + selectDrug.id + "\", 0)' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td><input type='text' length='10' value='dose < 10mg'/></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
 			}
 			else{
 				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "</td><td class='showStyle'><input type='text' length='10' value='dose < 10mg'/></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
@@ -1945,7 +1957,7 @@ function selectIndications(tabValue, container)
 		}
 		else{
 			if(liElement.length != 0){
-				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "&nbsp;<a onclick='openDetailInfo(\"" + selectDrug.id + "\", 1)' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
+				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "<a onclick='openDetailInfo(\"" + selectDrug.id + "\", 1)' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
 			}
 			else{
 				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "</td><td class='showStyle'></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
@@ -2278,5 +2290,36 @@ Array.prototype.uniqStr = function(){
   r[s[key]] = key;
  }
  return r;
+}
+
+
+ 
+function urldecode( str ) {
+
+    // *     example : urldecode('http%3A%2F%2Fwww.google.nl%2Fsearch%3Fq%3Dphp.js%26ie%3Dutf-8%26oe%3Dutf-8%26aq%3Dt%26rls%3Dcom.ubuntu%3Aen-US%3Aunofficial%26client%3Dfirefox-a');
+    // *     returns : 'http://www.google.nl/search?q=php.js&ie=utf-8&oe=utf-8&aq=t&rls=com.ubuntu:en-US:unofficial&client=firefox-a'
+    
+    var histogram = {}, histogram_r = {}, code = 0, str_tmp = [];
+    var ret = str.toString();
+    
+    var replacer = function(search, replace, str) {
+        var tmp_arr = [];
+        tmp_arr = str.split(search);
+        return tmp_arr.join(replace);
+    };
+    
+    // The histogram is identical to the one in urlencode.
+    histogram['!']   = '%21';
+    histogram['%20'] = '+';
+    
+    for (replace in histogram) {
+        search = histogram[replace]; // Switch order when decoding
+        ret = replacer(search, replace, ret) // Custom replace. No regexing   
+    }
+    
+    // End with decodeURIComponent, which most resembles PHP's encoding functions
+    ret = decodeURIComponent(ret);
+ 
+    return ret;
 }
 
