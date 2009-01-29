@@ -1,0 +1,60 @@
+@prefix : <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#_> .
+@prefix patient: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#patient_> .
+@prefix sex: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#sex_> .
+@prefix enterpriseEntry: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#enterpriseEntry_> .
+@prefix definitionSet: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#definitionSet_> .
+@prefix encounter: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#encounter_> .
+@prefix referringProvider: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#referringProvider_> .
+@prefix encounterType: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#encounterType_> .
+@prefix provider2: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#provider2_> .
+@prefix provider: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#provider_> .
+@prefix itemMedication: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#itemMedication_> .
+@prefix visit: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#visit_> .
+@prefix iCD9Diagnosis: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#iCD9Diagnosis_> .
+@prefix medication: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#medication_> .
+@prefix routeOfAdmin: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#routeOfAdmin_> .
+@prefix freqUnits: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#freqUnits_> .
+@prefix formOfMedication: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#formOfMedication_> .
+@prefix medDict: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#medDict_> .
+@prefix prescribedBy: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#prescribedBy_> .
+@prefix qo: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#qo_> .
+@prefix activityHeader: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#activityHeader_> .
+@prefix current: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#current_> .
+@prefix itemTestReults: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#itemTestReults_> .
+
+person:1505026 :pSex sex:2 ; :pLastEditedDTTM "2007-11-13T15:49:20"^^xsd:dateTime ; :pDateOfBirth "1945-01-02T00:00:00"^^xsd:dateTime .
+person:1505029 :pSex sex:3 ; :pLastEditedDTTM "2008-01-30T17:08:42"^^xsd:dateTime ; :pDateOfBirth "1961-12-27T00:00:00"^^xsd:dateTime .
+person:1505583 :pSex sex:3 ; :pLastEditedDTTM "2007-03-10T06:01:55"^^xsd:dateTime ; :pDateOfBirth "1950-02-25T00:00:00"^^xsd:dateTime .
+person:1505592 :pSex sex:3 ; :pLastEditedDTTM "2008-01-30T17:08:38"^^xsd:dateTime ; :pDateOfBirth "2006-01-01T00:00:00"^^xsd:dateTime .
+person:1515263 :pSex sex:3 ; :pLastEditedDTTM "2007-12-12T16:10:18"^^xsd:dateTime ; :pDateOfBirth "1958-02-15T00:00:00"^^xsd:dateTime .
+person:1515476 :pSex sex:3 ; :pLastEditedDTTM "2006-08-03T14:48:57"^^xsd:dateTime ; :pDateOfBirth "1964-05-22T00:00:00"^^xsd:dateTime .
+person:1515512 :pSex sex:3 ; :pLastEditedDTTM "2006-08-03T14:49:07"^^xsd:dateTime ; :pDateOfBirth "1939-04-05T00:00:00"^^xsd:dateTime .
+person:1515567 :pSex sex:3 ; :pLastEditedDTTM "2006-08-03T14:49:24"^^xsd:dateTime ; :pDateOfBirth "1959-02-02T00:00:00"^^xsd:dateTime .
+person:1516786 :pSex sex:3 ; :pLastEditedDTTM "2008-01-30T17:08:41"^^xsd:dateTime ; :pDateOfBirth "1948-01-01T00:00:00"^^xsd:dateTime .
+person:1516963 :pSex sex:2 ; :pLastEditedDTTM "2007-11-04T06:13:04"^^xsd:dateTime ; :pDateOfBirth "1938-09-13T00:00:00"^^xsd:dateTime .
+person:1516969 :pSex sex:3 ; :pLastEditedDTTM "2006-09-07T11:34:27"^^xsd:dateTime ; :pDateOfBirth "1948-01-01T00:00:00"^^xsd:dateTime .
+person:1516982 :pSex sex:3 ; :pLastEditedDTTM "2006-09-22T09:15:10"^^xsd:dateTime ; :pDateOfBirth "2006-01-01T00:00:00"^^xsd:dateTime .
+person:1516986 :pSex sex:2 ; :pLastEditedDTTM "2007-08-14T14:22:18"^^xsd:dateTime ; :pDateOfBirth "1995-06-13T00:00:00"^^xsd:dateTime .
+person:1516998 :pSex sex:2 ; :pLastEditedDTTM "2008-01-15T14:29:36"^^xsd:dateTime ; :pDateOfBirth "1950-01-01T00:00:00"^^xsd:dateTime .
+person:1516999 :pSex sex:3 ; :pLastEditedDTTM "2006-10-27T08:44:06"^^xsd:dateTime ; :pDateOfBirth "1948-01-26T00:00:00"^^xsd:dateTime .
+person:1517000 :pSex sex:2 ; :pLastEditedDTTM "2008-01-17T09:59:04"^^xsd:dateTime ; :pDateOfBirth "1958-01-01T00:00:00"^^xsd:dateTime .
+person:1517026 :pSex sex:3 ; :pLastEditedDTTM "2007-09-20T14:47:20"^^xsd:dateTime ; :pDateOfBirth "2002-01-01T00:00:00"^^xsd:dateTime .
+person:1517040 :pSex sex:2 ; :pLastEditedDTTM "2006-12-01T10:27:48"^^xsd:dateTime ; :pDateOfBirth "1948-12-12T00:00:00"^^xsd:dateTime .
+person:1517166 :pSex sex:2 ; :pLastEditedDTTM "2006-12-01T10:28:31"^^xsd:dateTime ; :pDateOfBirth "1951-01-01T00:00:00"^^xsd:dateTime .
+person:1517192 :pSex sex:3 ; :pLastEditedDTTM "2007-03-07T06:56:23"^^xsd:dateTime ; :pDateOfBirth "1949-05-10T00:00:00"^^xsd:dateTime .
+person:1517403 :pSex sex:2 ; :pLastEditedDTTM "2006-12-01T10:29:58"^^xsd:dateTime ; :pDateOfBirth "1981-05-11T00:00:00"^^xsd:dateTime .
+person:1517417 :pSex sex:2 ; :pLastEditedDTTM "2006-12-01T10:30:03"^^xsd:dateTime ; :pDateOfBirth "1981-05-11T00:00:00"^^xsd:dateTime .
+person:1517419 :pSex sex:2 ; :pLastEditedDTTM "2006-12-01T10:30:04"^^xsd:dateTime ; :pDateOfBirth "1981-05-11T00:00:00"^^xsd:dateTime .
+person:1517426 :pSex sex:2 ; :pLastEditedDTTM "2007-10-25T18:17:20"^^xsd:dateTime ; :pDateOfBirth "1953-08-10T00:00:00"^^xsd:dateTime .
+person:1517427 :pSex sex:2 ; :pLastEditedDTTM "2006-12-12T08:39:01"^^xsd:dateTime ; :pDateOfBirth "1985-05-17T00:00:00"^^xsd:dateTime .
+person:1517434 :pSex sex:2 ; :pLastEditedDTTM "2006-12-11T12:31:16"^^xsd:dateTime ; :pDateOfBirth "2006-12-10T00:00:00"^^xsd:dateTime .
+person:1517435 :pSex sex:2 ; :pLastEditedDTTM "2006-12-11T13:21:02"^^xsd:dateTime ; :pDateOfBirth "1963-12-30T00:00:00"^^xsd:dateTime .
+person:1517438 :pSex sex:2 ; :pLastEditedDTTM "2006-12-11T13:29:50"^^xsd:dateTime ; :pDateOfBirth "1963-12-30T00:00:00"^^xsd:dateTime .
+person:1517441 :pSex sex:3 ; :pLastEditedDTTM "2006-12-11T14:52:21"^^xsd:dateTime ; :pDateOfBirth "1964-09-01T00:00:00"^^xsd:dateTime .
+person:1517649 :pSex sex:2 ; :pLastEditedDTTM "2007-03-07T06:57:24"^^xsd:dateTime ; :pDateOfBirth "1978-12-15T00:00:00"^^xsd:dateTime .
+person:1517704 :pSex sex:3 ; :pLastEditedDTTM "2007-03-19T10:32:39"^^xsd:dateTime ; :pDateOfBirth "1938-04-02T00:00:00"^^xsd:dateTime .
+person:1517705 :pSex sex:3 ; :pLastEditedDTTM "2007-03-19T10:32:40"^^xsd:dateTime ; :pDateOfBirth "1926-01-01T00:00:00"^^xsd:dateTime .
+person:1517706 :pSex sex:2 ; :pLastEditedDTTM "2007-03-19T10:32:41"^^xsd:dateTime ; :pDateOfBirth "1930-08-07T00:00:00"^^xsd:dateTime .
+person:1517707 :pSex sex:3 ; :pLastEditedDTTM "2007-03-19T10:32:42"^^xsd:dateTime ; :pDateOfBirth "1928-07-02T00:00:00"^^xsd:dateTime .
+person:1524357 :pSex sex:2 ; :pLastEditedDTTM "2007-10-01T15:49:06"^^xsd:dateTime ; :pDateOfBirth "1955-05-05T00:00:00"^^xsd:dateTime .
+person:1524568 :pSex sex:3 ; :pLastEditedDTTM "2007-07-25T10:02:24"^^xsd:dateTime ; :pDateOfBirth "1961-12-22T00:00:00"^^xsd:dateTime .

@@ -1,0 +1,5 @@
+"ID","EnterpriseEntryID","DefinitionSetID","Entry","EntryCode","EntryName","EntryMnemonic","IsInactiveFLAG","IsEnforcedFLAG","IsCurrentFLAG","EffectiveDT"
+"0","0","0","0","          "," ","          ","N","Y","N",9/21/1996 12:12:00
+"3","389","0","2","2         ","Female","F         ","N","Y","Y",9/22/1996 16:43:00
+"2","388","0","1","1         ","Male","M         ","N","Y","Y",9/22/1996 16:43:00
+"4","390","0","3","3         ","Unknown","U         ","N","Y","Y",9/22/1996 16:43:00
