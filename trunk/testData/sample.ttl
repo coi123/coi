@@ -1,0 +1,253 @@
+# sample.ttl - sample contiguous graph from the accompanying database extracts
+# $Id: sample.ttl,v 1.5 2008/08/25 14:37:32 hstenzho Exp $
+# 
+# todo:
+#   finish finding connections in db-native schema
+#   db-native schema to clinical practice ontology
+
+# common namespaces
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+
+# namespaces from the database's public projection
+@prefix hl7: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#hl7_> .
+
+# namespaces from the database's default-mapping
+@prefix : <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#_> .
+@prefix patient: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#patient_> .
+@prefix sex: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#sex_> .
+@prefix enterpriseEntry: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#enterpriseEntry_> .
+@prefix definitionSet: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#definitionSet_> .
+@prefix encounter: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#encounter_> .
+@prefix referringProvider: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#referringProvider_> .
+@prefix encounterType: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#encounterType_> .
+@prefix provider2: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#provider2_> .
+@prefix provider: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#provider_> .
+@prefix itemMedication: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#itemMedication_> .
+@prefix visit: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#visit_> .
+@prefix iCD9Diagnosis: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#iCD9Diagnosis_> .
+@prefix medication: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#medication_> .
+@prefix routeOfAdmin: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#routeOfAdmin_> .
+@prefix freqUnits: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#freqUnits_> .
+@prefix formOfMedication: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#formOfMedication_> .
+@prefix medDict: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#medDict_> .
+@prefix prescribedBy: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#prescribedBy_> .
+@prefix qo: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#qo_> .
+@prefix activityHeader: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#activityHeader_> .
+@prefix current: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#current_> .
+@prefix itemTestReults: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#itemTestReults_> .
+
+#Person.ttl:4:
+patient:1505583 :pSex sex:3 ; # @@@ s/person:/patient:/
+	       :pLastEditedDTTM "2007-03-10T06:01:55"^^xsd:dateTime ; 
+	       :pDateOfBirth "1950-02-25T00:00:00"^^xsd:dateTime .
+#Sex_DE.ttl:1:
+sex:3 :pIsCurrent true ; 
+      :pEntry 2 ; 
+      :pEntryCode "2" ; 
+      :pEnterpriseEntry enterpriseEntry:389 ; 
+      :pDefinitionSet definitionSet:0 ; 
+      :pIsInactive false ; 
+      :pIsEnforced true ; 
+      :pEntryMnemonic "F" ; 
+      :pEffectiveDT "1996-09-22T16:43:00"^^xsd:dateTime ; 
+      :pEntryName "Female" .
+#Encounter.ttl:274:
+encounter:1144889 :pReferringProvider referringProvider:0 ; 
+		  :pDTTM "2006-08-07T14:45:00"^^xsd:dateTime ; 
+		  :pEncounterType encounterType:13 ; 
+		  :pProvider2 provider2:1259702 ; 
+		  :pProvider provider:1259702 ; 
+		  :pVisit visit:1107481 ; 
+		  :pPatient patient:1505583 .
+#Encounter_Diagnosis.ttl:1:
+encounter:1144889 :pICD9Diagnosis iCD9Diagnosis:30054 .
+#ICD9_Diagnosis_DE.ttl:13150:
+iCD9Diagnosis:30054 :pIsCurrent true ; 
+		    :pEntry 17335 ; 
+		    :pEntryCode "518.3" ; 
+		    :pEnterpriseEntry enterpriseEntry:843378 ; 
+		    :pSex sex:0 ; 
+		    :pDefinitionSet definitionSet:0 ; 
+		    :pIsInactive false ; 
+		    :pIsEnforced false ; 
+		    :pInjuryTypeReq false ; 
+		    :pDisplayName "PULMONARY EOSINOPHILIA" ; 
+		    :pEntryMnemonic "518.3" ; 
+		    :pEffectiveDT "2006-06-27T16:48:19"^^xsd:dateTime ; 
+		    :pEntryName "PULMONARY EOSINOPHILIA" .
+#Medication_DE.ttl:52232:
+medication:17335 :pUnitOfMeasure "MG" ; 
+		 :pNDC "67253066050" ; 
+		 :pControlSubstanceCode "" ; 
+		 :pEntry 18148 ; 
+		 :pEntryCode "18148" ; 
+		 :pRouteOfAdmin routeOfAdmin:15 ; 
+		 :pDrugName "Pyrazinamide" ; 
+		 :pStrength "500" ; 
+		 :pDisplayName "Pyrazinamide 500 MG Tablet" ; 
+		 :pEntryName "Pyrazinamide 500 MG Tablet" ; 
+		 :pDDI 18148 ; 
+		 :pForm "TABS" .
+#Here are two more Medication_DE entries that seem to refer to the one above:
+#Medication_DE.ttl:50239:
+medication:105459 :pUnitOfMeasure "" ; 
+		  :pNDC "00264908650" ; 
+		  :pControlSubstanceCode "" ; 
+		  :pEntry 17335 ; 
+		  :pEntryCode "17335" ; 
+		  :pRouteOfAdmin routeOfAdmin:24 ; 
+		  :pDrugName "Positive Pressure Admin Set" ; 
+		  :pStrength "" ; 
+		  :pDisplayName "Positive Pressure Admin Set MISC" ; 
+		  :pEntryName "Positive Pressure Admin Set MISC" ; 
+		  :pDDI 17335 ; 
+		  :pForm "MISC" .
+#Medication_DE.ttl:50240:
+medication:126616 :pUnitOfMeasure "" ; 
+		  :pNDC "00264908650" ; 
+		  :pControlSubstanceCode "" ; 
+		  :pEntry 126410 ; 
+		  :pEntryCode "C17335" ; 
+		  :pRouteOfAdmin routeOfAdmin:24 ; 
+		  :pDrugName "Positive Pressure Admin Set" ; 
+		  :pDisplayName "Positive Pressure Admin Set MISC" ; 
+		  :pEntryName "Positive Pressure Admin Set MISC" ; 
+		  :pDDI 17335 ; 
+		  :pForm "MISC" .
+
+# Other encounters on the same day:
+#Encounter.ttl:273:
+encounter:1144888 :pReferringProvider referringProvider:0 ; :pDTTM "2006-08-07T14:04:00"^^xsd:dateTime ; :pEncounterType encounterType:13 ; :pProvider2 provider2:1259702 ; :pProvider provider:1259702 ; :pVisit visit:1107481 ; :pPatient patient:1505583 .
+#Encounter.ttl:275:
+encounter:1144890 :pReferringProvider referringProvider:0 ; :pDTTM "2006-08-07T15:04:00"^^xsd:dateTime ; :pEncounterType encounterType:13 ; :pProvider2 provider2:1259702 ; :pProvider provider:1259702 ; :pVisit visit:1107481 ; :pPatient patient:1505583 .
+#Encounter.ttl:276:
+encounter:1144891 :pReferringProvider referringProvider:0 ; :pDTTM "2006-08-07T15:05:00"^^xsd:dateTime ; :pEncounterType encounterType:13 ; :pProvider2 provider2:1259702 ; :pProvider provider:1259702 ; :pVisit visit:1107481 ; :pPatient patient:1505583 .
+
+# An Encounter and an Item_Medication on the same day.
+#Encounter.ttl:355:
+encounter:1145665 :pReferringProvider referringProvider:0 ; :pDTTM "2007-02-20T08:37:00"^^xsd:dateTime ; :pEncounterType encounterType:13 ; :pProvider2 provider2:155 ; :pProvider provider:155 ; :pVisit visit:1107955 ; :pPatient patient:1505583 .
+#Encounter.ttl:356:
+encounter:1145666 :pReferringProvider referringProvider:0 ; :pDTTM "2007-02-20T08:37:00"^^xsd:dateTime ; :pEncounterType encounterType:13 ; :pProvider2 provider2:1485801 ; :pProvider provider:1485801 ; :pVisit visit:1107955 ; :pPatient patient:1505583 .
+#Item_Medication.ttl:18:
+itemMedication:10150700015 :pIsAbnormal true ; :pItemType "ME" ; :pPerformedDTTM "2007-02-20T00:00:00"^^xsd:dateTime ; :pEntryName "Zoloft 100 MG Tablet" ; :pPatient patient:1505583 ; :pIsError false .
+#Item_Medication.ttl:19:
+itemMedication:10150700019 :pIsAbnormal true ; :pItemType "ME" ; :pPerformedDTTM "2007-02-20T00:00:00"^^xsd:dateTime ; :pEntryName "Isosorbide Mononitrate CR 120 MG Tablet Extended Release 24 Hour" ; :pPatient patient:1505583 ; :pIsError false .
+
+# Some Medications for thise to Item_Medications:
+#Medication.ttl:30
+medication:10150700017 :pRoutOfAdministration routeOfAdmin:15 ; :pFreqUnits freqUnits:3 ; :pFormOfMedication formOfMedication:0 ; :pMedDict medDict:19502 ; :pMedication itemMedication:10150700015 ; :pDose 2 ; :pPrescribedBy prescribedBy:0 .
+#Medication.ttl:66
+medication:10227700023 :pRoutOfAdministration routeOfAdmin:15 ; :pFreqUnits freqUnits:3 ; :pFormOfMedication formOfMedication:0 ; :pMedDict medDict:19502 ; :pMedication itemMedication:10150700015 ; :pDose 2 ; :pPrescribedBy prescribedBy:0 .
+
+#Medication_DE.ttl:71683:
+medDict:19502 :pUnitOfMeasure "MG" ; :pNDC "68115036560" ; :pControlSubstanceCode "" ; :pEntry 24233 ; :pEntryCode "24233" ; :pRouteOfAdmin routeOfAdmin:15 ; :pDrugName "Zoloft" ; :pStrength "100" ; :pDisplayName "Zoloft 100 MG Tablet" ; :pEntryName "Zoloft 100 MG Tablet" ; :pDDI 24233 ; :pForm "TABS" .
+
+
+
+# An Encounter with tests.
+#Encounter.ttl:349:
+encounter:1145463 :pReferringProvider referringProvider:0 ; 
+		  :pDTTM "2007-01-20T00:00:00"^^xsd:dateTime ; 
+		  :pEncounterType encounterType:16 ; 
+		  :pProvider2 provider2:0 ; 
+		  :pProvider provider:155 ; 
+		  :pVisit visit:1107861 ; 
+		  :pPatient patient:1505583 .
+#ResultsByEncounter.ttl:13:
+encounter:1145463 :pEncounterType "Lab Encounter" ; 
+		  :pEncounterDate "2007-01-20T00:00:00"^^xsd:dateTime ; 
+		  :pPatient patient:1505583 .
+#TestReults.ttl:116:
+qo:587 :pIsAbnormal false ; 
+       :pSetOrder 7 ; 
+       :pAnswerDET 149 ; 
+       :pNumericResult "149.00" ; 
+       :pActivityHeader activityHeader:10121100000 ; 
+       :pPerformedDTTM "2007-01-20T00:00:00"^^xsd:dateTime ; 
+       :pPatient patient:1505583 ; 
+       :pResultStage "F" ; 
+       :pAbnormalFlagType "N" ; 
+       :pCurrent current:10121100000 ; 
+       :pUnitsMnemonic "mg/dl" ; 
+       :pQoMnemonic "25002900" ; 
+       :pUnitsDET "mg/dl" ; 
+       :pShortRefRange "<150" ; 
+       :pAnswerDataName "Numeric" ; 
+       :pTestReults itemTestReults:10121100000 ; 
+       :pQo "TRIGLYCERIDES" .
+#TestReults.ttl:117:
+qo:588 :pIsAbnormal false ; 
+       :pSetOrder 8 ; 
+       :pAnswerDET 199 ; 
+       :pNumericResult "199.00" ; 
+       :pActivityHeader activityHeader:10121100000 ; 
+       :pPerformedDTTM "2007-01-20T00:00:00"^^xsd:dateTime ; 
+       :pPatient patient:1505583 ; 
+       :pResultStage "F" ; 
+       :pAbnormalFlagType "N" ; 
+       :pCurrent current:10121100001 ; 
+       :pUnitsMnemonic "mg/dl" ; 
+       :pQoMnemonic "25003000" ; 
+       :pUnitsDET "mg/dl" ; 
+       :pShortRefRange "<200" ; 
+       :pAnswerDataName "Numeric" ; 
+       :pTestReults itemTestReults:10121100001 ; 
+       :pQo "CHOLESTEROL, TOTAL" .
+#TestReults.ttl:118:
+qo:464 :pIsAbnormal false ; 
+       :pSetOrder 9 ; 
+       :pAnswerDET 40 ; 
+       :pNumericResult "40.00" ; 
+       :pActivityHeader activityHeader:10121100000 ; 
+       :pPerformedDTTM "2007-01-20T00:00:00"^^xsd:dateTime ; 
+       :pPatient patient:1505583 ; 
+       :pResultStage "F" ; 
+       :pAbnormalFlagType "N" ; 
+       :pCurrent current:10121100002 ; 
+       :pUnitsMnemonic "mg/dl" ; 
+       :pQoMnemonic "25015900" ; 
+       :pUnitsDET "mg/dl" ; 
+       :pShortRefRange "> OR = 40" ; 
+       :pAnswerDataName "Numeric" ; 
+       :pTestReults itemTestReults:10121100002 ; 
+       :pQo "HDL CHOLESTEROL" .
+#TestReults.ttl:119:
+qo:589 :pIsAbnormal false ; 
+       :pSetOrder 10 ; 
+       :pAnswerDET 129 ; 
+       :pNumericResult "129.00" ; 
+       :pActivityHeader activityHeader:10121100000 ; 
+       :pPerformedDTTM "2007-01-20T00:00:00"^^xsd:dateTime ; 
+       :pPatient patient:1505583 ; 
+       :pResultStage "F" ; 
+       :pAbnormalFlagType "N" ; 
+       :pCurrent current:10121100003 ; 
+       :pUnitsMnemonic "MG/DL  CAL" ; 
+       :pQoMnemonic "25016900" ; 
+       :pUnitsDET "MG/DL  CAL" ; 
+       :pShortRefRange "<130" ; 
+       :pAnswerDataName "Numeric" ; 
+       :pTestReults itemTestReults:10121100003 ; 
+       :pQo "LDL-CHOLESTEROL" .
+#TestReults.ttl:120:
+qo:590 :pIsAbnormal true ; 
+       :pSetOrder 11 ; 
+       :pAnswerDET "5.0  CALC" ; 
+       :pNumericResult "5.00" ; 
+       :pActivityHeader activityHeader:10121100000 ; 
+       :pPerformedDTTM "2007-01-20T00:00:00"^^xsd:dateTime ; 
+       :pPatient patient:1505583 ; 
+       :pResultStage "F" ; 
+       :pAbnormalFlagType "H" ; 
+       :pCurrent current:10121100004 ; 
+       :pUnitsMnemonic "CALC" ; 
+       :pQoMnemonic "25017000" ; 
+       :pUnitsDET "CALC" ; 
+       :pShortRefRange "<4.4" ; 
+       :pAnswerDataName "Text" ; 
+       :pTestReults itemTestReults:10121100004 ; 
+       :pQo "CHOL/HDLC RATIO" .
+
+
