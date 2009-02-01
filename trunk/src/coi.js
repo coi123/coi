@@ -1038,6 +1038,7 @@ function getPropertyFromStatement(term){
 	return term.substring(term.lastIndexOf("D:")+2, term.length);
 }
 function showProperty(foundTerms, id){
+	$("#PROPERTY").get(0).innerHTML="";
 	var termStr = "";
 	for(var i =0;i < foundTerms.length;i++){
 		
@@ -1046,10 +1047,10 @@ function showProperty(foundTerms, id){
 		//}
 		var s = foundTerms[i].split(" ");
         k = s[1].length;  //get ride of D: in display
-		alert (urldecode(s[3]));
+		//alert (urldecode(s[3]));
 		
 		termStr += s[1].substring(2,k) + " <font color=red>" + s[2] + "</font> " + urldecode(s[3]) + " <br>";
-		alert (s[1] + " " + s[2] + " " + s[3] + " <br>");
+		//alert (s[1] + " " + s[2] + " " + s[3] + " <br>");
 	}
 	$("#PROPERTY").get(0).innerHTML=termStr;
 }
@@ -1060,7 +1061,7 @@ function processProperty(n3, pnode){
 	//var pattern = ".*D:hasProperty.*";
 	var pattern = "D:*.*";
 	
-	alert (pattern);
+	//alert (pattern);
 	var regex = new RegExp(pattern, "g");
 	statements = n3.match(regex);
 	
@@ -1076,7 +1077,7 @@ function processProperty(n3, pnode){
 function getPropertyFromServer(id, parentNodeId){
 		//showWait(true);
 		pnode = id.substring(0,id.length-2);
-		alert ("id = " + pnode);
+		//alert ("id = " + pnode);
 		process(host + path + "/doSubProperty?node="+pnode, function(n3) {
 		//process(host + path + "/coi/kb/property.n3", function(n3) {
 			// add by lixiaodong for test
@@ -1086,7 +1087,7 @@ function getPropertyFromServer(id, parentNodeId){
  			
  			if (foundTerms.length > 0)
 			{
- 				alert ("found property No " +  foundTerms.length); 
+ 				//alert ("found property No " +  foundTerms.length); 
  				showProperty(foundTerms, pnode);
  			}
  			//showWait(false);
