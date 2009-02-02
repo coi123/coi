@@ -508,6 +508,7 @@ function displayAllTree(container){
 				var bodyId = this.id.substring(0, this.id.length-2);
 				// aviod the children select end
 				$(this).addClass("selectColor");
+				getPropertyFromServer($(this).get(0).id, $(this).get(0).parentNode.id);
 				selectTimeForAcr = new Date().getTime();
 				if(this.lastChild.id != undefined){
 					selectId = this.lastChild.id;
@@ -541,6 +542,7 @@ function displayAllTree(container){
 					var bodyId = this.id.substring(0, this.id.length-2);
 					// aviod the children select end
 					$(this).addClass("selectColor");
+					getPropertyFromServer($(this).get(0).id, $(this).get(0).parentNode.id);
 					selectTimeForAcr = new Date().getTime();
 					if(this.lastChild.id != undefined){
 						selectId = this.lastChild.id;
@@ -551,7 +553,6 @@ function displayAllTree(container){
 					flg = 0;
 				}
 			}
-			getPropertyFromServer($(this).get(0).id, $(this).get(0).parentNode.id);
 	});
 	//for(var i=0;i<firstLevelDrug.length;i++){
 		//var time = new Date().getTime();
@@ -900,6 +901,7 @@ function displaySDTMAllTree(container){
 				var bodyId = this.id.substring(0, this.id.length-2);
 				// aviod the children select end
 				$(this).addClass("selectColor");
+				getPropertyFromServer($(this).get(0).id, $(this).get(0).parentNode.id);
 				selectTimeForAcr = new Date().getTime();
 				if(this.lastChild.id != undefined){
 					selectId = this.lastChild.id;
@@ -933,6 +935,7 @@ function displaySDTMAllTree(container){
 					var bodyId = this.id.substring(0, this.id.length-2);
 					// aviod the children select end
 					$(this).addClass("selectColor");
+					getPropertyFromServer($(this).get(0).id, $(this).get(0).parentNode.id);
 					selectTimeForAcr = new Date().getTime();
 					if(this.lastChild.id != undefined){
 						selectId = this.lastChild.id;
@@ -943,7 +946,6 @@ function displaySDTMAllTree(container){
 					flg = 0;
 				}
 			}
-			getPropertyFromServer($(this).get(0).id, $(this).get(0).parentNode.id);
 	});
 }
 
@@ -1038,7 +1040,6 @@ function getPropertyFromStatement(term){
 	return term.substring(term.lastIndexOf("D:")+2, term.length);
 }
 function showProperty(foundTerms, id){
-	$("#PROPERTY").get(0).innerHTML="";
 	var termStr = "";
 	for(var i =0;i < foundTerms.length;i++){
 		
@@ -1087,8 +1088,12 @@ function getPropertyFromServer(id, parentNodeId){
  			
  			if (foundTerms.length > 0)
 			{
+				//$("#PROPERTY").empty();
  				//alert ("found property No " +  foundTerms.length); 
  				showProperty(foundTerms, pnode);
+ 			}
+ 			else{
+ 					$("#PROPERTY").empty();
  			}
  			//showWait(false);
  		});
