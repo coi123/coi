@@ -1,0 +1,3 @@
+@echo off
+REM cat D:\acasvn\coi\kb\sdtm.rq | D:\acasvn\coi\kb\SWtransformer.exe -q - D:\acasvn\coi\kb\hl7-sdtm.rq | D:\acasvn\coi\kb\SWtransformer.exe -q - D:\acasvn\coi\kb\db-hl7.rq -s http://hospital.example/DB/ | mysql -u root --password="aca" coi --table
+cat %1 | D:\acasvn\coi\kb\SWtransformer.exe -q - %2 | D:\acasvn\coi\kb\SWtransformer.exe -q - %3 -s http://hospital.example/DB/ | mysql -u root --password="aca" coi --table

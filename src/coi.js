@@ -2116,7 +2116,8 @@ function isNumeric(form_value)
 
 function loadDrugTreeData() 
 {
-    // pre-load drug ontology
+    //TODO
+    //stab for progressive loading of drug ontology 
 
 }
 
@@ -2257,19 +2258,14 @@ $(function() {
 		clearCriteriaContainer();
 		clearCriteriaList();
 	})
-	$(document).ready(
-		function(){
-			
-			toggleDetailContainer("#DEFAULTCONT");
-			inclusionFlag = false;
-			clearCriteriaContainer();	
-			//loadDrugTreeData();
-			searchAllDrugTree();
-			loadSdtmAllTree();
-			$("#tabContainer").tabs();
-		}
-	);
-		
+	
+	//pre-loading
+	toggleDetailContainer("#DEFAULTCONT");
+	inclusionFlag = false;
+	clearCriteriaContainer();	
+	searchAllDrugTree();
+	loadSdtmAllTree();
+	$("#tabContainer").tabs();		
 });
 
 String.prototype.trim= function(){ 
