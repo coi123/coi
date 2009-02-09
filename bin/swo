@@ -1,3 +1,26 @@
 #/bin/sh
 dir=`dirname "$(cd ${0%/*} && echo $PWD/${0##*/})"`
-cat $1 | $dir/SWtransformer -q - $2 | $dir/SWtransformer -q - $3 -s http://hospital.example/DB/ | mysql -u $4 --password="$5" $6 --table
+temp=$dir/temp
+suffix=`date +"%Y%m%d-%H%m%S"`-$RANDOM
+
+if [ ! -d $temp ]; then
+  mkdir $temp
+fi
+
+one=$temp/sdtm-$suffix.rq 
+two=$temp/hl7_sdtm-$suffix.rq 
+three=$temp/db_hl7-$suffix.rq
+
+echo $one
+echo $two
+echo $three
+
+wget -nv -O $one $1
+wget -nv -O $two $2
+wget -nv -O $three $3
+
+$dir/SWtransformer -q $one $two | $dir/SWtransformer -q - $three -s $4 | mysql -u $5 --password=$6 $7 --table
+
+rm $one
+rm $two
+rm $three
