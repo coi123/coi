@@ -1,7 +1,7 @@
 @echo off
 set dir=%~dp0
 set temp=%dir%temp\
-for /f "tokens=1,2,3,4,5,6,7,8 delims=.:,\ " %%a in ("%date% %time% %random%") do set "suffix=%%c%%b%%a-%%d%%e%%f%%g-%%h"
+set suffix=%random%-%random%-%random%
 
 if not exist %temp% mkdir %temp%
 

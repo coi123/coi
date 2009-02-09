@@ -68,8 +68,7 @@ function getSDTM()
          "sdtm:startDateTimeOfMedication ?indicDate\n" +
          "] .\n" +
          "} LIMIT 30 \n" ;
-    alert(s);
-	return s;
+    return s;
 } 
 
 function getHL7_SDTM()
@@ -115,8 +114,7 @@ function getHL7_SDTM()
 				 "] \n" + 
     			 "] . \n" + 
 			 "} \n" ; 
-    alert(s);
-	return s;
+    return s;
 }
 
 function getDB_HL7()
@@ -175,12 +173,19 @@ function getDB_HL7()
 			 "  } \n" +
 			 "} LIMIT 30 \n" ;
 			 
-    alert(s);
+    
 	return s;
 	
 
 }
 
+
+function getDBLink()
+{
+  //decide which database to get patient information
+  var s = "http://hospital.example/DB/";
+  return s;
+}
 
 function getResults()
 {
@@ -194,7 +199,8 @@ function getResults()
   			query += "sdtm=" + encodeURIComponent("http://localhost/.context+" + encodeURIComponent(getSDTM()));
  		    query += "&&hl7_sdtm=" + encodeURIComponent("http://localhost/.context+" + encodeURIComponent(getHL7_SDTM()));
   		    query += "&&db_hl7=" + encodeURIComponent("http://localhost/.context+" +  encodeURIComponent(getDB_HL7()));
-  		
+  		    query += "&&db_link=" + getDBLink();
+  		    
   		process(query, function(n3) {
            //alert(n3);
           
@@ -203,7 +209,7 @@ function getResults()
            patientlist = n3.split("|");
           
            var length = patientlist.length;
-            alert (length);
+           // alert (length);
            if (length > 0) {
            		var s = "";
            		for (var i = 7; i < length; i += 5) {
@@ -220,7 +226,10 @@ function getResults()
            		}
            		
            	$("#pListBody").append(s);
+           	} else {
+           	alert("No eligible patient found");
            	}
+           	
            	
            	//$("#PLIST").append(n3);
  			showWait(false);
