@@ -196,9 +196,9 @@ function getResults()
 		showWait(true);
   		
   		var query = host + path + "/swoPatient?";
-  			query += "sdtm=" + encodeURIComponent(host + path + "/.context+" + encodeURIComponent(getSDTM()));
- 		    query += "&&hl7_sdtm=" + encodeURIComponent(host + path + "/.context+" + encodeURIComponent(getHL7_SDTM()));
-  		    query += "&&db_hl7=" + encodeURIComponent(host + path + "/.context+" +  encodeURIComponent(getDB_HL7()));
+  			query += "sdtm=" + encodeURIComponent(host + path + "/.context " + encodeURIComponent(getSDTM()));
+ 		    query += "&&hl7_sdtm=" + encodeURIComponent(host + path + "/.context " + encodeURIComponent(getHL7_SDTM()));
+  		    query += "&&db_hl7=" + encodeURIComponent(host + path + "/.context " +  encodeURIComponent(getDB_HL7()));
   		    query += "&&db_link=" + getDBLink();
   		    
   		    alert(query);
