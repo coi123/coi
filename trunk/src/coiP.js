@@ -34,6 +34,23 @@ function process(url, callback) {
 	}
 }
 
+function processQueue(url, callback) {
+	try {
+		$.ajaxQueue({url: host + path + "/POST", type: "POST", data: { URL: url }, success: function(n3) {
+			try {
+				callback(n3);
+			} catch (e) {
+				alert("ERROR [ajax] " + e.message);
+				showWait(false);
+			}
+		}});
+	} catch (e) {
+		alert("ERROR [process] " + e.message);
+		showWait(false);
+	}
+}
+
+
 function getList(n3) {
 	var statements = [];
 	
@@ -56,18 +73,28 @@ function getSDTM()
 
 	s += "PREFIX sdtm: <http://www.sdtm.org/vocabulary#> \n"  +  
 		 "PREFIX spl: <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#> \n" +
-		 "SELECT ?patient ?dob ?sex ?takes ?indicDate # ?indicEnd ?contra\n" + 
+		 "SELECT ?patient ?dob ?sex ?takes ?indicDate # ?indicEnd ?contra  \n" + 
  		 "WHERE { \n" +
   		 "?patient a sdtm:Patient ; \n" +
          "sdtm:middleName ?middleName ; \n" +
          "sdtm:dateTimeOfBirth ?dob ; \n" +
-         "sdtm:sex ?sex . \n" +
+         "sdtm:sex ?sex . \n" +         
   		 "[	  sdtm:subject ?patient ; \n" +
 	     "sdtm:standardizedMedicationName ?takes ; \n" +
 	     "spl:activeIngredient [ spl:classCode 6809 ] ;\n" +
          "sdtm:startDateTimeOfMedication ?indicDate\n" +
-         "] .\n" +
-         "} LIMIT 30 \n" ;
+         "].\n" +
+/**         
+         
+         "  OPTIONAL { \n" +
+" [	  sdtm:subject ?patient ; \n" +
+"	  sdtm:standardizedMedicationName ?contra ; \n" +
+"	  spl:activeIngredient [ spl:classCode 11289 ] \n" +
+"         sdtm:effectiveTime [ \n" +
+"         sdtm:startDateTimeOfMedication ?contraDate \n" +
+"  ] . \n" + 
+"  } \n" + */
+         " } LIMIT 30 \n" ;
     return s;
 } 
 
@@ -195,15 +222,26 @@ function getResults()
 		
 		showWait(true);
   		
+  		/**  calling swo.bat to generate all 3 temp files
+  		     works fine on wopeg but encouter problems "url too large" when using proxy forwarding on DERI
+  		     
   		var query = host + path + "/swoPatient?";
   			query += "sdtm=" + encodeURIComponent(host + path + "/.context " + encodeURIComponent(getSDTM()));
  		    query += "&&hl7_sdtm=" + encodeURIComponent(host + path + "/.context " + encodeURIComponent(getHL7_SDTM()));
   		    query += "&&db_hl7=" + encodeURIComponent(host + path + "/.context " +  encodeURIComponent(getDB_HL7()));
   		    query += "&&db_link=" + getDBLink();
   		    
-  		    alert(query);
+  		    //alert(query);
   		    
   		process(query, function(n3) {
+        
+        */
+        
+        // 
+        var query = host + path + "/tempfile?";
+        query += "sdtm=" + encodeURIComponent(host + path + "/.context+" + encodeURIComponent(getSDTM()));
+        
+        process(query, function(n3) {
            //alert(n3);
           
            var patientlist = []; 
