@@ -1,0 +1,33 @@
+SELECT ?patient ?dob ?sex ?takes ?indicDate 
+WHERE
+{
+  {
+    ?patient <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#entityName> ?middleName .
+    ?patient <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#livingSubjectBirthTime> ?dob .
+    ?patient <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#administrativeGenderCodePrintName> ?sex .
+    ?patient <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#Person> .
+    ?patient <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#substanceAdministration> ?b0036D760_gen0 .
+    ?b0036D760_gen0 <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#consumable> ?b0036C9C8_gen1 .
+    ?b0036D760_gen0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#SubstanceAdministration> .
+    ?b0036D760_gen0 <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#effectiveTime> ?b0036E4B8_gen3 .
+    ?b0036C9C8_gen1 <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#displayName> ?takes .
+    ?b0036C9C8_gen1 <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#activeIngredient> ?b0036CB20_gen2 .
+    ?b0036CB20_gen2 <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#classCode> 6809  .
+    ?b0036E4B8_gen3 <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#start> ?indicDate .
+  }
+  {
+    ?patient <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#entityName> ?middleName .
+    ?patient <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#livingSubjectBirthTime> ?dob .
+    ?patient <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#administrativeGenderCodePrintName> ?sex .
+    ?patient <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#Person> .
+    ?patient <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#substanceAdministration> ?b0036D760_gen1 .
+    ?b0036D760_gen1 <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#consumable> ?b0036C9C8_gen2 .
+    ?b0036D760_gen1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#SubstanceAdministration> .
+    ?b0036D760_gen1 <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#effectiveTime> ?b0036E4B8_gen4 .
+    ?b0036C9C8_gen2 <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#displayName> ?takes .
+    ?b0036C9C8_gen2 <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#activeIngredient> ?b0036CB20_gen3 .
+    ?b0036CB20_gen3 <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#classCode> 11289  .
+    ?b0036E4B8_gen4 <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#start> ?indicDate .
+  }
+}
+LIMIT 30
