@@ -224,26 +224,27 @@ function getResults()
   		
   		/**  calling swo.bat to generate all 3 temp files
   		     works fine on wopeg but encouter problems "url too large" when using proxy forwarding on DERI
-  		     
+  		*/     
   		var query = host + path + "/swoPatient?";
-  			query += "sdtm=" + encodeURIComponent(host + path + "/.context " + encodeURIComponent(getSDTM()));
- 		    query += "&&hl7_sdtm=" + encodeURIComponent(host + path + "/.context " + encodeURIComponent(getHL7_SDTM()));
-  		    query += "&&db_hl7=" + encodeURIComponent(host + path + "/.context " +  encodeURIComponent(getDB_HL7()));
+  			query += "sdtm=" + encodeURIComponent(host + path + "/.context" + encodeURIComponent(" "+getSDTM()));
+ 		    query += "&&hl7_sdtm=" + encodeURIComponent(host + path + "/.context" + encodeURIComponent(" " + getHL7_SDTM()));
+  		    query += "&&db_hl7=" + encodeURIComponent(host + path + "/.context"+  encodeURIComponent(" " + getDB_HL7()));
   		    query += "&&db_link=" + getDBLink();
   		    
   		    //alert(query);
   		    
   		process(query, function(n3) {
         
-        */
         
-        // 
+        
+       /**
         var query = host + path + "/tempfile?";
-        query += "sdtm=" + encodeURIComponent(host + path + "/.context+" + encodeURIComponent(getSDTM()));
+        //query += "sdtm=" + encodeURIComponent(host + path + "/.context+" + encodeURIComponent(" "+getSDTM()));
+        query += "sdtm=" + (encodeURIComponent(getSDTM()));
         
         process(query, function(n3) {
            //alert(n3);
-          
+        */  
            var patientlist = []; 
            //patientlist = getList(n3);
            patientlist = n3.split("|");
