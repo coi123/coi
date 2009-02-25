@@ -26,7 +26,7 @@
 </head>
 
 <body>
-  <form>
+   
     <input type="hidden" id="searchValue" name="searchValue">
 
     <div class="second">
@@ -124,10 +124,20 @@
       <h3>Medication:</h3>
       <div id="tabContainer">
         <ul>
-          <li><a href="#DrugOntology"><span>Drug Ontology</span></a></li>
           <li><a href="#SDTM"><span>SDTM</span></a></li>
+          <li><a href="#DrugOntology"><span>Drug Ontology</span></a></li>     
           <li><a href="#MappingRule"><span>Mapping Rule</span></a></li>
         </ul>
+        
+        <div id="SDTM">
+          <div id="SDTMTree" class="sdtm">
+          </div>
+          <div id="SDTMProp" class="sdtmprop">
+          </div> 
+          <button id="APPLYBUTTONSDTM" class="applyCode">Apply
+          Criteria</button> <input id="CLEARSDTM" class="clear"
+          type="image" src="images/reload.gif">
+        </div>
         
         <div id="DrugOntology">
           <table>
@@ -141,22 +151,18 @@
               <td></td>
             </tr>
           </table>
-          
+
 		  <div id="BROSWER" class="drugname"></div>
           <div id="PROPERTY" class="property"></div>
           <button id="APPLYBUTTON" class="applyCode">Apply Criteria</button>
           <input id="CLEAR" class="clear" type="image" src="images/reload.gif">
         </div>
-        <div id="SDTM">
-          <div id="SDTMTree" class="stdm"></div>
-          <button id="APPLYBUTTONSDTM" class="applyCode">Apply Criteria</button>
-          <input id="CLEARSDTM" class="clear" type="image" src="images/reload.gif">
-        </div>
         <div id="MappingRule">
-          <input type="checkbox" name="sdtmR" value=""><a href="/coi/kb/sdtmrq.n3"> SDTM Query <a> <br>
-          <input type="checkbox" name="sdtm-hl7R" value=""><a href="/coi/kb/hl7_sdtmrq.n3"> SDTM - HL7 Mapping Rule <a> <br>
-          <input type="checkbox" name="db-hl7R" value=""><a href="/coi/kb/db_hl7rq.n3"> Database - HL7 Mapping Rule <a> <br>
-          <input type="checkbox" name="drugR" value=""><a href="/coi/kb/CT2DOMapping.n3"> Drug Ontology Mapping Rule <a> <br>
+          <input type="checkbox" name="sdtmR" value=""><a href="/coi/kb/sdtmrq.n3"> SDTM Query </a> <br>
+          <input type="checkbox" name="sdtm-hl7R" value=""><a href="/coi/kb/hl7_sdtmrq.n3"> SDTM - HL7 Mapping Rule </a> <br>
+          <input type="checkbox" name="db-hl7R" value=""><a href="/coi/kb/db_hl7rq.n3"> Database - HL7 Mapping Rule </a> <br>
+          <input type="checkbox" name="drugR" value=""> <a href="/coi/kb/CT2DOMapping.n3">Drug Sub-Category Inclusion Rule </a><br>
+          <input type="checkbox" name="drugW" value=""> <a href="/coi/kb/WeightLossDrugRule.n3">Weight Loss Drug Ingredient Inference Rule<br>
         </div>
       </div>
     </div>
@@ -180,6 +186,6 @@
         </tr>
       </table>
     </div>
-  </form>
+  
 </body>
 </html>

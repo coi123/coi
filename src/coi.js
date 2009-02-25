@@ -958,7 +958,7 @@ function loadChildForOpenerPage(id){
 		}
 }
 function appendAllChildNew(id){
-		//alert(id);
+		alert(id);
 		appendAllChild(id, getAllChildIds(id));
 		$("#"+id).append(nodeStr);
 		getTreeViewForNode(this.id);
