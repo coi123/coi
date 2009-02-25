@@ -7,14 +7,12 @@
     @prefix : <http://www.owl-ontologies.com/DrugOntology.owl#> .
     
 
-#sub-concept inclusion
-{
-?A  a  :SelectedIngredient.
-?B  rdfs:subClassOf ?A.
-} =>
-{
-?B  a  :SelectedIngredient.
-}.
 
-
-
+#derive weight loss drug ingredient
+#check all drugs that "may_treat  obese"
+{?A        rdfs:subClassOf      ?B;
+ ?B        a                    owl:Restriction;
+           owl:onProperty       :may_treat;
+           owl:someValuesFrom   :C0028754}
+ =>
+{?A  a   :WeightLoseDrug}.
