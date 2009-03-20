@@ -247,7 +247,7 @@ function getResults()
         */  
            var patientlist = []; 
            //patientlist = getList(n3);
-           patientlist = n3.split("|");
+           patientlist = n3.replace(/00:00:00/gi, "").split("|");
           
            var length = patientlist.length;
            // alert (length);
