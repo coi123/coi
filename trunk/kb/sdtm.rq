@@ -16,13 +16,13 @@ SELECT ?patient ?dob ?sex ?takes ?indicDate # ?indicEnd ?contra
           sdtm:startDateTimeOfMedication ?indicDate
 	  # ; sdtm:endDateTimeOfMedication ?indicEnd
   ] .
-  OPTIONAL {
-  [	  sdtm:subject ?patient ;
-	  sdtm:standardizedMedicationName ?contra ;
-	  spl:activeIngredient [ spl:classCode 11289 ] ;
-         sdtm:effectiveTime [
-         sdtm:startDateTimeOfMedication ?contraDate
-	  # ; sdtm:endDateTimeOfMedication   ?contraEnd
-  ] .
-  }
+#  OPTIONAL {
+#  [	  sdtm:subject ?patient ;
+#	  sdtm:standardizedMedicationName ?contra ;
+#	  spl:activeIngredient [ spl:classCode 11289 ] ;
+#         sdtm:effectiveTime [
+#         sdtm:startDateTimeOfMedication ?contraDate
+#	  # ; sdtm:endDateTimeOfMedication   ?contraEnd
+#  ] .
+#  }
 } LIMIT 30
