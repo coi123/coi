@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 dir=`dirname "$(cd ${0%/*} && echo $PWD/${0##*/})"`
 temp=$dir/temp
 suffix=$RANDOM-$RANDOM-$RANDOM
@@ -10,10 +10,6 @@ fi
 one=$temp/sdtm-$suffix.rq 
 two=$temp/hl7_sdtm-$suffix.rq 
 three=$temp/db_hl7-$suffix.rq
-
-echo $one
-echo $two
-echo $three
 
 wget -nv -O $one $1
 wget -nv -O $two $2
