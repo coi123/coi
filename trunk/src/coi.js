@@ -958,7 +958,7 @@ function loadChildForOpenerPage(id){
 		}
 }
 function appendAllChildNew(id){
-		alert(id);
+		//alert(id);
 		appendAllChild(id, getAllChildIds(id));
 		$("#"+id).append(nodeStr);
 		getTreeViewForNode(this.id);
@@ -1465,7 +1465,7 @@ function getRootNode(rootNodeName, rootNodeID){
 function appendTree(node){
 
 	var nodeElement = node.get(0);
-	alert ("inside appendTree: " +nodeElement.id);
+	//alert ("inside appendTree: " +nodeElement.id);
 	
 	if(!nodeElement.hasChildNodes()){
 		getTreeData(node, nodeElement.id, "subClassOf");
@@ -1739,7 +1739,7 @@ function getAllIndicationTreeView(container, rootNodeName, rootNodeID){
 function appendTreeForIndication(node){
 	var nodeElement = node.get(0);
 	if(!nodeElement.hasChildNodes()){
-		alert ("nodeID: "+nodeElement.id)
+		//alert ("nodeID: "+nodeElement.id)
 		getAllIndicationTreeData(node, nodeElement.id);
 	}
 }
@@ -1953,6 +1953,8 @@ function selectIndications(tabValue, container)
 			selectDrugName = selectDrug.textContent;
 		}
 		var liElement = $(container+" .selectColor").find("li");
+		//alert ("selectDrug.id = " + selectDrug.id);
+		
 		if(tabValue == "do"){
 			if(liElement.length != 0){
 				select.append("<tr id='"+time+ "_" + selectDrug.id + "' class='codelist'><td>" + tabValue + "</td><td class='showStyle'>" + selectDrugName + "<a onclick='openDetailInfo(\"" + selectDrug.id + "\", 0)' href='#'><img border='0' src='images/warn.png'/></a>" + "</td><td><input type='text' length='10' value='dose < 10mg'/></td><td class='showStyle'><a href=\"javascript:deleteById('"+time+ "_" + selectDrug.id + "');\"><img alt='delete' border='0' src='images/DeleteIcon.png' width='19' height='19'/></a></td></tr>");
