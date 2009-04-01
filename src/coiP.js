@@ -1,5 +1,7 @@
 var blockUI = true;
 
+
+
 /* Show/hide the wait cursor 
  * or show a wait message */
 function showWait(wait) {
@@ -18,21 +20,6 @@ function showWait(wait) {
 	}
 }
 
-function process(url, callback) {
-	try {
-		$.ajaxSync({url: host + path + "/POST", type: "POST", data: { URL: url }, success: function(n3) {
-			try {
-				callback(n3);
-			} catch (e) {
-				alert("ERROR [ajax] " + e.message);
-				showWait(false);
-			}
-		}});
-	} catch (e) {
-		alert("ERROR [process] " + e.message);
-		showWait(false);
-	}
-}
 
 function processQueue(url, callback) {
 	try {
@@ -67,13 +54,53 @@ function getList(n3) {
 	return statements;
 }
 
-function getSDTM()
-{
-	var s = "";
+function queryPatients(){
+	
+	/* get RxNorm code for drug ingredients listed in inclusion list */
+	
+	var tbody = window.opener.document.getElementById("inListBody");
+	var drugStr="";
+	var flg=0;
+	var maxAge=0;
+	var minAge=0;
+    var drugList = new Array();
+    var i = 0;
+    
+    
+	$(tbody).find("tr").each(function(){
+		var tr = $(this).get(0);
+		var tdValue = tr.childNodes[0].childNodes[0].nodeValue;
+			
+		if(tdValue == "do"){
+			var index = tr.id.indexOf("_");               
+			drugList[i++] = tr.id.substring(index+1, tr.id.length-2);			
+			}
+	 });
 
-	s += "PREFIX sdtm: <http://www.sdtm.org/vocabulary#> \n"  +  
+	//get RxNORM code for drug ingredients in drug ontology	
+    var listStr = "";
+    var j = drugList.length;
+    if (j > 0) {
+    	listStr += "and+(id%3d'" + drugList[0] + "'+";
+    	for (i=1; i < j; i++) {
+    	    listStr += "or+id%3d'" + drugList[i] + "'+"; 
+    	    }
+    	listStr +=");";    
+    	}
+	
+	var query = host + path + "/drugRxCode?";
+  	query += "drugList=" + encodeURIComponent(listStr);
+  	//alert (query);		
+  	
+  	    
+	processQueue((query), function(n3) {
+        
+        var ingredientList = n3.trim().split("\n"); 
+        var sdtm = "";
+    
+		sdtm += "PREFIX sdtm: <http://www.sdtm.org/vocabulary#> \n"  +  
 		 "PREFIX spl: <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#> \n" +
-		 "SELECT ?patient ?dob ?sex ?takes ?indicDate # ?indicEnd ?contra  \n" + 
+		 "SELECT DISTINCT ?patient ?dob ?sex ?takes ?indicDate  \n" + 
  		 "WHERE { \n" +
   		 "?patient a sdtm:Patient ; \n" +
          "sdtm:middleName ?middleName ; \n" +
@@ -81,20 +108,47 @@ function getSDTM()
          "sdtm:sex ?sex . \n" +         
   		 "[	  sdtm:subject ?patient ; \n" +
 	     "sdtm:standardizedMedicationName ?takes ; \n" +
-	     "spl:activeIngredient [ spl:classCode 6809 ] ;\n" +
+	     "spl:activeIngredient [ spl:classCode ?code ] ;\n" +
          "sdtm:startDateTimeOfMedication ?indicDate\n" +
-         "].\n" +
-/**         
+         "]. "
+
+      if (ingredientList.length > 0)      
+        {   
+         sdtm += " FILTER (?code = " + ingredientList[0];
+         for (var i = 1; i < ingredientList.length; i++)
+         {
+            sdtm += " || ?code = " + ingredientList[i];
+         }
+         sdtm += ") " 
+      }
+     sdtm += " } LIMIT 30 \n" ;
+     
+     getResults(sdtm);
+     
+    });
+}
+
+function getSDTM_static()
+{
+	var s = "";
+    
+	
+	s += "PREFIX sdtm: <http://www.sdtm.org/vocabulary#> \n"  +  
+		 "PREFIX spl: <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#> \n" +
+		 "SELECT DISTINCT ?patient ?dob ?sex ?takes ?indicDate   \n" + 
+ 		 "WHERE { \n" +
+  		 "?patient a sdtm:Patient ; \n" +
+         "sdtm:middleName ?middleName ; \n" +
+         "sdtm:dateTimeOfBirth ?dob ; \n" +
+         "sdtm:sex ?sex . \n" +         
+  		 "[	  sdtm:subject ?patient ; \n" +
+	     "sdtm:standardizedMedicationName ?takes ; \n" +
+	     "spl:activeIngredient [ spl:classCode ?code ] ;\n" +
+         "sdtm:startDateTimeOfMedication ?indicDate\n" +
+         "]. FILTER (?code = 6809 || ?code = 11289) "     
+    s += " } LIMIT 30 \n" ;
          
-         "  OPTIONAL { \n" +
-" [	  sdtm:subject ?patient ; \n" +
-"	  sdtm:standardizedMedicationName ?contra ; \n" +
-"	  spl:activeIngredient [ spl:classCode 11289 ] \n" +
-"         sdtm:effectiveTime [ \n" +
-"         sdtm:startDateTimeOfMedication ?contraDate \n" +
-"  ] . \n" + 
-"  } \n" + */
-         " } LIMIT 30 \n" ;
+    
     return s;
 } 
 
@@ -214,26 +268,27 @@ function getDBLink()
   return s;
 }
 
-function getResults()
+function getResults(sdtm)
 {
    //transform query and get patient list coi database 
 	try {
 		
 		
 		showWait(true);
-  		
+
+		
   		/**  calling swo.bat to generate all 3 temp files
   		     works fine on wopeg but encouter problems "url too large" when using proxy forwarding on DERI
   		*/     
   		var query = host + path + "/swoPatient?";
-  			query += "sdtm=" + encodeURIComponent(host + path + "/.context" + encodeURIComponent(" "+getSDTM()));
+  			query += "sdtm=" + encodeURIComponent(host + path + "/.context" + encodeURIComponent(" "+ sdtm));
  		    query += "&&hl7_sdtm=" + encodeURIComponent(host + path + "/.context" + encodeURIComponent(" " + getHL7_SDTM()));
   		    query += "&&db_hl7=" + encodeURIComponent(host + path + "/.context"+  encodeURIComponent(" " + getDB_HL7()));
   		    query += "&&db_link=" + getDBLink();
   		    
   		    //alert(query);
   		    
-  		process(query, function(n3) {
+  		processQueue(query, function(n3) {
         
         
         
@@ -245,6 +300,7 @@ function getResults()
         process(query, function(n3) {
            //alert(n3);
         */  
+    
            var patientlist = []; 
            //patientlist = getList(n3);
            patientlist = n3.replace(/00:00:00/gi, "").split("|");
@@ -274,7 +330,7 @@ function getResults()
            	
            	//$("#PLIST").append(n3);
  			showWait(false);
- 		});
+ 		}); 
  	} 
  	catch (e) {
  		alert("ERROR [suggest]:" + e.toString());
@@ -287,5 +343,12 @@ function getResults()
 
 /* document ready */
 $(function() {
-		getResults();
+		queryPatients();
+		
 });
+
+String.prototype.trim = function () {
+    return this.replace(/^\s*/, "").replace(/\s*$/, "");
+}
+
+
