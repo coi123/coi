@@ -1,8 +1,6 @@
-// implement sequential service calls, thanks to Kristof's help
+// nested "callback" functions to get sequential service call
 
 var blockUI = true;
-
-
 
 /* Show/hide the wait cursor 
  * or show a wait message */
@@ -39,21 +37,6 @@ function processQueue(url, callback) {
 	}
 }
 
-//Kristof
-function processWithResult(url, callback) {
-	try {
-		$.ajax({url: "/POST", type: "POST", data: { URL: url }, async: false, success: function(n3) {
-			try {
-				result = callback(n3);
-			} catch (e) {
-				alert("ERROR [ajax] " + e.message);
-			}
-		}});
-	} catch (e) {
-		alert("ERROR [process] " + e.message);
-	}
-	return result;
-}
 
 function getList(n3) {
 	var statements = [];
@@ -69,6 +52,80 @@ function getList(n3) {
 		statements = [];
 	}
 	return statements;
+}
+
+function queryPatients(){
+	
+	/* get RxNorm code for drug ingredients listed in inclusion list */
+	
+	var tbody = window.opener.document.getElementById("inListBody");
+	var drugStr="";
+	var flg=0;
+	var maxAge=0;
+	var minAge=0;
+    var drugList = new Array();
+    var i = 0;
+    
+    
+	$(tbody).find("tr").each(function(){
+		var tr = $(this).get(0);
+		var tdValue = tr.childNodes[0].childNodes[0].nodeValue;
+			
+		if(tdValue == "do"){
+			var index = tr.id.indexOf("_");               
+			drugList[i++] = tr.id.substring(index+1, tr.id.length-2);			
+			}
+	 });
+
+	//get RxNORM code for drug ingredients in drug ontology	
+    var listStr = "";
+    var j = drugList.length;
+    if (j > 0) {
+    	listStr += "and+(id%3d'" + drugList[0] + "'+";
+    	for (i=1; i < j; i++) {
+    	    listStr += "or+id%3d'" + drugList[i] + "'+"; 
+    	    }
+    	listStr +=");";    
+    	}
+	
+	var query = host + path + "/drugRxCode?";
+  	query += "drugList=" + encodeURIComponent(listStr);
+  	//alert (query);		
+  	
+  	    
+	processQueue((query), function(n3) {
+        
+        var ingredientList = n3.trim().split("\n"); 
+        var sdtm = "";
+    
+		sdtm += "PREFIX sdtm: <http://www.sdtm.org/vocabulary#> \n"  +  
+		 "PREFIX spl: <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#> \n" +
+		 "SELECT DISTINCT ?patient ?dob ?sex ?takes ?indicDate  \n" + 
+ 		 "WHERE { \n" +
+  		 "?patient a sdtm:Patient ; \n" +
+         "sdtm:middleName ?middleName ; \n" +
+         "sdtm:dateTimeOfBirth ?dob ; \n" +
+         "sdtm:sex ?sex . \n" +         
+  		 "[	  sdtm:subject ?patient ; \n" +
+	     "sdtm:standardizedMedicationName ?takes ; \n" +
+	     "spl:activeIngredient [ spl:classCode ?code ] ;\n" +
+         "sdtm:startDateTimeOfMedication ?indicDate\n" +
+         "]. "
+
+      if (ingredientList.length > 0)      
+        {   
+         sdtm += " FILTER (?code = " + ingredientList[0];
+         for (var i = 1; i < ingredientList.length; i++)
+         {
+            sdtm += " || ?code = " + ingredientList[i];
+         }
+         sdtm += ") " 
+      }
+     sdtm += " } LIMIT 30 \n" ;
+     
+     getResults(sdtm);
+     
+    });
 }
 
 function getSDTM_static()
@@ -282,122 +339,13 @@ function getResults(sdtm)
 	}
 }
 
-function getDrugSelection(selectionType) {
 
-	// get drug ingredients listed in inclusion/exclusion list 
-	
-	var tbody = window.opener.document.getElementById(selectionType);
-	var drugStr="";
-    var drugList = new Array();
-    var i = 0;
-    
-    
-	$(tbody).find("tr").each(function(){
-		var tr = $(this).get(0);
-		var tdValue = tr.childNodes[0].childNodes[0].nodeValue;
-
-		if(tdValue == "do"){
-			var index = tr.id.indexOf("_");               
-			drugList[i++] = tr.id.substring(index+1, tr.id.length-2);			
-			}
-	 });
-
-    var listStr = "";
-    var j = drugList.length;
-    if (j > 0) {
-    	listStr += "and+(id%3d'" + drugList[0] + "'+";
-    	for (i=1; i < j; i++) {
-    	    listStr += "or+id%3d'" + drugList[i] + "'+"; 
-    	    }
-    	listStr +=");";    
-    	}
-     return listStr;
-}
-
-function getGender(selectionType) {
-  
-  // get gender selection for criteria
-  	var tbody = window.opener.document.getElementById(selectionType);
-	var genderStr="";
-   
-    
-	$(tbody).find("tr").each(function(){
-		var tr = $(this).get(0);
-		var tdValue = tr.childNodes[1].childNodes[0].nodeValue;
-        var tdBoolean = tr.childNodes[3].childNodes[0].nodeValue
-        
-		if(tdValue == "Male" && tdBoolean == "true"){
-			if (genderStr != "") 
-				genderStr += " || "
-			genderStr += "?sex = \'Male\' ";
-		}
-
-		if(tdValue == "Female" && tdBoolean == "true"){
-			if (genderStr != "") 
-				genderStr += " || "
-			genderStr += "?sex = \'Female\' ";
-		}
-	});
-	
-	return 	genderStr;	
-}  
 
 /* document ready */
-
 $(function() {
-	
-	//get RxNORM code for drug ingredients in drug ontology	
-	
-	var query = host + path + "/drugRxCode?";
-  	query += "drugList=" + encodeURIComponent(getDrugSelection("inListBody"));
-  	//alert (query);		
-  	
-  	    
-	var sdtm = processWithResult(query, function(n3) {
-        
-        var ingredientList = n3.trim().split("\n"); 
-        var sdtmStr = "";
-    
-		sdtmStr += "PREFIX sdtm: <http://www.sdtm.org/vocabulary#> \n"  +  
-		 "PREFIX spl: <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#> \n" +
-		 "SELECT DISTINCT ?patient ?dob ?sex ?takes ?indicDate  \n" + 
- 		 "WHERE { \n" +
-  		 "?patient a sdtm:Patient ; \n" +
-         "sdtm:middleName ?middleName ; \n" +
-         "sdtm:dateTimeOfBirth ?dob ; \n" +
-         "sdtm:sex ?sex . \n" +         
-  		 "[	  sdtm:subject ?patient ; \n" +
-	     "sdtm:standardizedMedicationName ?takes ; \n" +
-	     "spl:activeIngredient [ spl:classCode ?code ] ;\n" +
-         "sdtm:startDateTimeOfMedication ?indicDate\n" +
-         "]. FILTER ("
-      
-      //get demographic criteria such as gender and age constraint
-      var genderStr = getGender("inListBody");
-      
-      if (genderStr != "" )
-      	sdtmStr += "(" + genderStr + ") "; 
-      
-      if (ingredientList.length > 0 && genderStr != "")      
-         sdtmStr += " && ";     
-      if (ingredientList.length > 0 )      
-        {   
-         sdtmStr += " (?code = " + ingredientList[0];
-         for (var i = 1; i < ingredientList.length; i++)
-            sdtmStr += " || ?code = " + ingredientList[i];
-         sdtmStr += ") "    
-       	}
-     sdtmStr += ") "   	//end of FILTER ()
-     sdtmStr += " } LIMIT 30 \n" ;
-     
-     //alert(sdtmStr);
-     return sdtmStr;
-     
-    });
-	
-	getResults(sdtm);
+		queryPatients();
+		
 });
-
 
 String.prototype.trim = function () {
     return this.replace(/^\s*/, "").replace(/\s*$/, "");
