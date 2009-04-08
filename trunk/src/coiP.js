@@ -442,7 +442,7 @@ $(function() {
     
     sdtmRQ += "} LIMIT 30";
      
-    alert(sdtmRQ);
+    //alert(sdtmRQ);
 	
 	getResults(sdtmRQ);
 });
