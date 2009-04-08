@@ -1,7 +1,7 @@
 // implement sequential service calls, thanks to Kristof's help
 
 var blockUI = true;
-
+var sdtmRQ = "";
 
 
 /* Show/hide the wait cursor 
@@ -235,14 +235,6 @@ function getResults(sdtm)
         
         
         
-       /**
-        var query = host + path + "/tempfile?";
-        //query += "sdtm=" + encodeURIComponent(host + path + "/.context+" + encodeURIComponent(" "+getSDTM()));
-        query += "sdtm=" + (encodeURIComponent(getSDTM()));
-        
-        process(query, function(n3) {
-           //alert(n3);
-        */  
     
            var patientlist = []; 
            //patientlist = getList(n3);
@@ -346,19 +338,7 @@ function getGender(selectionType) {
 
 $(function() {
 	
-	//get RxNORM code for drug ingredients in drug ontology	
-	
-	var query = host + path + "/drugRxCode?";
-  	query += "drugList=" + encodeURIComponent(getDrugSelection("inListBody"));
-  	//alert (query);		
-  	
-  	    
-	var sdtm = processWithResult(query, function(n3) {
-        
-        var ingredientList = n3.trim().split("\n"); 
-        var sdtmStr = "";
-    
-		sdtmStr += "PREFIX sdtm: <http://www.sdtm.org/vocabulary#> \n"  +  
+	sdtmRQ += "PREFIX sdtm: <http://www.sdtm.org/vocabulary#> \n"  +  
 		 "PREFIX spl: <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#> \n" +
 		 "SELECT DISTINCT ?patient ?dob ?sex ?takes ?indicDate  \n" + 
  		 "WHERE { \n" +
@@ -370,32 +350,53 @@ $(function() {
 	     "sdtm:standardizedMedicationName ?takes ; \n" +
 	     "spl:activeIngredient [ spl:classCode ?code ] ;\n" +
          "sdtm:startDateTimeOfMedication ?indicDate\n" +
-         "]. FILTER ("
-      
-      //get demographic criteria such as gender and age constraint
-      var genderStr = getGender("inListBody");
-      
-      if (genderStr != "" )
-      	sdtmStr += "(" + genderStr + ") "; 
-      
-      if (ingredientList.length > 0 && genderStr != "")      
-         sdtmStr += " && ";     
-      if (ingredientList.length > 0 )      
-        {   
-         sdtmStr += " (?code = " + ingredientList[0];
-         for (var i = 1; i < ingredientList.length; i++)
-            sdtmStr += " || ?code = " + ingredientList[i];
-         sdtmStr += ") "    
-       	}
-     sdtmStr += ") "   	//end of FILTER ()
-     sdtmStr += " } LIMIT 30 \n" ;
+         "]. "
+
+     //get demographic and medication criteria such as gender and age constraint
+     var genderStr = getGender("inListBody");     
+     var drugStr = getDrugSelection("inListBody");
      
-     //alert(sdtmStr);
-     return sdtmStr;
-     
-    });
+     if (genderStr != "" || drugStr != "" )
+        {
+        	sdtmRQ += " FILTER (" ;
+
+     		if (genderStr != "")	
+      			sdtmRQ += "(" + genderStr + ") "; 
+
+			if (drugStr != "")
+				{      
+					//get RxNORM code for drug ingredients in drug ontology	
 	
-	getResults(sdtm);
+					var query = host + path + "/drugRxCode?";
+  					query += "drugList=" + encodeURIComponent(drugStr);
+  					//alert (query);		
+
+					sdtmRQ += processWithResult(query, function(n3) {
+        
+        			var ingredientList = n3.trim().split("\n"); 
+        			var sdtmStr = "";
+        			if (ingredientList.length > 0) 
+        				{
+        				 	sdtmStr = " && (?code = " + ingredientList[0];        
+         					for (var i = 1; i < ingredientList.length; i++)
+            					sdtmStr += " || ?code = " + ingredientList[i];
+         					sdtmStr += ") "    
+       					}
+     				//alert(sdtmStr);
+     				return sdtmStr;
+     			   });
+
+     		}
+     		
+     		sdtmRQ += " ) \n ";
+     		         
+     	}
+    
+    sdtmRQ += "} LIMIT 30";
+     
+    alert(sdtmRQ);
+	
+	getResults(sdtmRQ);
 });
 
 
