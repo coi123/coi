@@ -12,10 +12,10 @@ SELECT ?patient ?dob ?sex ?takes ?indicDate # ?indicEnd ?contra
 	  sdtm:standardizedMedicationName ?takes ;
 
 	  # nothing by ingredient in sdtm/caBIG/...
-	  spl:activeIngredient [ spl:classCode 6809 ], [ spl:classCode 1234 ] ;
+	  spl:activeIngredient [ spl:classCode ?code ] ;
           sdtm:startDateTimeOfMedication ?indicDate
 	  # ; sdtm:endDateTimeOfMedication ?indicEnd
-  ]. 
+  ]. FILTER (?code = 6809 ) 
 #  OPTIONAL {
 #  [	  sdtm:subject ?patient ;
 #	  sdtm:standardizedMedicationName ?contra ;

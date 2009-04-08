@@ -1,7 +1,7 @@
 // implement sequential service calls, thanks to Kristof's help
 
 var blockUI = true;
-var sdtmRQ = "";
+
 
 
 /* Show/hide the wait cursor 
@@ -274,11 +274,9 @@ function getResults(sdtm)
 	}
 }
 
-function getDrugSelection(selectionType) {
+function getDrugSelection(tbody) {
 
 	// get drug ingredients listed in inclusion/exclusion list 
-	
-	var tbody = window.opener.document.getElementById(selectionType);
 	var drugStr="";
     var drugList = new Array();
     var i = 0;
@@ -306,10 +304,9 @@ function getDrugSelection(selectionType) {
      return listStr;
 }
 
-function getGender(selectionType) {
+function getGender(tbody) {
   
   // get gender selection for criteria
-  	var tbody = window.opener.document.getElementById(selectionType);
 	var genderStr="";
    
     
@@ -334,12 +331,53 @@ function getGender(selectionType) {
 	return 	genderStr;	
 }  
 
+function getAge(tbody) {
+  
+  // get age selection for criteria
+	var ageStr="";
+    var today = new Date();
+    
+
+    var thisYear = today.getFullYear(); 
+    var thisMonth = today.getMonth();
+    var thisDate = today.getDate(); 
+    
+    
+    
+    
+	$(tbody).find("tr").each(function(){
+		var tr = $(this).get(0);
+		var tdValue = tr.childNodes[1].childNodes[0].nodeValue;
+        var tYear = tr.childNodes[3].childNodes[0].nodeValue;
+        
+        var backYear = thisYear*1 - tYear*1; 
+        
+        
+		if(tdValue == "AgeMin"){
+			if(ageStr != "") ageStr += " && ";
+			ageStr += "(?dob < " + " \'" + backYear + "-" + thisMonth + "-" + thisDate + "T00:00:00\'^^xsd:dateTime ) " ;
+		}
+
+		if(tdValue == "AgeMax"){
+			if (ageStr != "") ageStr += " && ";
+			ageStr += "(?dob > " + " \'" +backYear + "-" + thisMonth + "-" + thisDate + "T00:00:00\'^^xsd:dateTime ) " ;
+		}
+	});
+	
+	
+	return 	ageStr;	
+}  
+
+
 /* document ready */
 
 $(function() {
 	
-	sdtmRQ += "PREFIX sdtm: <http://www.sdtm.org/vocabulary#> \n"  +  
+	var inbody = window.opener.document.getElementById("inListBody");
+	
+	var sdtmRQ = "PREFIX sdtm: <http://www.sdtm.org/vocabulary#> \n"  +  
 		 "PREFIX spl: <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#> \n" +
+		 "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \n" +
 		 "SELECT DISTINCT ?patient ?dob ?sex ?takes ?indicDate  \n" + 
  		 "WHERE { \n" +
   		 "?patient a sdtm:Patient ; \n" +
@@ -350,34 +388,42 @@ $(function() {
 	     "sdtm:standardizedMedicationName ?takes ; \n" +
 	     "spl:activeIngredient [ spl:classCode ?code ] ;\n" +
          "sdtm:startDateTimeOfMedication ?indicDate\n" +
-         "]. "
+         "]. ";
 
      //get demographic and medication criteria such as gender and age constraint
-     var genderStr = getGender("inListBody");     
-     var drugStr = getDrugSelection("inListBody");
+     var genderStr = getGender(inbody);     
+     var ageStr = getAge(inbody);
+     var drugStr = getDrugSelection(inbody);
      
-     if (genderStr != "" || drugStr != "" )
+     var conditionStr = "";
+     
+     if (genderStr != "" || drugStr != "" || ageStr != "" )
         {
         	sdtmRQ += " FILTER (" ;
-
-     		if (genderStr != "")	
-      			sdtmRQ += "(" + genderStr + ") "; 
-
-			if (drugStr != "")
-				{      
-					//get RxNORM code for drug ingredients in drug ontology	
+        	
+     		if (genderStr != "") {
+        		if (conditionStr != "") conditionStr += " && ";	
+      			conditionStr += "(" + genderStr + ") "; 
+      		 }     
+     		if (ageStr != "") {
+        		if (conditionStr != "") conditionStr += " && ";   
+        		conditionStr += "(" + ageStr + ") "; 
+       		}     	 
+	  		if (drugStr != "") {
+				if (conditionStr != "") conditionStr += " && ";   
+				//get RxNORM code for drug ingredients in drug ontology	
 	
 					var query = host + path + "/drugRxCode?";
   					query += "drugList=" + encodeURIComponent(drugStr);
   					//alert (query);		
 
-					sdtmRQ += processWithResult(query, function(n3) {
+					conditionStr += processWithResult(query, function(n3) {
         
         			var ingredientList = n3.trim().split("\n"); 
         			var sdtmStr = "";
         			if (ingredientList.length > 0) 
         				{
-        				 	sdtmStr = " && (?code = " + ingredientList[0];        
+        				 	sdtmStr = " (?code = " + ingredientList[0];        
          					for (var i = 1; i < ingredientList.length; i++)
             					sdtmStr += " || ?code = " + ingredientList[i];
          					sdtmStr += ") "    
@@ -387,6 +433,8 @@ $(function() {
      			   });
 
      		}
+     		
+     		if (conditionStr != "") sdtmRQ += conditionStr;
      		
      		sdtmRQ += " ) \n ";
      		         
