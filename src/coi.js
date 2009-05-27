@@ -424,7 +424,7 @@ function deleteById(id){
 function searchAllDrugTree(){
 	try {
 		showWait(true);
-  		process(host + path + "/kb/DOClassTreeA.n3", function(n3) {
+  		process(host + path + "/coi/kb/DOClassTreeA.n3", function(n3) {
   		//process(host + path + "/doSubAll?a=1", function(n3) {
   			//now you get all sub tree data
 			var drugInfoArray = getAllTreeInfo(n3);
@@ -645,7 +645,7 @@ function getSdtmParentId(str){
 }
 function loadSdtmAllTree(){
 	try {
-  		process(host + path + "/kb/SDTMTree.n3", function(n3) {
+  		process(host + path + "/coi/kb/SDTMTree.n3", function(n3) {
   		//process(host + path + "/doSubAll?a=1", function(n3) {
   			//now you get all sub tree data
 			getAllSDTMTreeInfo(n3);
@@ -1080,7 +1080,7 @@ function getPropertyFromServer(id, parentNodeId){
 		pnode = id.substring(0,id.length-2);
 		//alert ("id = " + pnode);
 		process(host + path + "/doSubProperty?node="+pnode, function(n3) {
-		//process(host + path + "/kb/property.n3", function(n3) {
+		//process(host + path + "/coi/kb/property.n3", function(n3) {
 			// add by lixiaodong for test
 			//parentNodeId = "C0007066";
 			//id="C1533643";
