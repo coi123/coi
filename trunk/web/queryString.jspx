@@ -1,0 +1,58 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+		xmlns:f="http://java.sun.com/jsf/core"
+    	xmlns:ice="http://www.icesoft.com/icefaces/component">
+
+	<ice:outputDeclaration doctypeRoot="html"
+						   doctypePublic="-//W3C//DTD HTML 4.01 Transitional//EN"
+        				   doctypeSystem="http://www.w3.org/TR/html4/loose.dtd" />	
+	
+	<html>
+	<head>
+	  <meta http-equiv="PRAGMA" content="NO-CACHE"/>
+	  <meta http-equiv="CACHE-CONTROL" content="NO-CACHE"/>
+	  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii"/> 
+	  
+	  <title>SDTM Query</title>
+	  <link rel="stylesheet" href="css/coi.css" type="text/css" />
+	  <link rel="stylesheet" href="css/xp.css" type="text/css" /> 
+	</head>
+	  
+	<body>  
+	  <div class="fourth">
+	    COI Demo : SPARQL Query String in SDTM
+	  </div>
+	  
+	  <div class="sparql">
+	  	<pre>
+	  	  <ice:outputText value="#{controller.queryModel.prefixs}"/>
+	  	  <ice:outputText value="#{controller.queryModel.selectStatement}"/>
+	  	  <ice:outputText value="#{controller.queryModel.whereStatement}"/>
+	  	  <ice:outputText value="#{controller.queryModel.limitStatement}"/>
+	  	</pre>
+	  <!--
+	  <p>
+	  PREFIX sdtm: &lt;http://www.sdtm.org/vocabulary#&gt;
+	  PREFIX spl: &lt;http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#&gt;
+	
+	    
+	  SELECT ?patient ?dob ?sex ?takes ?indicDate 
+	  WHERE {
+	  ?patient a sdtm:Patient .
+	           sdtm:middleName ?middleName ;
+	           sdtm:dateTimeOfBirth ?dob ;
+	           sdtm:sex ?sex .
+	  
+
+	  ?x1 sdtm:dosePerAdministration ?doseX1 .
+	  ?x1 sdtm:maxDosage ?maxDose .
+	  ?x1 sdtm:endDateTime ?dateTimeX1 .
+	  FILTER 
+
+	  
+	  }
+	  </p>
+	  -->
+	  </div>
+	</body>   
+	</html>
+</f:view>

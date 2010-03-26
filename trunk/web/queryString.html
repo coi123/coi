@@ -1,0 +1,66 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+		xmlns:f="http://java.sun.com/jsf/core"
+    	xmlns:ice="http://www.icesoft.com/icefaces/component">
+
+	<ice:outputDeclaration doctypeRoot="html"
+						   doctypePublic="-//W3C//DTD HTML 4.01 Transitional//EN"
+        				   doctypeSystem="http://www.w3.org/TR/html4/loose.dtd" />
+        				   
+	<html>
+	<head>
+	  <meta http-equiv="PRAGMA" content="NO-CACHE" > 
+	  <meta http-equiv="CACHE-CONTROL" content="NO-CACHE" > 
+	  <meta http-equiv="Content-Type" content="text/html; charset=UTF8"> 
+	  <meta name="keywords" content="COI Demo"> 
+	  
+	  <title>SDTM Query</title>
+	  <link rel="stylesheet" href="css/coi.css" type="text/css" >
+	  <link rel="stylesheet" href="css/xp.css" type="text/css" > 
+	</head>
+	  
+	<body>  
+	  <div class="fourth">
+	    COI Demo : SPARQL Query String in SDTM
+	  </div>
+	  
+	  <div class="sparql">
+	  <pre>
+	  PREFIX sdtm: &lt;http://www.sdtm.org/vocabulary#&gt;
+	  PREFIX spl: &lt;http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#&gt;
+	
+	    
+	  SELECT ?patient ?dob ?sex ?takes ?indicDate 
+	  WHERE {
+	  ?patient a sdtm:Patient .
+	           sdtm:middleName ?middleName ;
+	           sdtm:dateTimeOfBirth ?dob ;
+	           sdtm:sex ?sex .
+	  
+	           <div id="genderCond">
+	             <ice:outputText></ice:outputText>
+	           </div>
+	           <div id="ageCond">
+	           </div>         
+	  <div id="drugCond">
+	  </div>
+	  ?x1 sdtm:dosePerAdministration ?doseX1 .
+	  ?x1 sdtm:maxDosage ?maxDose .
+	  ?x1 sdtm:endDateTime ?dateTimeX1 .
+	  <div id="exclution">
+	  OPTIONAL {
+	  <div id="ageExtCond">
+	  </div>
+	  <div id="genderExtCond">
+	  </div>
+	  <div id="drugExtCond">
+	  </div>
+	  }
+	  FILTER (!bound(?x1).
+	  </div>
+	  
+	  }
+	  </pre>
+	  </div>
+	</body>   
+	</html>
+</f:view>
