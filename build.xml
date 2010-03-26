@@ -1,0 +1,11 @@
+<project name="coi" default="tomcat6.0">
+    
+    <import file="../etc/build-common.xml"/>
+    
+    <!--property name="ant.project.name" value="coi"/-->
+    
+    <target name="build.war" depends="compile">
+        <build.war web.xml="config/web.sunri.icefaces.ce.xml"/>
+    </target>
+    
+</project>
