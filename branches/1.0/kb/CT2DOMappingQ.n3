@@ -1,0 +1,31 @@
+# Mapping CT 8 Drug Class to Drug Ontology
+#   Base was: file:///acasvn/triples/hcls/DrugOntology/DrugOntology04.owl
+    @prefix owl: <http://www.w3.org/2002/07/owl#> .    
+    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+    @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+    
+    @prefix : <http://www.owl-ontologies.com/DrugOntology.owl#> .
+    
+    
+{?A  a    :CTDrugName;  rdfs:label  ?D} => {?D :hasID ?A}.
+
+#check all drugs that "may_treat  obese"
+#{?A rdfs:subClassOf  ?B;
+#    rdfs:label  ?D.
+# ?B  a owl:Restriction;
+#     owl:onProperty :may_treat;
+#     owl:someValuesFrom :C0028754}
+#=>
+#{
+# ?A  a   :CTDrugName}.    
+
+#check all drugs that "has_adverse_effect"
+#{?A rdfs:subClassOf  ?B;
+#    rdfs:label  ?D.
+# ?B  a owl:Restriction;
+#     owl:onProperty :may_treat;
+#     owl:someValuesFrom ?C.
+#  ?C rdfs:label  ?E }
+#=>
+#{
+# ?D  :hasAdverseEffect   ?E}.    

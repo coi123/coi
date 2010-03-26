@@ -1,0 +1,61 @@
+@prefix str: <http://www.w3.org/2000/10/swap/string#>.
+@prefix var: <http://localhost/var#>.
+@prefix q: <http://www.w3.org/2004/ql#>.
+@prefix list: <http://www.w3.org/2000/10/swap/list#>.
+@prefix e: <http://eulersharp.sourceforge.net/2003/03swap/log-rules#>.
+@prefix fn: <http://www.w3.org/2006/xpath-functions#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix : <http://www.owl-ontologies.com/DrugOntology.owl#>.
+@prefix nsp0: <http://www.owl-ontologies.com/>.
+@prefix time: <http://www.w3.org/2000/10/swap/time#>.
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix n3: <http://www.w3.org/2004/06/rei#>.
+@prefix math: <http://www.w3.org/2000/10/swap/math#>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix r: <http://www.w3.org/2000/10/swap/reason#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+
+:C0001962 rdfs:subClassOf :C1690586.
+:C0017951 rdfs:subClassOf :C1690586.
+:C0037556 rdfs:subClassOf :C1690586.
+:C1563032 rdfs:subClassOf :C1690586.
+:C1623735 rdfs:subClassOf :C1690586.
+:C0719741 rdfs:subClassOf :C0001962.
+:C0032483 rdfs:subClassOf :C0017951.
+:C0072225 rdfs:subClassOf :C0017951.
+:C0017861 rdfs:subClassOf :C1563032.
+:C0028053 rdfs:subClassOf :C1563032.
+:C1562418 rdfs:subClassOf :C1563032.
+:C0022237 rdfs:subClassOf :C1623735.
+:C0001962 :level 1.
+:C0017951 :level 1.
+:C0037556 :level 1.
+:C1563032 :level 1.
+:C1623735 :level 1.
+:C0719741 :level 2.
+:C0032483 :level 2.
+:C0072225 :level 2.
+:C0017861 :level 2.
+:C0028053 :level 2.
+:C1562418 :level 2.
+:C0022237 :level 2.
+:C0001962 rdfs:label "Ethanol".
+:C0017951 rdfs:label "Glycol".
+:C0037556 rdfs:label "Sodium Tetradecyl Sulfate".
+:C1563032 rdfs:label "Alcohol derivative".
+:C1623735 rdfs:label "Alcohol disinfectant".
+:C0719741 rdfs:label "denatured ethanol".
+:C0032483 rdfs:label "Polyethylene Glycols".
+:C0072225 rdfs:label "Propylene glycol".
+:C0017861 rdfs:label "Glycerol".
+:C0028053 rdfs:label "Nicotinyl Alcohol".
+:C1562418 rdfs:label "Alkanol".
+:C0022237 rdfs:label "Isopropanol".
+:C0991869 rdfs:subClassOf :C0072225.
+:C0215278 rdfs:subClassOf :C1562418.
+:C0991869 :level 3.
+:C0215278 :level 3.
+:C0991869 rdfs:label "PROPYLENE GLYCOL DIACETATE".
+:C0215278 rdfs:label "policosanol".
+
