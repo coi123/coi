@@ -1,0 +1,19 @@
+# generate Property list 
+#   Base was: file:///acasvn/triples/hcls/DrugOntology/DrugOntology04.owl
+    @prefix owl: <http://www.w3.org/2002/07/owl#> .    
+    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+    @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+    @prefix math: <http://www.w3.org/2000/10/swap/math#>.
+    
+    @prefix : <http://www.owl-ontologies.com/DrugOntology.owl#> .
+    
+    
+
+#inference rule
+?A a owl:Class.
+{?A rdfs:subClassOf :C0007066, _:x.
+ _:x a owl:Restriction;
+    owl:onProperty ?D.
+} =>
+{?A :hasProperty ?D}.
+

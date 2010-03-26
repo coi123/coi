@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+<head>
+  <meta http-equiv="PRAGMA" content="NO-CACHE">
+  <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
+  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+
+  <title>Clinical Observations Interoperability (COI) Demo : Clinical Trial Eligibility Criteria Selection</title>
+  <link rel="shortcut icon" href="images/favicon-sw.ico" />
+  <link rel="stylesheet" href="coi.css" type="text/css">
+  <link rel="stylesheet" href="treeview.css" type="text/css">
+  <link rel="stylesheet" href="jquery.tabs.css" type="text/css" media="print, projection, screen">
+  <script src="src/variables.js" type="text/javascript"></script>
+  <script src="src/jquery-latest.js" type="text/javascript"></script>
+  <script src="src/coi.js" type="text/javascript"></script>
+  <script src="src/jquery.blockUI.js" type="text/javascript"></script>
+  <script src="src/jquery.corner.js" type="text/javascript"></script>
+  <script src="src/parser.js" type="text/javascript"></script>
+  <script src="src/jquery.jcarousel.js" type="text/javascript"></script>
+  <script src="src/jquery.cookie.js" type="text/javascript"></script>
+  <script src="src/jquery.treeview.js" type="text/javascript"></script>
+  <script src="src/jquery.treeview.pack.js" type="text/javascript"></script>
+  <script src="src/jquery.tabs.pack.js" type="text/javascript"></script>
+  <script src="src/jschart.js" type="text/javascript"></script>
+  <script src="src/jquery-ajax-queue-1.0.js" type="text/javascript"></script>
+</head>
+
+<body>
+   
+    <input type="hidden" id="searchValue" name="searchValue">
+
+    <div class="second">
+      <img src="images/sw-horz-w3c.png">&nbsp;Clinical Observations Interoperability (COI) Demo : Clinical Trial Eligibility Criteria Selection
+    </div>
+
+    <div class="inner">
+      <div id="INCLUSIONGRP">
+        <h2>INCLUSION CRITERIA <input id="ADDIN" type="image" src="images/add.png"></h2>
+        <hr>
+
+        <div class="criteriaList" id="INCLUSIONCONTAINER">
+          <table id="Inclusion" style="table-layout:fixed">
+            <thead class="title">
+              <tr nowrap>
+                <th width="22%">Domain</th>
+                <th width="40%">Inclusion Category</th>
+                <th width="30%">Constraint</th>
+                <th width="8%">&nbsp;</th>
+              </tr>
+            </thead>
+
+            <tbody id="inListBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="EXCLUSIONGRP">
+        <h2>EXCLUSION CRITERIA <input id="ADDEX" type="image" src="images/add.png"></h2>
+        <hr>
+
+        <div class="criteriaList" id="EXCLUSIONCONTAINER">
+          <table id="Exclusion" style="table-layout:fixed">
+            <thead class="title">
+              <tr nowrap>
+                <th width="22%">Domain</th>
+                <th width="40%">Exclusion Category</th>
+                <th width="30%">Constraint</th>
+                <th width="8%">&nbsp;</th>
+              </tr>
+            </thead>
+
+            <tbody id="exListBody"></tbody>
+          </table>
+        </div>
+      </div>
+	  <br>
+      <br>
+      <button id="querysql" class="querysql">SPARQL</button>
+    </div>
+    
+	<!-- default containers for details -->
+
+    <div id="DEFAULTCONT" class="showDetails">
+      <h2>Clinical Trial Eligibility: Inclusion Criteria:</h2>
+
+      <ul>
+        <li>Ages Eligible for Study: 18 Years - 75 Years,</li>
+        <li>Genders Eligible for Study: Both</li>
+        <li>Type 2 diabetes on diet and exercise therapy or monotherapy with metformin, insulin secretagogue, or alpha-glucosidase inhibitors, or a low-dose combination of these at &le; 50% maximal dose (see Appendix). Dosing is stable for 8 weeks prior to randomization.</li>
+      </ul>
+
+      <h2>Clinical Trial Eligibility: Exclusion Criteria:</h2>
+
+      <ul>
+        <li>Therapy with rosiglitazone (Avandia) or pioglitazone (Actos), or extendin-4 (Byetta), alone or in combination in the previous 6 months</li>
+        <li>Use of weight loss drugs [e.g., Xenical (orlistat), Meridia (sibutramine), Acutrim (phenylpropanol-amine), or similar over-the-counter medications] within 3 months of screening or intentional weight loss of &ge; 10 lbs in the previous 6 months</li>
+        <li>Use of warfarin (Coumadin), clopidogrel (Plavix) or other anticoagulants</li>
+        <li>Use of probenecid (Benemid, Probalan), sulfinpyrazone (Anturane) or other uricosuric agents</li>
+      </ul>
+    </div>
+
+    <div id="DRUG" class="showDetails">
+      <h3>Demographic Information</h3>
+
+      <table id="PSEARCHCRITERIA" class="section">
+        <tbody>
+          <tr>
+            <td><input type="checkbox" name="Male" value="Male" checked="unchecked">Male</td>
+            <td><input type="checkbox" name="Female" value="Female">Female</td>
+            <td></td>
+            <td></td>
+          </tr>
+
+          <tr>
+            <td>Minimum Age</td>
+            <td><input type="text" value="0" name="AgeMin" id="agemin"></td>
+            <td>Maximum Age</td>
+            <td><input type="text" value="100" name="AgeMax" id="agemax"></td>
+          </tr>
+        </tbody>
+      </table>
+      <hr>
+
+      <h3>Medication:</h3>
+      <div id="tabContainer">
+        <ul>
+          <li><a href="#SDTM"><span>SDTM</span></a></li>
+          <li><a href="#DrugOntology"><span>Drug Ontology</span></a></li>     
+          <li><a href="#MappingRule"><span>Mapping Rule</span></a></li>
+          <li><a href="#InterResults"><span>Intermediate Results</span></a></li>
+        </ul>
+        
+        <div id="SDTM">
+          <div id="SDTMTree" class="sdtm">
+          </div>
+          <div id="SDTMProp" class="sdtmprop">
+          </div> 
+          <button id="APPLYBUTTONSDTM" class="applyCode">Apply
+          Criteria</button> <input id="CLEARSDTM" class="clear"
+          type="image" src="images/reload.gif">
+        </div>
+        
+        <div id="DrugOntology">
+          <table>
+            <tr>
+              <td width="50%">Drug Ingredient <!--button id="DisplayAllDrug" class="search">All</button--></td>
+              <td>Property</td>
+            </tr>
+
+            <tr>
+              <td><!--  input type="text" id="drugName">--><button id="drugSearch" class="search"><img src="images/search.png" alt="drug search"></button></td>
+              <td></td>
+            </tr>
+          </table>
+
+          <div id="BROSWER" class="drugname"></div>
+          <div id="PROPERTY" class="property"></div>
+          <button id="APPLYBUTTON" class="applyCode">Apply Criteria</button>
+          <input id="CLEAR" class="clear" type="image" src="images/reload.gif">
+        </div>
+        <div id="MappingRule">
+          <input type="checkbox" name="sdtmR" value="" ><a href="kb/sdtmrq.n3" target="_blank"> SDTM Query Sample</a> <br>
+          <input type="checkbox" name="sdtm-hl7R" value="" checked><a href="kb/hl7_sdtmrq.n3" target="_blank"> SDTM - HL7 Mapping Rule</a> <br>
+          <input type="checkbox" name="db-hl7R" value="" checked><a href="kb/db_hl7rq.n3" target="_blank"> Database - HL7 Mapping Rule</a> <br>
+          <input type="checkbox" name="drugR" value="" checked> <a href="kb/CT2DOMapping.n3" target="_blank">Drug Sub-Category Inclusion Rule</a><br>
+          <input type="checkbox" name="drugW" value="" checked> <a href="kb/WeightLossDrugRule.n3" target="_blank">Weight Loss Drug Ingredient Inference Rule Used in Exclusion Criteria</a><br>
+          <input type="checkbox" name="drugM" value="" checked> <a href="kb/NDCcodes_ClinicalDrugs.txt" target="_blank">RxNorm to NDC Code Conversion</a><br>
+        </div>
+        <div id="InterResults">
+          <input type="checkbox" name="hlsparql" value="" checked><a href="bin/hl7_temp.txt" target="_blank"> Generated HL7 Query</a><br>
+          <input type="checkbox" name="sql" value="" checked><a href="bin/sql_temp.txt" target="_blank"> Generated SQL Query</a><br>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <button id="QUERYEXEC" class="generalButtonClass">Query Patients</button>
+      <button id="RESET" class="generalButtonClass">Reset Criteria</button>
+    </div>
+
+    <div class="address">
+      <table>
+        <tr>
+          <td><a href="http://www.agfa.com/w3c/hchen">Helen Chen</a> Agfa Healthcare</td>
+          <td><a href="http://purl.org/holger">Holger Stenzhorn</a>, DERI</td>
+          <td><a href="http://www.mdcl.com.cn/">Xiaodong Li</a>, MDCL</td>
+        </tr>
+        <tr>
+          <td><a href="http://lsdis.cs.uga.edu/~kashyap/">Vipul Kashyap</a>, CIGNA</td>
+          <td><a href="http://www.w3.org/People/Eric">Eric Prud'hommeaux</a>, W3C</td>
+          <td></td>
+        </tr>
+      </table>
+    </div>
+  
+</body>
+</html>

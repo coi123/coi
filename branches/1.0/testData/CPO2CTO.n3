@@ -1,0 +1,46 @@
+# $Id: CPO2CTO.n3,v 1.3 2008/06/12 05:23:51 eric Exp $
+# place to copy rules from http://esw.w3.org/topic/HCLS/ClinicalObservationsInteroperability/InterOntologyMapping.html
+
+# common namespaces
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix log: <http://www.w3.org/2000/10/swap/log#> .
+
+#!!! invented
+@prefix rxnorm: <rxnorm:> .
+@prefix rdfs: <rdfs:> .
+@prefix owl: <owl:> .
+@prefix ncit: <ncit:> .
+
+# namespaces from the database's public projection
+@prefix hl7: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#hl7_> .
+@prefix sdtm: <http://www.w3.org/2008/04/DiabeticPatientsDataSet/ClinicalPracticeOntology-Version3.owl#sdtm_> .
+
+{ ?x rdf:type hl7:Person . ?x hl7:player hl7:Patient . } 
+=> { ?x rdf:type sdtm:Patient . } .
+
+{?x hl7:subject ?y .}
+=> {?x sdtm:subject ?y . } .
+
+{?x hl7:doseQuantity ?y . ?x rdf:type sdtm:SubstanceAdministration .} 
+=> {?x sdtm:dosePerAdministration ?y . ?x rdf:type sdtm:Medication} .
+
+{?x hl7:maxDoseQuantity ?y . ?x rdf:type hl7:SubstanceAdministration .} 
+=> {?x sdtm:maxDosage ?y . ?x rdf:type sdtm:Medication . } .
+
+{?x rdf:type hl7:SubstanceAdministration . ?x hl7:effectiveTime ?timeInterval . ?timeInterval hl7:start ?y . } 
+=> {?x sdtm:startDateTime ?y . ?x rdf:type sdtm:Medication .} .
+
+{?x rdf:type hl7:SubstanceAdministration . ?x hl7:effectiveTime ?timeInterval . ?timeInterval hl7:end ?y .} 
+=> {?x sdtm:endDateTime ?y . ?x rdf:type sdtm:Medication .} .
+
+{?x hl7:consumable ?y . ?y rdf:type hl7:Medication .}
+=> {?x rdf:type sdtm:Medication .} .
+
+{?x rdf:type hl7:SubstanceAdministration . ?x hl7:consumable ?y . ?y rdf:type hl7:Medication . ?y hl7:hasName rxnorm:Metformin . } 
+=> {?x rdf:type sdtm:Metformin . sdtm:Metformin rdfs:subClassOf sdtm:Medication . sdtm:Metformin owl:equivalentClass ncit:Metformin .} .
+
+# $Log: CPO2CTO.n3,v $
+# Revision 1.3  2008/06/12 05:23:51  eric
+# + CVS log
+#

@@ -1,0 +1,22 @@
+#!/bin/sh
+dir=`dirname "$(cd ${0%/*} && echo $PWD/${0##*/})"`
+temp=$dir/temp
+suffix=$RANDOM-$RANDOM-$RANDOM
+
+if [ ! -d $temp ]; then
+  mkdir $temp
+fi
+
+one=$temp/sdtm-$suffix.rq 
+two=$temp/hl7_sdtm-$suffix.rq 
+three=$temp/db_hl7-$suffix.rq
+
+wget -nv -O $one $1
+wget -nv -O $two $2
+wget -nv -O $three $3
+
+$dir/SPARQL -p $one $two | $dir/SPARQL -p - $three -s $4 | mysql -u $5 --password=$6 $7 --table
+
+rm $one
+rm $two
+rm $three
