@@ -1,3 +1,4 @@
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -14,6 +15,7 @@ import com.icesoft.faces.component.tree.Tree;
 import com.icesoft.faces.context.effects.Effect;
 import com.icesoft.faces.context.effects.Fade;
 import com.icesoft.faces.context.effects.Highlight;
+import com.icesoft.faces.context.effects.JavascriptContext;
 import com.icesoft.faces.context.effects.Opacity;
 
 
@@ -29,8 +31,9 @@ public class ControllerBean
 	{
 		sdtmTreeModel = new SDTMTreeModel();
 		doTreeModel = new DOTreeModel();
-		tableModel = new TablesBean();
 		queryModel = new SparqlQueryModel();
+		tableModel = new TablesBean(queryModel);
+		
 	}
 	
 	public Effect getFadeOut()
@@ -60,12 +63,20 @@ public class ControllerBean
 	
 	public void setInclusion(ActionEvent e)
 	{
+		FacesContext fcontext = FacesContext.getCurrentInstance();
+		String javaCall = "document.getElementById(\"INCLUSIONGRP\").className=\"selected\";" +
+		                  "document.getElementById(\"EXCLUSIONGRP\").className=\"unselected\";";
+		JavascriptContext.addJavascriptCall(fcontext, javaCall);
 		tableModel.setInclusion();
 		fadeOut = new Fade();
 	}
 	
 	public void setExclusion(ActionEvent e)
 	{
+		FacesContext fcontext = FacesContext.getCurrentInstance();
+		String javaCall = "document.getElementById(\"INCLUSIONGRP\").className=\"unselected\";" +
+		                  "document.getElementById(\"EXCLUSIONGRP\").className=\"selected\";";
+		JavascriptContext.addJavascriptCall(fcontext, javaCall);
 		tableModel.setExclusion();
 		fadeOut = new Fade();
 	}
@@ -158,7 +169,7 @@ public class ControllerBean
 	
 	public void sdtmApplyBtnPress(ActionEvent e)
 	{
-		String domain = "SDTM";
+		String domain = "sdtm";
 		String category = sdtmTreeModel.getSelectedNodeText();
 		String constraints = "";
 		tableModel.addItem(domain, category, constraints);
@@ -187,7 +198,7 @@ public class ControllerBean
 	
 	public void doApplyBtnPress(ActionEvent e)
 	{
-		String domain = "DO";
+		String domain = "do";
 		String category = doTreeModel.getSelectedNodeText();
 		String constraints = "";
 		tableModel.addItem(domain, category, constraints);

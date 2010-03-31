@@ -5,7 +5,6 @@ public class TreeItem
 	private String itemID;
 	private String parentID;
 	private String itemLabel;
-	private int itemLevel;
 	
 	public TreeItem(String itemID, String parentID, String itemLabel)
 	{

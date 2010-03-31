@@ -1,96 +1,248 @@
+import java.util.ArrayList;
+
 
 public class SparqlQueryModel 
 {
-	private String prefixs;
-	private String fieldsToReturn;
-	private String selectStatement;
-	private String criteria;
-	private String whereStatement;
-	private String constraints;
+	private ArrayList inclusionCriteria;
+	private ArrayList exclusionCriteria;
+	
+	private ArrayList prefices;
+	private ArrayList fieldsToReturn;
+	
+	private TableItem maleItem;
+	private TableItem femaleItem;
+	private TableItem ageMinItem;
+	private TableItem ageMaxItem;
+	private ArrayList sdtmItems;
+	private ArrayList doItems;
+	
+	private String prefixStatements;
+	private String selectionStatement;
+	private String criteriaStatement = "";
+	private String optionalStatement;
 	private String filterStatement;
-	private int limit;
 	private String limitStatement;
+	private int varNum;
+	
+	private int limit;
 	
 	public SparqlQueryModel()
 	{
-		prefixs        = "PREFIX sdtm: <http://www.sdtm.org/vocabulary#>\n" +
-				         "PREFIX spl: <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#>\r\n";
-		fieldsToReturn = "?patient ?dob ?sex ?takes ?indicDate ";
-		criteria       = "?patient a sdtm:Patient .\n" +
-				         "         sdtm:middleName ?middleName ;\n" +
-				         "         sdtm:dateTimeOfBirth ?dob ;\n" +
-				         "         sdtm:sex ?sex .\n";
-		constraints    = null;
+		inclusionCriteria = new ArrayList();
+		exclusionCriteria = new ArrayList();
+		
+		prefices = new ArrayList();
+		fieldsToReturn = new ArrayList();
+		
+		sdtmItems = new ArrayList();
+		doItems = new ArrayList();
+		
+		prefices.add("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
+		prefices.add("PREFIX sdtm: <http://www.sdtm.org/vocabulary#>\n");
+		prefices.add("PREFIX spl: <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#>\n");
+		prefices.add("PREFIX do: <http://www.owl-ontologies/wm/DrugOntology.owl#>\n");
+		fieldsToReturn.add("?patient");
+		fieldsToReturn.add("?dob");
+		fieldsToReturn.add("?sex");
+		fieldsToReturn.add("?takes");
+		fieldsToReturn.add("?indicDate");
+		
+		varNum = 0;
+		
 		limit = 30;
 	}
 	
-	public String getPrefixs()
+	public void setInclusionList(ArrayList arr)
 	{
-		return prefixs;
+		inclusionCriteria = arr;
 	}
 	
-	public String getSelectStatement()
+	public void setExclusionList(ArrayList arr)
 	{
-		if (fieldsToReturn != null)
-		{
-			selectStatement = "SELECT " + fieldsToReturn + "\n";
-		}
-		else 
-		{
-			selectStatement = "";
-		}
-		selectStatement = filterOutput(selectStatement);
-		return selectStatement;
+		exclusionCriteria = arr;
 	}
 	
-	public String getWhereStatement()
+	public String getPrefixStatements()
 	{
-		if (criteria != null)
+		prefixStatements = "";
+		if (!prefices.isEmpty())
 		{
-			whereStatement = "WHERE {\n" + 
-							  criteria +
-							  getFilterStatement() + "}\n";
+			for(int i = 0; i < prefices.size(); i++)
+			{
+				prefixStatements += prefices.get(i);
+			}
+			prefixStatements += "\n";
 		}
-		else
-		{
-			whereStatement = "";
-		}
-		whereStatement = filterOutput(whereStatement);
-		return whereStatement;
+		return prefixStatements;
 	}
 	
-	public String getFilterStatement()
+	public String getSelectionStatement()
 	{
-		if (constraints != null)
+		selectionStatement = "";
+		if (!fieldsToReturn.isEmpty())
 		{
-			filterStatement = "FILTER " + constraints + "\n";
+			selectionStatement = "SELECT ";
+			for (int a = 0; a < fieldsToReturn.size(); a++)
+			{
+				selectionStatement += fieldsToReturn.get(a).toString() + " ";
+			}
 		}
-		else
+		return selectionStatement;
+	}
+	
+	public String getCriteriaStatement()
+	{
+		//sorts list into local variables
+		readVariables();
+		
+		//standard query definition for the coi demo
+		criteriaStatement  = "WHERE {\n";
+		criteriaStatement += "?patient a sdtm:Patient ;\n";
+		criteriaStatement += "           sdtm:middleName ?middleName ;\n";
+		criteriaStatement += "           sdtm:dateTimeOfBirth ?dob ;\n";
+		criteriaStatement += "           sdtm:sex ?sex .\n\n";
+		
+		//mapping all possible variable combinations: relationship declarations
+		if (ageMinItem != null || ageMaxItem != null)
 		{
-			filterStatement = "";
+			criteriaStatement += "           ?patient sdtm:hasAge ?age .\n";
 		}
-		filterStatement = filterOutput(filterStatement);
-		return filterStatement;
+		int a;
+		for (a = 0; a < sdtmItems.size(); a++)
+		{
+			TableItem item = (TableItem)sdtmItems.get(a);
+			criteriaStatement += "           ?x" + a + " rdf:type sdtm:" + item.getCategory() + " .\n";
+			criteriaStatement += "           ?x" + a + " sdtm:dosePerAdministration ?doseX" + a + " .\n";
+		}
+		int b;
+		for (b = 0; b < doItems.size(); b++)
+		{
+			TableItem item = (TableItem)doItems.get(b);
+			criteriaStatement += "           ?x" + (a + b) + " rdf:type do:" + item.getCategory() + " .\n";
+			criteriaStatement += "           ?x" + (a + b) + " do:dose ?doseX" + (a + b) + " .\n";
+		}
+		//mapping all possible variable combinations:query construction
+		
+		boolean firstItem = true;
+		criteriaStatement += "\n           FILTER ("; 
+		
+		if (maleItem != null && maleItem.getConstraints().equals("true"))
+		{
+			if (maleItem != null)
+			{
+				criteriaStatement += "(";
+			}
+			criteriaStatement += "?sex = \"Male\"";
+			firstItem = false;
+		}
+		if (femaleItem != null && femaleItem.getConstraints().equals("true"))
+		{
+			if (firstItem == false)
+			{
+				criteriaStatement += " || ";
+			}
+			criteriaStatement += "?sex = \"Female\"";
+			if (maleItem != null)
+			{
+				criteriaStatement += ")";
+			}
+			firstItem = false;
+		}
+		if (ageMinItem != null)
+		{
+			if (firstItem == false)
+			{
+				criteriaStatement += " && ";
+			}
+			criteriaStatement += "?age >= " + ageMinItem.getConstraints();
+			firstItem = false;
+		}
+		if (ageMaxItem != null)
+		{
+			if (firstItem == false)
+			{
+				criteriaStatement += " && ";
+			}
+			criteriaStatement += "?age <= " + ageMaxItem.getConstraints();
+			firstItem = false;
+		}
+		for (a = 0; a < sdtmItems.size(); a++)
+		{
+			TableItem item = (TableItem)sdtmItems.get(a);
+			if (firstItem == false)
+			{
+				criteriaStatement += " && ";
+			}
+			criteriaStatement += "?doseX" + a + " " + item.getConstraints();
+			firstItem = false;
+		}
+		for (b = 0; b < doItems.size(); b++)
+		{
+			TableItem item = (TableItem)doItems.get(b);
+			if (firstItem == false)
+			{
+				criteriaStatement += " && ";
+			}
+			criteriaStatement += "?doseX" + (a + b) + " " + item.getConstraints();
+			firstItem = false;
+		}
+		
+		criteriaStatement += ") \n";
+		criteriaStatement += "} \n";
+		
+		return criteriaStatement;
 	}
 	
 	public String getLimitStatement()
 	{
-		if (limit != -1)
-		{
-			limitStatement = "LIMIT " + limit;
-		}
-		else
-		{
-			limitStatement = "";
-		}
-		limitStatement = filterOutput(limitStatement);
-		return limitStatement;
+		return "LIMIT " + limit;
 	}
 	
-	private String filterOutput(String inString)
+	private void readVariables()
 	{
-		String outString = inString;
-		//outString = outString.replaceAll("\n", "&lt;br/&gt;");
-		return outString;
+		maleItem = null;
+		femaleItem = null;
+		ageMinItem = null;
+		ageMaxItem = null;
+		sdtmItems.clear();			
+		doItems.clear();
+
+		
+		//sorts variables so there is less guesswork
+		
+		if (!inclusionCriteria.isEmpty())
+		{
+			for (int j = 0; j < inclusionCriteria.size(); j++)
+			{
+				TableItem curItem = ((TableItem)inclusionCriteria.get(j));
+				if (curItem.getDomain().equals("sdtm"))
+				{
+					if (curItem.getCategory().equals("Male"))
+					{
+						maleItem = curItem;
+					}
+					else if (curItem.getCategory().equals("Female"))
+					{
+						femaleItem = curItem;
+					}
+					else if (curItem.getCategory().equals("ageMin"))
+					{
+						ageMinItem = curItem;
+					}
+					else if (curItem.getCategory().equals("ageMax"))
+					{
+						ageMaxItem = curItem;
+					}
+					else
+					{
+						sdtmItems.add(curItem);
+					}
+				}
+				else
+				{
+					doItems.add(curItem);
+				}
+			}
+		}
 	}
 }
