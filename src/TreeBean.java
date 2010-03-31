@@ -35,7 +35,7 @@ public class TreeBean {
         // create root node with its children expanded
         rootTreeNode = new DefaultMutableTreeNode();
         IceUserObject rootObject = new IceUserObject(rootTreeNode);
-        rootObject.setText("SDTM");
+        rootObject.setText("sdtm");
         rootObject.setExpanded(false);
         rootTreeNode.setUserObject(rootObject);
         TreeItem rootRawNode = new TreeItem("root", null, "root");

@@ -34,22 +34,23 @@
 	        				   actionListener="#{controller.setInclusion}"/>
 	        </h2>
 	        <hr/>
-			<ice:dataTable id="inclTable"
+			<ice:dataTable columnWidths="22%,40%,30%,8%"
+						   id="inclTable"
 						   value="#{controller.tableModel.inclItems}"
 			 			   var="inclTable">
-			  <ice:column style="width:22%">
+			  <ice:column>
 			    <f:facet name="header">
 			      <ice:outputText value="Domain"/>
 			    </f:facet>
 			    <ice:outputText value="#{inclTable.domain}"/>
 			  </ice:column>
-			  <ice:column style="width:40%">
+			  <ice:column>
 			    <f:facet name="header">
 			      <ice:outputText value="Inclusion Category"/>
 			    </f:facet>
 			    <ice:outputText value="#{inclTable.category}"/>
 			  </ice:column>
-			  <ice:column style="width:30%;">
+			  <ice:column>
 			    <f:facet name="header">
 			      <ice:outputText value="Constraint"/>
 			    </f:facet>
@@ -57,7 +58,7 @@
 			    			   value="#{inclTable.constraints}"
 			    			   valueChangedListener="#{controller.constraintsChanged}"/>
 			  </ice:column>
-			  <ice:column style="width:8%">
+			  <ice:column>
 			    <f:facet name="header">
 			      <ice:outputText value=""/>
 			    </f:facet>
@@ -76,7 +77,8 @@
 	        					 actionListener="#{controller.setExclusion}"/>
 	        </h2>
 	        <hr/>
-			<ice:dataTable id="exclTable"
+			<ice:dataTable columnWidths="22%,40%,30%,8%"
+						   id="exclTable"
 						   value="#{controller.tableModel.exclItems}"
 			 			   var="exclTable">
 			  <ice:column style="width:22%">

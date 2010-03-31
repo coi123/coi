@@ -14,7 +14,6 @@ position:"absolute";
 }
 
 #EXCLUSIONGRP, #exclPanel {
-background-color:transparent;
 font-size:11px;
 font-weight:bold;
 height:200px;
@@ -36,7 +35,6 @@ width:410px;
 }
 
 #INCLUSIONGRP, #inclPanel {
-background-color:transparent;
 font-size:11px;
 font-weight:bold;
 height:210px;

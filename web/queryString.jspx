@@ -24,9 +24,9 @@
 	  
 	  <div class="sparql">
 	  	<pre>
-	  	  <ice:outputText value="#{controller.queryModel.prefixs}"/>
-	  	  <ice:outputText value="#{controller.queryModel.selectStatement}"/>
-	  	  <ice:outputText value="#{controller.queryModel.whereStatement}"/>
+	  	  <ice:outputText value="#{controller.queryModel.prefixStatements}"/>
+	  	  <ice:outputText value="#{controller.queryModel.selectionStatement}"/>
+	  	  <ice:outputText value="#{controller.queryModel.criteriaStatement}"/>
 	  	  <ice:outputText value="#{controller.queryModel.limitStatement}"/>
 	  	</pre>
 	  <!--
