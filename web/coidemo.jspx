@@ -34,39 +34,41 @@
 	        				   actionListener="#{controller.setInclusion}"/>
 	        </h2>
 	        <hr/>
-			<ice:dataTable columnWidths="22%,40%,30%,8%"
-						   id="inclTable"
-						   value="#{controller.tableModel.inclItems}"
-			 			   var="inclTable">
-			  <ice:column>
-			    <f:facet name="header">
-			      <ice:outputText value="Domain"/>
-			    </f:facet>
-			    <ice:outputText value="#{inclTable.domain}"/>
-			  </ice:column>
-			  <ice:column>
-			    <f:facet name="header">
-			      <ice:outputText value="Inclusion Category"/>
-			    </f:facet>
-			    <ice:outputText value="#{inclTable.category}"/>
-			  </ice:column>
-			  <ice:column>
-			    <f:facet name="header">
-			      <ice:outputText value="Constraint"/>
-			    </f:facet>
-			    <ice:inputText partialSubmit="true"
-			    			   value="#{inclTable.constraints}"
-			    			   valueChangedListener="#{controller.constraintsChanged}"/>
-			  </ice:column>
-			  <ice:column>
-			    <f:facet name="header">
-			      <ice:outputText value=""/>
-			    </f:facet>
-			    <ice:commandButton style="width:19px; height:19px;"
-			    				   image="images/delete.png"
-			    				   actionListener="#{controller.deleteRow}"/>
-			  </ice:column>
-			</ice:dataTable>
+	          <div style="overflow:auto; height:235px;">
+				<ice:dataTable columnWidths="22%,40%,30%,8%"
+							   id="inclTable"
+							   value="#{controller.tableModel.inclItems}"
+				 			   var="inclTable">
+				  <ice:column>
+				    <f:facet name="header">
+				      <ice:outputText value="Domain"/>
+				    </f:facet>
+				    <ice:outputText value="#{inclTable.domain}"/>
+				  </ice:column>
+				  <ice:column>
+				    <f:facet name="header">
+				      <ice:outputText value="Inclusion Category"/>
+				    </f:facet>
+				    <ice:outputText value="#{inclTable.category}"/>
+				  </ice:column>
+				  <ice:column>
+				    <f:facet name="header">
+				      <ice:outputText value="Constraint"/>
+				    </f:facet>
+				    <ice:inputText partialSubmit="true"
+				    			   value="#{inclTable.constraints}"
+				    			   valueChangedListener="#{controller.constraintsChanged}"/>
+				  </ice:column>
+				  <ice:column>
+				    <f:facet name="header">
+				      <ice:outputText value=""/>
+				    </f:facet>
+				    <ice:commandButton style="width:19px; height:19px;"
+				    				   image="images/delete.png"
+				    				   actionListener="#{controller.deleteRow}"/>
+				  </ice:column>
+				</ice:dataTable>
+			  </div>
 	      </div>
 	      </ice:form>
 	      <ice:form>
@@ -77,39 +79,41 @@
 	        					 actionListener="#{controller.setExclusion}"/>
 	        </h2>
 	        <hr/>
-			<ice:dataTable columnWidths="22%,40%,30%,8%"
-						   id="exclTable"
-						   value="#{controller.tableModel.exclItems}"
-			 			   var="exclTable">
-			  <ice:column style="width:22%">
-			    <f:facet name="header">
-			      <ice:outputText value="Domain"/>
-			    </f:facet>
-			    <ice:outputText value="#{exclTable.domain}"/>
-			  </ice:column>
-			  <ice:column style="width:40%">
-			    <f:facet name="header">
-			      <ice:outputText value="Exclusion Category"/>
-			    </f:facet>
-			    <ice:outputText value="#{exclTable.category}"/>
-			  </ice:column>
-			  <ice:column style="width:30%">
-			    <f:facet name="header">
-			      <ice:outputText value="Constraint"/>
-			    </f:facet>
-			    <ice:inputText partialSubmit="true"
-			    			   value="#{exclTable.constraints}"
-			    			   valueChangedListener="#{controller.constraintsChanged}"/>
-			  </ice:column>
-			  <ice:column style="width:8%">
-			    <f:facet name="header">
-			      <ice:outputText value=""/>
-			    </f:facet>
-			    <ice:commandButton style="width:19px; height:19px;"
-			    				   image="images/delete.png"
-			    				   actionListener="#{controller.deleteRow}"/>
-			  </ice:column>
-			</ice:dataTable>
+	          <div style="overflow:auto;height:225px;">
+				<ice:dataTable columnWidths="22%,40%,30%,8%"
+							   id="exclTable"
+							   value="#{controller.tableModel.exclItems}"
+				 			   var="exclTable">
+				  <ice:column style="width:22%">
+				    <f:facet name="header">
+				      <ice:outputText value="Domain"/>
+				    </f:facet>
+				    <ice:outputText value="#{exclTable.domain}"/>
+				  </ice:column>
+				  <ice:column style="width:40%">
+				    <f:facet name="header">
+				      <ice:outputText value="Exclusion Category"/>
+				    </f:facet>
+				    <ice:outputText value="#{exclTable.category}"/>
+				  </ice:column>
+				  <ice:column style="width:30%">
+				    <f:facet name="header">
+				      <ice:outputText value="Constraint"/>
+				    </f:facet>
+				    <ice:inputText partialSubmit="true"
+				    			   value="#{exclTable.constraints}"
+				    			   valueChangedListener="#{controller.constraintsChanged}"/>
+				  </ice:column>
+				  <ice:column style="width:8%">
+				    <f:facet name="header">
+				      <ice:outputText value=""/>
+				    </f:facet>
+				    <ice:commandButton style="width:19px; height:19px;"
+				    				   image="images/delete.png"
+				    				   actionListener="#{controller.deleteRow}"/>
+				  </ice:column>
+				</ice:dataTable>
+			  </div>
 	      </div>
 	      </ice:form>
 		  <br/>
@@ -143,50 +147,34 @@
 	      </div>
 	    </ice:panelGroup>
 	    <div id="DRUG" class="showDetails">
-	      <h3>Demographic Information</h3>
-	        <table id="PSEARCHCRITERIA" class="section">
-	          <tbody>
-	            <tr>
-	              <td>
-	                <ice:form>
-	                <ice:selectBooleanCheckbox valueChangeListener="#{controller.maleClicked}"
-	                                           partialSubmit="true">
-	                  Male
-	                </ice:selectBooleanCheckbox>
-	                </ice:form>
-	              </td>
-	              <td>
-	                <ice:form>
-	                <ice:selectBooleanCheckbox valueChangeListener="#{controller.femaleClicked}"
-	                                           partialSubmit="true">
-	                  Female
-	                </ice:selectBooleanCheckbox>
-	                </ice:form>
-	              </td>
-	              <td></td>
-	              <td></td>
-	            </tr>
-	
-	            <tr>
-	              <ice:form>
-	                <td>Minimum Age</td>
-	                <td>
-	              	  <ice:inputText actionListener="#{controller.setAgeMin}"
-	              				     partialSubmit="true"
-	              				     value="0"/>
-	                </td>
-	              </ice:form>
-	              <ice:form>
-	                <td>Maximum Age</td>
-	                <td>
-	              	  <ice:inputText actionListener="#{controller.setAgeMax}"
-	              		  		 	 partialSubmit="true"
-	              		  		 	 value="100"/>
-	                </td>
-	              </ice:form>
-	            </tr>
-	          </tbody>
-	        </table>
+	      <h3>General Patient Information</h3>
+	      <div id="DEMOGRAPHICINFO">
+	        <ice:form>
+	      	  <ice:panelGrid binding="#{controller.interfaceModel.treeStructure}">
+	          </ice:panelGrid>
+	      	</ice:form>
+	        <!-- 
+	        <ice:form>
+		      <ice:tree bindng="#{controller.interfaceModel.tree}"
+		    		    hideRootNode="false"
+		    		    hideNavigation="false"
+		    		    value="#{controller.interfaceModel.treeModel}"
+		    		    var="interModel">
+		    	<ice:treeNode>
+		    	  <f:facet name="content">
+		    	  	<ice:panelGroup value="#{interModel.userObject.panelGroup}">
+		    	  	  <ice:panelGroup>
+		    	  	  </ice:panelGroup>
+		    	  	</ice:panelGroup>
+		    	  </f:facet>
+		    	</ice:treeNode>
+		      </ice:tree>
+		    </ice:form>
+		    -->
+		    <!--<ice:panelGrid binding="#{controller.interfaceModel.panelGrid}">
+		    </ice:panelGrid>
+		    -->
+	      </div>
 	      <hr/>
 	
 	      <h3>Medication:</h3>

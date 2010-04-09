@@ -30,7 +30,7 @@ public class SDTMTreeModel {
     
     private SDTMModelBuilder builder;
     
-    public SDTMTreeModel()
+    public SDTMTreeModel(InputStream iStream)
     {
         // create root node with its children expanded
         rootTreeNode = new DefaultMutableTreeNode();
@@ -58,9 +58,6 @@ public class SDTMTreeModel {
         
         try 
         {
-        	url = new URL("http://localhost:8080/coi/kb/SDTMSuperTree.n3");
-        	InputStream iStream = url.openStream();
-            
             builder = new SDTMModelBuilder(iStream);
         }
         catch (Exception ex)

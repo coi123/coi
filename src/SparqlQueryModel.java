@@ -13,8 +13,10 @@ public class SparqlQueryModel
 	private TableItem femaleItem;
 	private TableItem ageMinItem;
 	private TableItem ageMaxItem;
-	private ArrayList sdtmItems;
-	private ArrayList doItems;
+	private ArrayList sdtmInItems;
+	private ArrayList doInItems;
+	private ArrayList sdtmExItems;
+	private ArrayList doExItems;
 	
 	private String prefixStatements;
 	private String selectionStatement;
@@ -34,8 +36,10 @@ public class SparqlQueryModel
 		prefices = new ArrayList();
 		fieldsToReturn = new ArrayList();
 		
-		sdtmItems = new ArrayList();
-		doItems = new ArrayList();
+		sdtmInItems = new ArrayList();
+		doInItems = new ArrayList();
+		sdtmExItems = new ArrayList();
+		doExItems = new ArrayList();
 		
 		prefices.add("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
 		prefices.add("PREFIX sdtm: <http://www.sdtm.org/vocabulary#>\n");
@@ -108,18 +112,32 @@ public class SparqlQueryModel
 			criteriaStatement += "           ?patient sdtm:hasAge ?age .\n";
 		}
 		int a;
-		for (a = 0; a < sdtmItems.size(); a++)
+		for (a = 0; a < sdtmInItems.size(); a++)
 		{
-			TableItem item = (TableItem)sdtmItems.get(a);
+			TableItem item = (TableItem)sdtmInItems.get(a);
 			criteriaStatement += "           ?x" + a + " rdf:type sdtm:" + item.getCategory() + " .\n";
 			criteriaStatement += "           ?x" + a + " sdtm:dosePerAdministration ?doseX" + a + " .\n";
 		}
 		int b;
-		for (b = 0; b < doItems.size(); b++)
+		for (b = 0; b < doInItems.size(); b++)
 		{
-			TableItem item = (TableItem)doItems.get(b);
+			TableItem item = (TableItem)doInItems.get(b);
 			criteriaStatement += "           ?x" + (a + b) + " rdf:type do:" + item.getCategory() + " .\n";
 			criteriaStatement += "           ?x" + (a + b) + " do:dose ?doseX" + (a + b) + " .\n";
+		}
+		int c;
+		for (c = 0; c < sdtmExItems.size(); c++)
+		{
+			TableItem item = (TableItem)sdtmExItems.get(c);
+			criteriaStatement += "           ?x" + (a + b + c) + " rdf:type do:" + item.getCategory() + " .\n";
+			criteriaStatement += "           ?x" + (a + b + c) + " do:dose ?doseX" + (a + b + c) + " .\n";
+		}
+		int d;
+		for (d = 0; d < doExItems.size(); d++)
+		{
+			TableItem item = (TableItem)doExItems.get(d);
+			criteriaStatement += "           ?x" + (a + b + c + d) + " rdf:type do:" + item.getCategory() + " .\n";
+			criteriaStatement += "           ?x" + (a + b + c + d) + " do:dose ?doseX" + (a + b + c + d) + " .\n";
 		}
 		//mapping all possible variable combinations:query construction
 		
@@ -128,7 +146,7 @@ public class SparqlQueryModel
 		
 		if (maleItem != null && maleItem.getConstraints().equals("true"))
 		{
-			if (maleItem != null)
+			if (femaleItem != null && femaleItem.getConstraints().equals("true"))
 			{
 				criteriaStatement += "(";
 			}
@@ -142,7 +160,7 @@ public class SparqlQueryModel
 				criteriaStatement += " || ";
 			}
 			criteriaStatement += "?sex = \"Female\"";
-			if (maleItem != null)
+			if (maleItem != null && maleItem.getConstraints().equals("true"))
 			{
 				criteriaStatement += ")";
 			}
@@ -166,25 +184,77 @@ public class SparqlQueryModel
 			criteriaStatement += "?age <= " + ageMaxItem.getConstraints();
 			firstItem = false;
 		}
-		for (a = 0; a < sdtmItems.size(); a++)
+		for (a = 0; a < sdtmInItems.size(); a++)
 		{
-			TableItem item = (TableItem)sdtmItems.get(a);
+			TableItem item = (TableItem)sdtmInItems.get(a);
 			if (firstItem == false)
 			{
 				criteriaStatement += " && ";
+			}
+			if (item.getConstraints().contains("<"))
+			{
+				criteriaStatement += "(";
 			}
 			criteriaStatement += "?doseX" + a + " " + item.getConstraints();
 			firstItem = false;
+			if (item.getConstraints().contains("<"))
+			{
+				criteriaStatement += " || !bound (?x" + a + "))";
+			}
 		}
-		for (b = 0; b < doItems.size(); b++)
+		for (b = 0; b < doInItems.size(); b++)
 		{
-			TableItem item = (TableItem)doItems.get(b);
+			TableItem item = (TableItem)doInItems.get(b);
 			if (firstItem == false)
 			{
 				criteriaStatement += " && ";
 			}
+			if (item.getConstraints().contains("<"))
+			{
+				criteriaStatement += "(";
+			}
 			criteriaStatement += "?doseX" + (a + b) + " " + item.getConstraints();
 			firstItem = false;
+			if (item.getConstraints().contains("<"))
+			{
+				criteriaStatement += " || !bound (?x" + ( a + b ) + "))";
+			}
+		}
+		for (c = 0; c < sdtmExItems.size(); c++)
+		{
+			TableItem item = (TableItem)sdtmExItems.get(c);
+			if (firstItem == false)
+			{
+				criteriaStatement += " && ";
+			}
+			if (item.getConstraints().contains(">"))
+			{
+				criteriaStatement += "(";
+			}
+			criteriaStatement += "!(?doseX" + (a + b + c) + " " + item.getConstraints() + ")";
+			firstItem = false;
+			if (item.getConstraints().contains(">"))
+			{
+				criteriaStatement += " || !bound (?x" + ( a + b + c ) + "))";
+			}
+		}
+		for (d = 0; d < doExItems.size(); d++)
+		{
+			TableItem item = (TableItem)doExItems.get(d);
+			if (firstItem == false)
+			{
+				criteriaStatement += " && ";
+			}
+			if (item.getConstraints().contains(">"))
+			{
+				criteriaStatement += "(";
+			}
+			criteriaStatement += "!(?doseX" + (a + b + c + d) + " " + item.getConstraints() + ")";
+			firstItem = false;
+			if (item.getConstraints().contains(">"))
+			{
+				criteriaStatement += " || !bound (?x" + ( a + b + c + d ) + "))";
+			}
 		}
 		
 		criteriaStatement += ") \n";
@@ -204,8 +274,10 @@ public class SparqlQueryModel
 		femaleItem = null;
 		ageMinItem = null;
 		ageMaxItem = null;
-		sdtmItems.clear();			
-		doItems.clear();
+		sdtmInItems.clear();			
+		doInItems.clear();
+		sdtmExItems.clear();			
+		doExItems.clear();
 
 		
 		//sorts variables so there is less guesswork
@@ -235,12 +307,27 @@ public class SparqlQueryModel
 					}
 					else
 					{
-						sdtmItems.add(curItem);
+						sdtmInItems.add(curItem);
 					}
 				}
 				else
 				{
-					doItems.add(curItem);
+					doInItems.add(curItem);
+				}
+			}
+		}
+		if (!exclusionCriteria.isEmpty())
+		{
+			for (int k = 0; k < exclusionCriteria.size(); k++)
+			{
+				TableItem curItem = ((TableItem)exclusionCriteria.get(k));
+				if (curItem.getDomain().equals("sdtm"))
+				{
+					sdtmExItems.add(curItem);
+				}
+				else
+				{
+					doExItems.add(curItem);
 				}
 			}
 		}
