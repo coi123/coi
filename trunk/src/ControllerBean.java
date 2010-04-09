@@ -1,3 +1,6 @@
+import java.io.InputStream;
+import java.net.URL;
+
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
@@ -21,16 +24,33 @@ import com.icesoft.faces.context.effects.Opacity;
 
 public class ControllerBean 
 {
+	private URL url;
 	private SDTMTreeModel sdtmTreeModel;
 	private DOTreeModel doTreeModel;
 	private TablesBean tableModel;
+	private InterfaceModel interfaceModel;
 	private SparqlQueryModel queryModel;
 	private Effect fadeOut;
 	
 	public ControllerBean()
 	{
-		sdtmTreeModel = new SDTMTreeModel();
-		doTreeModel = new DOTreeModel();
+		InputStream iStream = null;
+		try 
+		{
+			url = new URL("http://localhost:8080/coi/kb/SDTMSuperTree.n3");
+	    	iStream = url.openStream();
+	    	sdtmTreeModel = new SDTMTreeModel(iStream);
+	    	url = new URL("http://localhost:8080/coi/kb/DOSuperTree.n3");
+	    	iStream = url.openStream();
+	    	doTreeModel = new DOTreeModel(iStream);
+	    	url = new URL("http://localhost:8080/coi/kb/demParams.n3");
+	    	iStream = url.openStream();
+	    	interfaceModel = new InterfaceModel(iStream);
+		}
+		catch (Exception e)
+		{
+			
+		}
 		queryModel = new SparqlQueryModel();
 		tableModel = new TablesBean(queryModel);
 		
@@ -59,6 +79,11 @@ public class ControllerBean
 	public SparqlQueryModel getQueryModel()
 	{
 		return queryModel;
+	}
+	
+	public InterfaceModel getInterfaceModel()
+	{
+		return interfaceModel;
 	}
 	
 	public void setInclusion(ActionEvent e)
@@ -172,7 +197,7 @@ public class ControllerBean
 		String domain = "sdtm";
 		String category = sdtmTreeModel.getSelectedNodeText();
 		String constraints = "";
-		tableModel.addItem(domain, category, constraints);
+		tableModel.addItem(domain, category, constraints, category);
 	}
 	
 	public void expandDOTreeModel(ActionEvent e)
@@ -201,7 +226,8 @@ public class ControllerBean
 		String domain = "do";
 		String category = doTreeModel.getSelectedNodeText();
 		String constraints = "";
-		tableModel.addItem(domain, category, constraints);
+		//String itemID = doTreeModel.getSelectedNodeId();
+		tableModel.addItem(domain, category, constraints, category);
 	}
 	
 	public void clearTable(ActionEvent e)

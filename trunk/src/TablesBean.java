@@ -1,14 +1,7 @@
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-import javax.faces.event.ActionEvent;
-import javax.faces.event.ValueChangeEvent;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-
-import com.icesoft.faces.component.tree.IceUserObject;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class TablesBean 
 {
@@ -48,55 +41,64 @@ public class TablesBean
 	
 	public void toggleSex(String sex, String isChecked)
 	{
-		for (int a = 0; a < selectedList.size(); a++)
+		if (selectedList.equals(inclItems))
 		{
-			if (((TableItem)selectedList.get(a)).getCategory().equals(sex))
+			for (int a = 0; a < selectedList.size(); a++)
 			{
-				((TableItem)selectedList.get(a)).setConstraints(isChecked);
-				return;
+				if (((TableItem)selectedList.get(a)).getCategory().equals(sex))
+				{
+					((TableItem)selectedList.get(a)).setConstraints(isChecked);
+					return;
+				}
 			}
+			TableItem item = new TableItem("sdtm", sex, isChecked, sex);
+			selectedList.add(item);
+			sortTableItems();
+			updateQueryModel();
 		}
-		TableItem item = new TableItem("sdtm", sex, isChecked);
-		selectedList.add(item);
-		sortTableItems();
-		updateQueryModel();
 	}
 	
 	public void setAgeMin(String constraints)
 	{
-		for (int a = 0; a < selectedList.size(); a++)
+		if (selectedList.equals(inclItems))
 		{
-			if (((TableItem)selectedList.get(a)).getCategory().equals("ageMin"))
+			for (int a = 0; a < selectedList.size(); a++)
 			{
-				((TableItem)selectedList.get(a)).setConstraints(constraints);
-				return;
+				if (((TableItem)selectedList.get(a)).getCategory().equals("ageMin"))
+				{
+					((TableItem)selectedList.get(a)).setConstraints(constraints);
+					return;
+				}
 			}
+			TableItem item = new TableItem("sdtm", "ageMin", constraints, "ageMin");
+			selectedList.add(item);
+			sortTableItems();
+			updateQueryModel();
 		}
-		TableItem item = new TableItem("sdtm", "ageMin", constraints);
-		selectedList.add(item);
-		sortTableItems();
-		updateQueryModel();
 	}
 	
 	public void setAgeMax(String constraints)
 	{
-		for (int a = 0; a < selectedList.size(); a++)
+		if (selectedList.equals(inclItems))
 		{
-			if (((TableItem)selectedList.get(a)).getCategory().equals("ageMax"))
+			for (int a = 0; a < selectedList.size(); a++)
 			{
-				((TableItem)selectedList.get(a)).setConstraints(constraints);
-				return;
+				if (((TableItem)selectedList.get(a)).getCategory().equals("ageMax"))
+				{
+					((TableItem)selectedList.get(a)).setConstraints(constraints);
+					return;
+				}
 			}
+			TableItem item = new TableItem("sdtm", "ageMax", constraints, "ageMax");
+			selectedList.add(item);
+			sortTableItems();
+			updateQueryModel();
 		}
-		TableItem item = new TableItem("sdtm", "ageMax", constraints);
-		selectedList.add(item);
-		sortTableItems();
-		updateQueryModel();
 	}
 	
-	public void addItem(String domain, String category, String criteria)
+	public void addItem(String domain, String category, String criteria, String itemID)
 	{
-		selectedList.add(new TableItem(domain, category, criteria));
+		selectedList.add(new TableItem(domain, category, criteria, itemID));
 		sortTableItems();
 		updateQueryModel();
 	}

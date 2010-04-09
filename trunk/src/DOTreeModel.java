@@ -31,7 +31,7 @@ public class DOTreeModel {
     
     private DOModelBuilder builder;
     
-    public DOTreeModel()
+    public DOTreeModel(InputStream iStream)
     {
         // create root node with its children expanded
         rootTreeNode = new DefaultMutableTreeNode();
@@ -59,9 +59,6 @@ public class DOTreeModel {
         
         try 
         {
-        	url = new URL("http://localhost:8080/coi/kb/DOSuperTree.n3");
-        	InputStream iStream = url.openStream();
-            
             builder = new DOModelBuilder(iStream);
         }
         catch (Exception ex)

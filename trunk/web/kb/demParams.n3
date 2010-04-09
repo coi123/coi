@@ -1,0 +1,44 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix D: <http://www.owl-ontologies.com/DrugOntology.owl#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix math: <http://www.w3.org/2000/10/swap/math#>.
+@prefix log: <http://www.w3.org/2000/10/swap/log#>.
+@prefix e: <http://eulersharp.sourceforge.net/2003/03swap/log-rules#>.
+@prefix var: <http://localhost/var#>.
+@prefix r: <http://www.w3.org/2000/10/swap/reason#>.
+@prefix n3: <http://www.w3.org/2004/06/rei#>.
+@prefix : <http://www.owl-ontologies.com/2008/4/7/OntologySDTM.owl#>.
+@prefix ui: <http://www.UI.org/vocabulary#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+
+:General_Patient_Characteristic     rdf:type ui:category.
+
+:Gender     rdf:type ui:category;
+     ui:hasParent :General_Patient_Characteristic.
+
+:Age     rdf:type ui:category;
+     ui:hasParent :General_Patient_Characteristic. 
+
+:Menopausal_Status     rdf:type ui:category;
+     ui:hasParent :General_Patient_Characteristic.
+
+:Gender_Fields     rdf:type ui:parameter;
+     ui:hasParent :Gender;
+     ui:hasInputField     [     rdf:type ui:selectInput;
+                                ui:hasOption "Male";
+                                ui:hasOption "Female" ] .
+          
+:Age_Fields     rdf:type ui:parameter;
+     ui:hasParent :Age;
+     ui:hasInputField     [     rdf:type ui:selectInput;
+                                ui:hasOption "ageMin";
+                                ui:hasOption "ageMax" ],
+                          [     rdf:type ui:inputText ].
+
+:Menopausal_Status_Fields     rdf:type ui:parameter;
+     ui:hasParent :Menopausal_Status;
+     ui:hasInputField     [     rdf:type ui:selectInput;
+                                ui:hasOption "Pre-Menopause";
+                                ui:hasOption "Menopausal";
+                                ui:hasOption "PostMenopausal" ].
