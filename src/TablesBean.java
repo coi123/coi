@@ -2,6 +2,16 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+import javax.faces.component.UIInput;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
+import javax.faces.model.SelectItem;
+
+import com.icesoft.faces.component.ext.HtmlDataTable;
+import com.icesoft.faces.component.ext.HtmlSelectBooleanCheckbox;
+import com.icesoft.faces.component.ext.HtmlSelectOneRadio;
+import com.icesoft.faces.context.effects.JavascriptContext;
+
 
 public class TablesBean 
 {
@@ -12,11 +22,20 @@ public class TablesBean
 	
 	private SparqlQueryModel model;
 	
+	private SelectItem[] linkRadioButtons;
+	private String selectedLinkType;
+	private String[] radioItemLabels = {"AND","OR"};
+	private int inclLinkSuffix;
+	private int exclLinkSuffix;
+	
 	public TablesBean(SparqlQueryModel queryModel)
 	{
 		inclItems = new ArrayList();
 		exclItems = new ArrayList();
 		model = queryModel;
+		inclLinkSuffix = 0;
+		exclLinkSuffix = 0;
+		selectedLinkType = "AND";
 	}
 	
 	public void setInclusion()
@@ -39,61 +58,72 @@ public class TablesBean
 		return exclItems;
 	}
 	
-	public void toggleSex(String sex, String isChecked)
+	public String getSelectedLinkType()
 	{
-		if (selectedList.equals(inclItems))
-		{
-			for (int a = 0; a < selectedList.size(); a++)
-			{
-				if (((TableItem)selectedList.get(a)).getCategory().equals(sex))
-				{
-					((TableItem)selectedList.get(a)).setConstraints(isChecked);
-					return;
-				}
-			}
-			TableItem item = new TableItem("sdtm", sex, isChecked, sex);
-			selectedList.add(item);
-			sortTableItems();
-			updateQueryModel();
-		}
+		return selectedLinkType;
 	}
 	
-	public void setAgeMin(String constraints)
+	public SelectItem[] getLinkRadioButtons()
 	{
-		if (selectedList.equals(inclItems))
+	    String[] names = radioItemLabels;
+		linkRadioButtons = new SelectItem[names.length];
+		for (int a = 0; a < names.length; a++)
 		{
-			for (int a = 0; a < selectedList.size(); a++)
-			{
-				if (((TableItem)selectedList.get(a)).getCategory().equals("ageMin"))
-				{
-					((TableItem)selectedList.get(a)).setConstraints(constraints);
-					return;
-				}
-			}
-			TableItem item = new TableItem("sdtm", "ageMin", constraints, "ageMin");
-			selectedList.add(item);
-			sortTableItems();
-			updateQueryModel();
+			linkRadioButtons[a] = new SelectItem();
+			linkRadioButtons[a].setLabel(names[a]);
+			linkRadioButtons[a].setValue(names[a]);
 		}
+		return linkRadioButtons;
 	}
 	
-	public void setAgeMax(String constraints)
+	public void createLink()
 	{
-		if (selectedList.equals(inclItems))
+		if (selectedList != null && selectedList.size() > 0)
 		{
+			ArrayList itemsToLink = new ArrayList();
 			for (int a = 0; a < selectedList.size(); a++)
 			{
-				if (((TableItem)selectedList.get(a)).getCategory().equals("ageMax"))
+				TableItem currentItem = (TableItem)selectedList.get(a);
+				if (currentItem.isToLink())
 				{
-					((TableItem)selectedList.get(a)).setConstraints(constraints);
-					return;
+					itemsToLink.add(currentItem);
 				}
 			}
-			TableItem item = new TableItem("sdtm", "ageMax", constraints, "ageMax");
-			selectedList.add(item);
-			sortTableItems();
-			updateQueryModel();
+			if (itemsToLink.size() > 0)
+			{
+				for (int b = 0; b < itemsToLink.size();b++)
+				{
+					TableItem currentItem = (TableItem)itemsToLink.get(b);
+					if (selectedList.equals(inclItems))
+					{
+						currentItem.setLinkID(selectedLinkType + " " + 
+											  inclLinkSuffix + " ");
+						currentItem.setToLink(false);
+					}
+					else
+					{
+						currentItem.setLinkID(selectedLinkType + " " + 
+											  exclLinkSuffix + " ");
+						currentItem.setToLink(false);
+					}
+				}
+				if (selectedList.equals(inclItems))
+				{
+					inclLinkSuffix++;
+				}
+				else 
+				{
+					exclLinkSuffix++;
+				}
+			}
 		}
+		sortTableItems();
+		updateQueryModel();
+	}
+	
+	public void linkTypeChanged(ValueChangeEvent e)
+	{
+		selectedLinkType = e.getNewValue().toString();
 	}
 	
 	public void addItem(String domain, String category, String criteria, String itemID)
@@ -117,15 +147,31 @@ public class TablesBean
 		updateQueryModel();
 	}
 	
+	public void changeToLinkAt(String tableName, int rowIndex)
+	{
+		if (tableName.equals("inclTable"))
+		{
+			TableItem thisItem = (TableItem)inclItems.get(rowIndex);
+			thisItem.setToLink(!thisItem.isToLink());
+		}
+		else
+		{
+			TableItem thisItem = (TableItem)exclItems.get(rowIndex);
+			thisItem.setToLink(!thisItem.isToLink());
+		}
+	}
+	
 	public void deleteItemAt(String table, int index)
 	{
 		if (table.equals("inclTable"))
 		{
-			inclItems.remove(index);
+			TableItem itemToDelete = ((TableItem)inclItems.get(index));
+			inclItems.remove(itemToDelete);
 		}
 		else
 		{
-			exclItems.remove(index);
+			TableItem itemToDelete = ((TableItem)exclItems.get(index));
+			exclItems.remove(itemToDelete);
 		}
 		sortTableItems();
 		updateQueryModel();
@@ -171,62 +217,70 @@ public class TablesBean
 		}
 	}
 	
+	private void debug(String message)
+	{
+		JavascriptContext.addJavascriptCall(FacesContext.getCurrentInstance(), 
+											"alert('" + message + "');");
+	}
+	
 	private class TableItemComparator implements Comparator
 	{
 		public int compare(Object obj1, Object obj2)
 		{
 			TableItem item1 = (TableItem) obj1;
 			TableItem item2 = (TableItem) obj2;
-			if(item1.getDomain().equals("sdtm") && item2.getDomain().equals("do"))
+			if (item1.getLinkID()!=null && item2.getLinkID() == null)
 			{
 				return -1;
 			}
-			else if(item1.getDomain().equals("do") && item2.getDomain().equals("sdtm"))
+			else if (item1.getLinkID()== null && item2.getLinkID() != null)
 			{
 				return 1;
 			}
-			else if(item1.getDomain().equals("sdtm") && item2.getDomain().equals("sdtm"))
+			else if (item1.getLinkID()!= null && item2.getLinkID() != null)
 			{
-				if (item1.getCategory().equals("Male"))
+				if (item1.getLinkID().equals(item2.getLinkID()))
+				{
+					if(item1.getDomain().equals("sdtm") && item2.getDomain().equals("do"))
+					{
+						return -1;
+					}
+					else if(item1.getDomain().equals("do") && item2.getDomain().equals("sdtm"))
+					{
+						return 1;
+					}
+					else if(item1.getDomain().equals("sdtm") && item2.getDomain().equals("sdtm"))
+					{
+						return item1.getCategory().compareToIgnoreCase(item2.getCategory());
+					}
+					else
+					{
+						return item1.getCategory().compareToIgnoreCase(item2.getCategory());
+					}
+				}
+				else
+				{
+					return item1.getLinkID().compareToIgnoreCase(item2.getLinkID());
+				}
+			}
+			else //(both link id's are null)
+			{
+				if(item1.getDomain().equals("sdtm") && item2.getDomain().equals("do"))
 				{
 					return -1;
 				}
-				else if(item2.getCategory().equals("Male"))
+				else if(item1.getDomain().equals("do") && item2.getDomain().equals("sdtm"))
 				{
 					return 1;
 				}
-				else if (item1.getCategory().equals("Female"))
+				else if(item1.getDomain().equals("sdtm") && item2.getDomain().equals("sdtm"))
 				{
-					return -1;
-				}
-				else if (item2.getCategory().equals("Female"))
-				{
-					return 1;
-				}
-				else if (item1.getCategory().equals("ageMin"))
-				{
-					return -1;
-				}
-				else if (item2.getCategory().equals("ageMin"))
-				{
-					return 1;
-				}
-				else if (item1.getCategory().equals("ageMax"))
-				{
-					return -1;
-				}
-				else if (item2.getCategory().equals("ageMax"))
-				{
-					return 1;
+					return item1.getCategory().compareToIgnoreCase(item2.getCategory());
 				}
 				else
 				{
 					return item1.getCategory().compareToIgnoreCase(item2.getCategory());
 				}
-			}
-			else
-			{
-				return item1.getCategory().compareToIgnoreCase(item2.getCategory());
 			}
 		}
 	}

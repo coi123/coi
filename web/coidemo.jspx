@@ -26,19 +26,26 @@
 	      <img src="images/sw-horz-w3c.png"/>Clinical Observations Interoperability (COI) Demo : Clinical Trial Eligibility Criteria Selection
 	    </div>
 	    <div class="inner">
-	      <ice:form>
+	      <ice:form id="inclForm">
 	      <div id="INCLUSIONGRP">
 	        <h2>INCLUSION CRITERIA 
-	        <ice:commandButton id="ADDIN" 
+	        <ice:commandButton id="ADDIN"
+	        				   styleClass="addin"
 	        			       image="images/add.png"
 	        				   actionListener="#{controller.setInclusion}"/>
 	        </h2>
 	        <hr/>
 	          <div style="overflow:auto; height:235px;">
-				<ice:dataTable columnWidths="22%,40%,30%,8%"
+				<ice:dataTable columnWidths="10%,14%,32%,25%,12%,7%"
 							   id="inclTable"
 							   value="#{controller.tableModel.inclItems}"
 				 			   var="inclTable">
+				  <ice:column>
+				    <f:facet name="header">
+				      <ice:outputText value="Link"/>
+				    </f:facet>
+				    <ice:outputText value="#{inclTable.linkID}"/>
+				  </ice:column>
 				  <ice:column>
 				    <f:facet name="header">
 				      <ice:outputText value="Domain"/>
@@ -61,6 +68,14 @@
 				  </ice:column>
 				  <ice:column>
 				    <f:facet name="header">
+				      <ice:outputText value="Add Link"/>
+				    </f:facet>
+				    <ice:selectBooleanCheckbox partialSubmit="true"
+				    						   value="#{inclTable.toLink}"
+				    						   valueChangedListener="#{controller.addLinkToggle}"/>
+				  </ice:column>
+				  <ice:column>
+				    <f:facet name="header">
 				      <ice:outputText value=""/>
 				    </f:facet>
 				    <ice:commandButton style="width:19px; height:19px;"
@@ -71,7 +86,7 @@
 			  </div>
 	      </div>
 	      </ice:form>
-	      <ice:form>
+	      <ice:form id="exclForm">
 	      <div id="EXCLUSIONGRP">
 	        <h2>EXCLUSION CRITERIA 
 	          <ice:commandButton id="ADDEX" 
@@ -80,23 +95,29 @@
 	        </h2>
 	        <hr/>
 	          <div style="overflow:auto;height:225px;">
-				<ice:dataTable columnWidths="22%,40%,30%,8%"
+				<ice:dataTable columnWidths="10%,14%,32%,25%,12%,7%"
 							   id="exclTable"
 							   value="#{controller.tableModel.exclItems}"
 				 			   var="exclTable">
-				  <ice:column style="width:22%">
+				  <ice:column>
+				    <f:facet name="header">
+				      <ice:outputText value="Link"/>
+				    </f:facet>
+				    <ice:outputText value="#{exclTable.linkID}"/>
+				  </ice:column>
+				  <ice:column>
 				    <f:facet name="header">
 				      <ice:outputText value="Domain"/>
 				    </f:facet>
 				    <ice:outputText value="#{exclTable.domain}"/>
 				  </ice:column>
-				  <ice:column style="width:40%">
+				  <ice:column>
 				    <f:facet name="header">
 				      <ice:outputText value="Exclusion Category"/>
 				    </f:facet>
 				    <ice:outputText value="#{exclTable.category}"/>
 				  </ice:column>
-				  <ice:column style="width:30%">
+				  <ice:column>
 				    <f:facet name="header">
 				      <ice:outputText value="Constraint"/>
 				    </f:facet>
@@ -104,7 +125,15 @@
 				    			   value="#{exclTable.constraints}"
 				    			   valueChangedListener="#{controller.constraintsChanged}"/>
 				  </ice:column>
-				  <ice:column style="width:8%">
+				  <ice:column>
+				    <f:facet name="header">
+				      <ice:outputText value="Add Link"/>
+				    </f:facet>
+				    <ice:selectBooleanCheckbox partialSubmit="true"
+				    						   value="#{exclTable.toLink}"
+				    						   valueChangedListener="#{controller.addLinkToggle}"/>
+				  </ice:column>
+				  <ice:column>
 				    <f:facet name="header">
 				      <ice:outputText value=""/>
 				    </f:facet>
@@ -118,6 +147,19 @@
 	      </ice:form>
 		  <br/>
 	      <br/>
+	      <ice:form>
+	        <ice:commandButton styleClass="link"
+	         				   value="Link"
+	        				   actionListener="#{controller.createLink}"/>
+	        <!-- add in a value binding expression -->
+	    	<ice:selectOneRadio dir="LTR" 
+	    						layout="lineDirection"
+	    						partialSubmit="true"
+	    						styleClass="linkOptsIn" 
+	    						valueChangeListener="#{controller.linkTypeChanged}">
+	    	  <f:selectItems value="#{controller.tableModel.linkRadioButtons}"/>
+	    	</ice:selectOneRadio>
+	      </ice:form>
 	      <input id="querysql"
 	      		 onclick="javascript:window.open('queryString.jsp')"
 	      		 class="querysql"
@@ -153,28 +195,12 @@
 	      	  <ice:panelGrid binding="#{controller.interfaceModel.treeStructure}">
 	          </ice:panelGrid>
 	      	</ice:form>
-	        <!-- 
-	        <ice:form>
-		      <ice:tree bindng="#{controller.interfaceModel.tree}"
-		    		    hideRootNode="false"
-		    		    hideNavigation="false"
-		    		    value="#{controller.interfaceModel.treeModel}"
-		    		    var="interModel">
-		    	<ice:treeNode>
-		    	  <f:facet name="content">
-		    	  	<ice:panelGroup value="#{interModel.userObject.panelGroup}">
-		    	  	  <ice:panelGroup>
-		    	  	  </ice:panelGroup>
-		    	  	</ice:panelGroup>
-		    	  </f:facet>
-		    	</ice:treeNode>
-		      </ice:tree>
-		    </ice:form>
-		    -->
-		    <!--<ice:panelGrid binding="#{controller.interfaceModel.panelGrid}">
-		    </ice:panelGrid>
-		    -->
 	      </div>
+	      <ice:form>
+	      <ice:commandButton actionListener="#{controller.addDemClicked}"
+	      					 styleClass="applyDemCriteria"
+	      					 value="Add"/>
+	      </ice:form>
 	      <hr/>
 	
 	      <h3>Medication:</h3>
@@ -282,7 +308,7 @@
 	    <div class="address">
 	      <table>
 	        <tr>
-	          <td><a href="http://www.agfa.com/w3c/hchen">Helen Chen</a> Agfa Healthcare</td>
+	          <td><a href="http://www.agfa.com/w3c/hchen">Helen Chen</a>, Agfa Healthcare</td>
 	          <td><a href="http://purl.org/holger">Holger Stenzhorn</a>, DERI</td>
 	          <td><a href="http://www.mdcl.com.cn/">Xiaodong Li</a>, MDCL</td>
 	        </tr>

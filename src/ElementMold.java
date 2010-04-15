@@ -7,12 +7,14 @@ public class ElementMold
 	private String name;
 	private String[] options;
 	private ArrayList optionsList;
+	private String text;
 	
 	public ElementMold()
 	{
 		inputType = null;
 		name = null;
 		optionsList = new ArrayList();
+		text = "";
 	}
 	
 	public ElementMold(String inName, String type)
@@ -55,6 +57,16 @@ public class ElementMold
 			options[a] = optionsList.get(a).toString();
 		}
 		return options;
+	}
+	
+	public void setText(String value)
+	{
+		text = value;
+	}
+	
+	public String getText()
+	{
+		return text;
 	}
 	
 }

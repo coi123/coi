@@ -21,7 +21,7 @@ left:5px;
 padding-left:3px;
 position:relative;
 top:45px;
-width:415px;
+width:515px;
 }
 
 #INCLUSIONCONTAINER,#EXCLUSIONCONTAINER {
@@ -41,12 +41,12 @@ height:285px;
 left:5px;
 padding-left:3px;position:relative;
 top:10px;
-width:415px;
+width:515px;
 }
 
 #DEMOGRAPHICINFO {
 background-color:white;
-height:200px;
+height:170px;
 width:98%;
 overflow:auto;
 }
@@ -84,16 +84,29 @@ top:30px;
 width:430px;
 }
 
+.addin {
+margin-left:5px;
+position: relative;
+}
+
 .address {
 color:rgb(160,160,160);
 font-size:85%;
 font-weight:light;
 height:40px;
-left:280px;
+left:380px;
 position:absolute;
 text-align:left;
 top:770px;
 width:500px;
+}
+
+
+.applyDemCriteria {
+margin-top:10px;
+margin-left:10px;
+margin-bottom: 5px;
+background-color: #D0E8D9;
 }
 
 .arguTextArea {
@@ -197,7 +210,7 @@ left:10px;
 position:absolute;
 text-align:center;
 top:730px;
-width:1000px;
+width:1100px;
 }
 
 .fourth {
@@ -227,11 +240,18 @@ padding-left:8px;
 position:absolute;
 text-align:left;
 top:42px;
-width:992px;
+width:1092px;
 }
 
 .legend .item {
 font-size:11px;
+}
+
+.link {
+font-size:12px;
+left:15px;
+position:absolute;
+top:625px;
 }
 
 .presql {
@@ -287,7 +307,7 @@ left:10px;
 position:absolute;
 text-align:left;
 top:10px;
-width:1000px;
+width:1100px;
 }
 
 .second  img {
@@ -318,7 +338,7 @@ border-width:1px;
 border-top:none;
 border-bottom:none;
 height:688px;
-left:460px;
+left:560px;
 overflow:auto;
 padding-left:1em;
 position:absolute;
@@ -449,7 +469,7 @@ border-right-style:none;
 border-top-style:none;
 font-size:10px;
 font-weight:bold;
-left:5px;
+left:400px;
 position:absolute;
 text-align:center;
 top:625px;
@@ -610,6 +630,14 @@ overflow:auto;
 position:relative;
 top:20px;
 width:99%;
+}
+
+FIELDSET.linkOptsIn {
+display:inline;
+left:50px;
+position:absolute;
+top:620px;
+width:auto;
 }
 
 HR.position {
