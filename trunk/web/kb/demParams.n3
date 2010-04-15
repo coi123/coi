@@ -25,7 +25,9 @@
 
 :Gender_Fields     rdf:type ui:parameter;
      ui:hasParent :Gender;
-     ui:hasInputField     [     rdf:type ui:selectInput;
+     ui:hasInputField     [     rdf:type ui:outputText;
+                                ui:hasValue "Gender" ] ,
+                          [     rdf:type ui:selectInput;
                                 ui:hasOption "Male";
                                 ui:hasOption "Female" ] .
           
@@ -33,12 +35,14 @@
      ui:hasParent :Age;
      ui:hasInputField     [     rdf:type ui:selectInput;
                                 ui:hasOption "ageMin";
-                                ui:hasOption "ageMax" ],
-                          [     rdf:type ui:inputText ].
+                                ui:hasOption "ageMax" ] ,
+                          [     rdf:type ui:inputText ] .
 
 :Menopausal_Status_Fields     rdf:type ui:parameter;
      ui:hasParent :Menopausal_Status;
-     ui:hasInputField     [     rdf:type ui:selectInput;
+     ui:hasInputField     [     rdf:type ui:outputText;
+                                ui:hasValue "Menopausal State" ] ,
+                          [     rdf:type ui:selectInput;
                                 ui:hasOption "Pre-Menopause";
                                 ui:hasOption "Menopausal";
-                                ui:hasOption "PostMenopausal" ].
+                                ui:hasOption "PostMenopausal" ] .

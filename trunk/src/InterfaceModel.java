@@ -12,24 +12,28 @@ import com.icesoft.faces.component.ext.HtmlSelectOneMenu;
 import com.icesoft.faces.context.effects.JavascriptContext;
 
 import javax.faces.component.UIComponent;
+import javax.faces.component.UISelectItem;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
+import javax.faces.event.ValueChangeEvent;
+import javax.faces.event.ValueChangeListener;
 
 public class InterfaceModel
 {
 	/*Interface construction declarations*/
 	private HtmlPanelGrid treeStructure;
 	private InterfaceModelBuilder interfaceModelBuilder;
-	private int idSuffix;
+	private HtmlPanelGroup currentPanel;
 	
 	public InterfaceModel(InputStream iStream)
 	{
-		//panelgrid recieves children in order
+		//panelgrid receives children in order
 		treeStructure = new HtmlPanelGrid();
 		treeStructure.setColumns(1);
 		interfaceModelBuilder = new InterfaceModelBuilder(iStream);
+		currentPanel = null;
 		initializeInterface();
 	}
 	
@@ -41,6 +45,38 @@ public class InterfaceModel
 	public void setTreeStructure(HtmlPanelGrid inStructure)
 	{
 		treeStructure = inStructure;
+	}
+	
+	public HtmlPanelGroup getCurrentPanel()
+	{
+		return currentPanel;
+	}
+	
+	public void setCurrentPanel(HtmlPanelGroup curGroup)
+	{
+		currentPanel = curGroup;
+	}
+	
+	public String getCurrentPanelChildValue(int childIndex)
+	{
+		Object obj = currentPanel.getChildren().get(childIndex);
+		String returnStr = "";
+		if (obj instanceof HtmlSelectOneMenu)
+		{
+			HtmlSelectOneMenu menu = (HtmlSelectOneMenu) obj;
+			returnStr = menu.getValue().toString();
+		}
+		else if (obj instanceof HtmlInputText)
+		{
+			HtmlInputText text = (HtmlInputText) obj;
+			returnStr = text.getValue().toString();
+		}
+		else if (obj instanceof HtmlOutputText)
+		{
+			HtmlOutputText text = (HtmlOutputText) obj;
+			returnStr = text.getValue().toString();
+		}
+		return returnStr;
 	}
 	
 	private void initializeInterface()
@@ -78,6 +114,8 @@ public class InterfaceModel
 			newButton.setWidth(520);
 			newButton.setOffset(0);
 		}
+		//TODO: better to redesign interface model to support a CSS class with
+		//relative positioning for the offset
 		newButton.setStyle("width:" + newButton.getWidth() + "px; " +
 						   "margin-left:" + newButton.getOffset() + "px;" +
 				   		   "height:100%");
@@ -85,20 +123,51 @@ public class InterfaceModel
 		return newButton;
 	}
 	
-	private HtmlSelectOneMenu buildSelectBox(String[] opts)
+	private HtmlSelectOneMenu buildSelectBox(String[] opts, CustomButtonNode parent)
 	{
 		HtmlSelectOneMenu newMenu = new HtmlSelectOneMenu();
+		for (int a = 0; a < opts.length; a++)
+		{
+			UISelectItem item = new UISelectItem();
+			item.setItemValue(opts[a]);
+			newMenu.getChildren().add(item);
+		}
+		newMenu.setStyle("margin-left:" + (parent.getOffset() + 5) + "px;");
+		newMenu.addValueChangeListener(new ValueChangeListener(){
+			public void processValueChange(ValueChangeEvent e)
+				throws AbortProcessingException 
+			{
+				valueChanged(e);
+			}
+		});
+		newMenu.setPartialSubmit(true);
 		return newMenu;
 	}
 	
-	private HtmlInputText buildTextField(CustomButtonNode parent)
+	private HtmlInputText buildInputTextField(CustomButtonNode parent)
 	{
 		HtmlInputText text = new HtmlInputText();
+		text.setStyle("margin-left:"+(parent.getOffset()+5)+"px;");
+		text.addValueChangeListener(new ValueChangeListener(){
+			public void processValueChange(ValueChangeEvent e)
+			throws AbortProcessingException 
+			{
+				valueChanged(e);
+			}
+		});
+		text.setPartialSubmit(true);
+		return text;
+	}
+	
+	private HtmlOutputText buildOutputTextField(String value, CustomButtonNode parent)
+	{
+		HtmlOutputText text = new HtmlOutputText();
+		text.setValue(value);
 		text.setStyle("margin-left:"+(parent.getOffset()+5)+"px;");
 		return text;
 	}
 	
-	public void buttonClicked (ActionEvent e)
+	public void buttonClicked(ActionEvent e)
 	{
 		CustomButtonNode currentButton = (CustomButtonNode)e.getSource();
 		if (currentButton.isExpanded())
@@ -111,13 +180,23 @@ public class InterfaceModel
 		}
 	}
 	
+	public void valueChanged(ValueChangeEvent e)
+	{
+		UIComponent curComp = e.getComponent();
+		HtmlPanelGroup curPanel = (HtmlPanelGroup) curComp.getParent();
+		currentPanel = curPanel;
+	}
+	
 	private void expandNode(CustomButtonNode button)
 	{
+		//add an ordering attribute to the RDF file so the model returns the items
+		//in proper order
 		if (!button.isLoaded())
 		{	
 			int index = treeStructure.getChildren().indexOf(button);
 			ElementMold[] fields = 
 				interfaceModelBuilder.getChildrenOf(button.getValue().toString());
+			HtmlPanelGroup childrenContainer = new HtmlPanelGroup();
 			for (int a = 0; a < fields.length; a++)
 			{
 				if (fields[a].getInputType().equals("button"))
@@ -125,19 +204,34 @@ public class InterfaceModel
 					CustomButtonNode newNode = this.buildButtonNode(fields[a].getName(), button);
 					button.getChildren().add(newNode);
 				}
-				else if (fields[a].getInputType().equals("inputText"))
+			}
+			for (int a = 0; a < fields.length; a++)
+			{
+				if (fields[a].getInputType().equals("outputText"))
 				{
-					HtmlInputText newText = this.buildTextField(button);
-					button.getChildren().add(newText);
-				}
-				else
-				{
-					HtmlOutputText newItem = new HtmlOutputText();
-					newItem.setValue(fields[a].getName() + " " + fields[a].getInputType());
-					newItem.setStyle("margin-left:"+(button.getOffset()+5)+"px;");
-					button.getChildren().add(newItem);
+					HtmlOutputText newText = 
+						this.buildOutputTextField(fields[a].getText(),button);
+					childrenContainer.getChildren().add(newText);
 				}
 			}
+			for (int a = 0; a < fields.length; a++)
+			{
+				if (fields[a].getInputType().equals("selectInput"))
+				{
+					HtmlSelectOneMenu newSelector = 
+						this.buildSelectBox(fields[a].getOptions(), button);
+					childrenContainer.getChildren().add(newSelector);
+				}
+			}
+			for (int a = 0; a < fields.length; a++)
+			{
+				if (fields[a].getInputType().equals("inputText"))
+				{
+					HtmlInputText newText = this.buildInputTextField(button);
+					childrenContainer.getChildren().add(newText);
+				}
+			}
+			button.getChildren().add(childrenContainer);
 			button.setLoaded(true);
 			treeStructure.getChildren().addAll(index + 1, button.getChildren());
 		}
