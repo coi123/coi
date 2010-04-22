@@ -18,6 +18,7 @@ public class DOTreeModel {
     private DefaultTreeModel model;
     private DefaultMutableTreeNode rootTreeNode;
     private String selectedNode;
+    private String selectedNodeId;
     private String selectedNodeProperty;
     //type DefaultMutableTreeNode
     private ArrayList nodeCollection;
@@ -83,12 +84,17 @@ public class DOTreeModel {
     	return selectedNode;
     }
     
+    public String getSelectedNodeId()
+    {
+    	return selectedNodeId;
+    }
+    
     public String getSelectedNodeProperty()
     {
     	return selectedNodeProperty;
     }
     
-    private void setSelectedNodeProperty(String selectedNode)
+    private void setSelectedNodePropertyAndId(String selectedNode)
     {
     	String nodeID = "";
     	for (int a = 0; a < rawNodesCollection.size(); a++)
@@ -99,13 +105,14 @@ public class DOTreeModel {
     			break;
     		}
     	}
+    	selectedNodeId = nodeID;
     	selectedNodeProperty = DOSubProperty.getPropertyFromNode(nodeID);
     }
     
     public void setSelectedNodeText(String selNode)
     {
     	selectedNode = selNode;
-    	setSelectedNodeProperty(selNode);
+    	setSelectedNodePropertyAndId(selNode);
     }
     
     public void initRoot(DefaultMutableTreeNode node)
@@ -180,8 +187,6 @@ public class DOTreeModel {
 		        	treeLevel2Branches[k].setText(rawLevel2SubNodes[k].getLabel());
 		        	treeLevel2MutNodes[k].setUserObject(treeLevel2Branches[k]);
 		        	((DefaultMutableTreeNode)nodeCollection.get(listIndex)).add(treeLevel2MutNodes[k]);
-		        	//TODO: ADD A NESTED LOOP TO ATTACH NEXT NODE LEVEL, WILL NOT
-		        	//BE DIFFICULT AS THE level2 ARRAYS CAN BE DIRECTLY ACCESSED.
 		        }
 		        updateCollections(treeLevel2MutNodes, treeLevel2Branches, rawLevel2SubNodes);
 	        }

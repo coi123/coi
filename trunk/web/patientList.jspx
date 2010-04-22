@@ -1,0 +1,72 @@
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+		xmlns:f="http://java.sun.com/jsf/core"
+    	xmlns:ice="http://www.icesoft.com/icefaces/component">
+
+	<ice:outputDeclaration doctypeRoot="html"
+						   doctypePublic="-//W3C//DTD HTML 4.01 Transitional//EN"
+        				   doctypeSystem="http://www.w3.org/TR/html4/loose.dtd" />	
+        				   
+	<html>
+	<head>
+	  <meta http-equiv="PRAGMA" content="NO-CACHE"/>
+	  <meta http-equiv="CACHE-CONTROL" content="NO-CACHE"/>
+	  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii"/>
+	  <meta name="keywords" content="COI Patient List"/>
+	
+	  <title>Clinical Observations Interoperability (COI) Demo : Patient List</title>
+	  <link rel="stylesheet" href="css/coi.css" type="text/css"/>
+	  <link rel="stylesheet" href="css/xp.css" type="text/css"/>
+	</head>
+	
+	<body>
+	  <div class="second">
+	    Clinical Observations Interoperability (COI) Demo : Patient List
+	  </div>
+	
+	  <div class="result">
+	 <!-- <p id="PLIST"></p> -->
+	
+	    <table id="PList" style="table-layout:fixed">
+	      <ice:dataTable columnWidths="15%,20%,15%,30%,20%"
+	      				 styleClass="title"
+	      				 value="#{controller.patientTableModel.patientItems}"
+	      				 var="patientEntry">
+	      	<ice:column>
+	      	  <f:facet name="header">
+	      	    <ice:outputText value="Patient"/>
+	      	  </f:facet>
+	      	  <ice:outputText value="#{patientEntry.patient}"/>
+	      	</ice:column>
+	        <ice:column>
+	      	  <f:facet name="header">
+	      	    <ice:outputText value="Birthday"/>
+	      	  </f:facet>
+	      	  <ice:outputText value="#{patientEntry.dob}"/>
+	      	</ice:column>
+	      	<ice:column>
+	      	  <f:facet name="header">
+	      	    <ice:outputText value="Gender"/>
+	      	  </f:facet>
+	      	  <ice:outputText value="#{patientEntry.gender}"/>
+	      	</ice:column>
+	      	<ice:column>
+	      	  <f:facet name="header">
+	      	    <ice:outputText value="Medication"/>
+	      	  </f:facet>
+	      	  <ice:outputText value="#{patientEntry.medication}"/>
+	      	</ice:column>
+	      	<ice:column>
+	      	  <f:facet name="header">
+	      	    <ice:outputText value="Prescription Date"/>
+	      	  </f:facet>
+	      	  <ice:outputText value="#{patientEntry.datePrescribed}"/>
+	      	</ice:column>
+	      </ice:dataTable>
+	
+	      <tbody id="pListBody">
+	      </tbody>
+	    </table>
+	  </div>
+	</body>
+	</html>
+</f:view>

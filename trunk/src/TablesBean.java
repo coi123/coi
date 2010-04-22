@@ -25,17 +25,19 @@ public class TablesBean
 	private SelectItem[] linkRadioButtons;
 	private String selectedLinkType;
 	private String[] radioItemLabels = {"AND","OR"};
-	private int inclLinkSuffix;
-	private int exclLinkSuffix;
+	private int linkSuffix;
+	private ArrayList inclLinks;
+	private ArrayList exclLinks;
 	
 	public TablesBean(SparqlQueryModel queryModel)
 	{
 		inclItems = new ArrayList();
 		exclItems = new ArrayList();
 		model = queryModel;
-		inclLinkSuffix = 0;
-		exclLinkSuffix = 0;
+		linkSuffix = 0;
 		selectedLinkType = "AND";
+		inclLinks = new ArrayList();
+		exclLinks = new ArrayList();
 	}
 	
 	public void setInclusion()
@@ -78,6 +80,7 @@ public class TablesBean
 	
 	public void createLink()
 	{
+		TableItemLink newLink = new TableItemLink();
 		if (selectedList != null && selectedList.size() > 0)
 		{
 			ArrayList itemsToLink = new ArrayList();
@@ -93,27 +96,38 @@ public class TablesBean
 			{
 				for (int b = 0; b < itemsToLink.size();b++)
 				{
-					TableItem currentItem = (TableItem)itemsToLink.get(b);
+					//ensure that the original item is modified
+					TableItem currentItem = 
+						(TableItem)selectedList.get(selectedList.indexOf(itemsToLink.get(b)));
+					newLink.getLinkItems().add(currentItem);
 					if (selectedList.equals(inclItems))
 					{
 						currentItem.setLinkID(selectedLinkType + " " + 
-											  inclLinkSuffix + " ");
+											  linkSuffix + " ");
 						currentItem.setToLink(false);
 					}
 					else
 					{
 						currentItem.setLinkID(selectedLinkType + " " + 
-											  exclLinkSuffix + " ");
+											  linkSuffix + " ");
 						currentItem.setToLink(false);
 					}
 				}
 				if (selectedList.equals(inclItems))
 				{
-					inclLinkSuffix++;
+					newLink.setLinkID(selectedLinkType + " " + 
+							  		  linkSuffix + " ");
+					newLink.setLinkType(selectedLinkType);
+					inclLinks.add(newLink);
+					linkSuffix++;
 				}
 				else 
 				{
-					exclLinkSuffix++;
+					newLink.setLinkID(selectedLinkType + " " + 
+					  		  		  linkSuffix + " ");
+					newLink.setLinkType(selectedLinkType);
+					exclLinks.add(newLink);
+					linkSuffix++;
 				}
 			}
 		}
@@ -124,6 +138,37 @@ public class TablesBean
 	public void linkTypeChanged(ValueChangeEvent e)
 	{
 		selectedLinkType = e.getNewValue().toString();
+	}
+	
+	private void cleanLinks(ArrayList linkList)
+	{
+		for (int i = 0; i < linkList.size(); i++)
+		{	
+			boolean linkStillValid = false;
+			TableItemLink curLink = (TableItemLink) linkList.get(i);
+			ArrayList curChildren = curLink.getLinkItems();
+			for (int j = 0; j < curChildren.size(); j++)
+			{
+				TableItem curChild = (TableItem) curChildren.get(j);
+				if (selectedList.contains(curChild))
+				{
+					linkStillValid = true;
+				}
+				else
+				{
+					curChildren.remove(curChild);
+				}
+			}
+			if (curChildren.size() == 1)
+			{
+				((TableItem)curChildren.get(0)).setLinkID(null);
+				linkStillValid = false;
+			}
+			if (linkStillValid == false)
+			{
+				linkList.remove(curLink);
+			}
+		}
 	}
 	
 	public void addItem(String domain, String category, String criteria, String itemID)
@@ -167,11 +212,13 @@ public class TablesBean
 		{
 			TableItem itemToDelete = ((TableItem)inclItems.get(index));
 			inclItems.remove(itemToDelete);
+			this.cleanLinks(inclLinks);
 		}
 		else
 		{
 			TableItem itemToDelete = ((TableItem)exclItems.get(index));
 			exclItems.remove(itemToDelete);
+			this.cleanLinks(exclLinks);
 		}
 		sortTableItems();
 		updateQueryModel();
@@ -189,6 +236,8 @@ public class TablesBean
 		sortTableItems();
 		model.setInclusionList(inclItems);
 		model.setExclusionList(exclItems);
+		model.setInclLinks(inclLinks);
+		model.setExclLinks(exclLinks);
 	}
 	
 	private void sortTableItems()
@@ -215,12 +264,6 @@ public class TablesBean
 		{
 			exclItems.set(a, arr2[a]);
 		}
-	}
-	
-	private void debug(String message)
-	{
-		JavascriptContext.addJavascriptCall(FacesContext.getCurrentInstance(), 
-											"alert('" + message + "');");
 	}
 	
 	private class TableItemComparator implements Comparator

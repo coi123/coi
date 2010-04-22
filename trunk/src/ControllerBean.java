@@ -1,4 +1,7 @@
+import java.io.BufferedReader;
+import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.List;
 
@@ -36,6 +39,9 @@ public class ControllerBean
 	private TablesBean tableModel;
 	private InterfaceModel interfaceModel;
 	private SparqlQueryModel queryModel;
+	private PatientTableModel patientTableModel;
+	private BufferedReader hl7_sdtm;
+	private BufferedReader db_hl7;
 	private Effect fadeOut;
 	
 	
@@ -57,6 +63,10 @@ public class ControllerBean
 	    	url = new URL("http://localhost:8080/coi/kb/demParams.n3");
 	    	iStream = url.openStream();
 	    	interfaceModel = new InterfaceModel(iStream);
+	    	url = new URL("http://localhost:8080/coi/kb/hl7-sdtm.rq");
+	    	hl7_sdtm = new BufferedReader(new InputStreamReader(url.openStream()));
+	    	url = new URL("http://localhost:8080/coi/kb/db-hl7.rq");
+	    	db_hl7 = new BufferedReader(new InputStreamReader(url.openStream()));
 		}
 		catch (Exception e)
 		{
@@ -64,7 +74,8 @@ public class ControllerBean
 		}
 		//creates the table and query models
 		queryModel = new SparqlQueryModel();
-		tableModel = new TablesBean(queryModel);	
+		tableModel = new TablesBean(queryModel);
+		patientTableModel = new PatientTableModel();
 	}
 	
 	//effect to hide the study description
@@ -97,6 +108,11 @@ public class ControllerBean
 	public InterfaceModel getInterfaceModel()
 	{
 		return interfaceModel;
+	}
+	
+	public PatientTableModel getPatientTableModel()
+	{
+		return patientTableModel;
 	}
 	
 	/* 
@@ -299,16 +315,35 @@ public class ControllerBean
 		String domain = "do";
 		String category = doTreeModel.getSelectedNodeText();
 		String constraints = "";
+		String drugID = doTreeModel.getSelectedNodeId();
 		//TODO: query should have the drug ID not name, therefore  the node needs an
 		//extra parameter
 		
 		//String itemID = doTreeModel.getSelectedNodeId();
-		tableModel.addItem(domain, category, constraints, category);
+		tableModel.addItem(domain, category, constraints, drugID);
 	}
 	
 	// the action listener called when the clear button is pressed
 	public void clearTable(ActionEvent e)
 	{
 		tableModel.clearTable();
+	}
+	
+	public void queryDbClicked(ActionEvent e)
+	{
+		FacesContext context = FacesContext.getCurrentInstance();
+		
+		String sdtmString = queryModel.getPrefixStatements() + 
+							queryModel.getSelectionStatement() +
+							queryModel.getCriteriaStatement() +
+							queryModel.getLimitStatement();
+		/*
+		patientTableModel.executeAndParse(sdtmString, hl7_sdtm, db_hl7);
+		*/
+		//executed as a final measure
+		String jsCall = "window.open('patientList.jsp');";
+		
+		JavascriptContext.addJavascriptCall(context, jsCall);
+		
 	}
 }

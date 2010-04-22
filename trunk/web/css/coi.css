@@ -196,6 +196,10 @@ top:50px;
 width:480px;
 }
 
+.eulerLabelCol {
+padding-left:10px;
+}
+
 .final,.final1 {
 cursor:pointer;
 }
@@ -411,6 +415,10 @@ background-color:rgb(241,241,241);
 border-style:none;
 padding:0;
 text-align:left;
+}
+
+.urlBar {
+width:350px;
 }
 
 A {
