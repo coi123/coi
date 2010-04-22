@@ -40,7 +40,7 @@
 							   id="inclTable"
 							   value="#{controller.tableModel.inclItems}"
 				 			   var="inclTable">
-				  <ice:column>
+				  <ice:column groupOn="#{inclTable.linkID}">
 				    <f:facet name="header">
 				      <ice:outputText value="Link"/>
 				    </f:facet>
@@ -99,7 +99,7 @@
 							   id="exclTable"
 							   value="#{controller.tableModel.exclItems}"
 				 			   var="exclTable">
-				  <ice:column>
+				  <ice:column groupOn="#{exclTable.linkID}">
 				    <f:facet name="header">
 				      <ice:outputText value="Link"/>
 				    </f:facet>
@@ -287,6 +287,24 @@
 		  	        <input type="checkbox" name="drugM" value="" /><a href="kb/NDCcodes_ClinicalDrugs.txt" target="_blank">RxNorm to NDC Code Conversion</a><br/>
 		          </div>
 	            </ice:panelTab>
+	            <ice:panelTab label="Euler Engine">
+	              <ice:panelGrid columns="2" columnClasses="eulerLabelCol,eulerInputColumn">
+	                <ice:outputText value="File to excute rule over: "/>
+	                <ice:inputText styleClass="urlBar" value=""/>
+	              	<ice:outputText value="Rule File:"/>
+	              	<ice:panelGroup/>
+	              	<ice:outputText value="Existing File"/>
+	              	<ice:inputText styleClass="urlBar" value=""/>
+	                <ice:outputText value="New Rule"/>
+	              </ice:panelGrid>
+	              <ice:panelGrid columns="2">
+	              	<ice:panelGrid columns="1">
+	              	  
+	              	</ice:panelGrid>
+	                <ice:inputTextarea>
+	                </ice:inputTextarea>
+	              </ice:panelGrid>
+	            </ice:panelTab>
 	          </ice:panelTabSet>
 	        </ice:form>
 	      <!-- 
@@ -301,8 +319,14 @@
 	    </div>
 	
 	    <div class="footer">
-	      <button id="QUERYEXEC" class="generalButtonClass">Query Patients</button>
-	      <button id="RESET" class="generalButtonClass">Reset Criteria</button>
+	      <ice:form>
+	        <ice:commandButton actionListener="#{controller.queryDbClicked}"
+	      					   id="QUERYEXEC"
+	      		 			   styleClass="generalButtonClass"
+	      		 			   partialSubmit="true"
+	      		 			   value="QueryPatients"/>
+	        <button id="RESET" class="generalButtonClass">Reset Criteria</button>
+	      </ice:form>
 	    </div>
 	
 	    <div class="address">

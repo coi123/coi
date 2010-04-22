@@ -9,10 +9,10 @@ public class TableItem
 	private String constraints;
 	private String itemID;
 	private boolean toLink;
-	private HtmlSelectBooleanCheckbox linkCheck;
+	private String queryVar;
 	
 	/**class that allows for creation of object collections for table column value
-	 * attributes
+	 * attributes and query model population
 	 */
 	public TableItem(String inDomain, String inCategory, String inConstraints, String inID)
 	{
@@ -23,7 +23,6 @@ public class TableItem
 		setConstraints(inConstraints);
 		setItemID(inID);
 		toLink = false;
-		linkCheck = null;
 	}
 	
 	/*
@@ -89,12 +88,11 @@ public class TableItem
 		return toLink;
 	}
 
-	public void setLinkCheck(HtmlSelectBooleanCheckbox inLinkCheck) 
-	{
-		linkCheck = inLinkCheck;
+	public void setQueryVar(String queryVar) {
+		this.queryVar = queryVar;
 	}
 
-	public HtmlSelectBooleanCheckbox getLinkCheck() {
-		return linkCheck;
+	public String getQueryVar() {
+		return queryVar;
 	}
 }

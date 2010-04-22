@@ -26,6 +26,7 @@ public class InterfaceModel
 	private HtmlPanelGrid treeStructure;
 	private InterfaceModelBuilder interfaceModelBuilder;
 	private HtmlPanelGroup currentPanel;
+	private int treeButtonIncr;
 	
 	public InterfaceModel(InputStream iStream)
 	{
@@ -34,6 +35,7 @@ public class InterfaceModel
 		treeStructure.setColumns(1);
 		interfaceModelBuilder = new InterfaceModelBuilder(iStream);
 		currentPanel = null;
+		treeButtonIncr = 0;
 		initializeInterface();
 	}
 	
@@ -87,6 +89,8 @@ public class InterfaceModel
 			if (rootNodes[a].getInputType().equals("button"))
 			{
 				CustomButtonNode nodeToAdd = buildButtonNode(rootNodes[a].getName(), null);
+				nodeToAdd.setLoaded(false);
+				nodeToAdd.setExpanded(false);
 				treeStructure.getChildren().add(nodeToAdd);
 				updateInterface();
 			}
@@ -120,6 +124,8 @@ public class InterfaceModel
 						   "margin-left:" + newButton.getOffset() + "px;" +
 				   		   "height:100%");
 		newButton.setPartialSubmit(true);
+		newButton.setId("treeButton" + treeButtonIncr);
+		treeButtonIncr++;
 		return newButton;
 	}
 	
@@ -231,7 +237,10 @@ public class InterfaceModel
 					childrenContainer.getChildren().add(newText);
 				}
 			}
-			button.getChildren().add(childrenContainer);
+			if (childrenContainer.getChildCount() > 0)
+			{
+				button.getChildren().add(childrenContainer);
+			}
 			button.setLoaded(true);
 			treeStructure.getChildren().addAll(index + 1, button.getChildren());
 		}

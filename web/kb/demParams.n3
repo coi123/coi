@@ -41,7 +41,7 @@
 :Menopausal_Status_Fields     rdf:type ui:parameter;
      ui:hasParent :Menopausal_Status;
      ui:hasInputField     [     rdf:type ui:outputText;
-                                ui:hasValue "Menopausal State" ] ,
+                                ui:hasValue "Menopausal_Status" ] ,
                           [     rdf:type ui:selectInput;
                                 ui:hasOption "Pre-Menopause";
                                 ui:hasOption "Menopausal";

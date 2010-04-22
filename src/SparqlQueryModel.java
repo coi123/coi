@@ -9,22 +9,20 @@ public class SparqlQueryModel
 	private ArrayList prefices;
 	private ArrayList fieldsToReturn;
 	
-	private TableItem maleItem;
-	private TableItem femaleItem;
-	private TableItem ageMinItem;
-	private TableItem ageMaxItem;
-	private ArrayList sdtmInItems;
-	private ArrayList doInItems;
-	private ArrayList sdtmExItems;
-	private ArrayList doExItems;
+	private ArrayList inclLinks;
+	private ArrayList exclLinks;
+	private ArrayList unlinkedInclItems;
+	private ArrayList unlinkedExclItems;
 	
 	private String prefixStatements;
 	private String selectionStatement;
 	private String criteriaStatement = "";
-	private String optionalStatement;
-	private String filterStatement;
 	private String limitStatement;
-	private int varNum;
+	int varIncrementer = 0;
+	
+	private boolean previousStatements = false;
+	
+	private ArrayList paramsDefined;
 	
 	private int limit;
 	
@@ -33,14 +31,16 @@ public class SparqlQueryModel
 		inclusionCriteria = new ArrayList();
 		exclusionCriteria = new ArrayList();
 		
+		inclLinks = new ArrayList();
+		exclLinks = new ArrayList();
+		unlinkedInclItems = new ArrayList();
+		unlinkedExclItems = new ArrayList();
+		
+		paramsDefined = new ArrayList();
+		
 		prefices = new ArrayList();
 		fieldsToReturn = new ArrayList();
-		
-		sdtmInItems = new ArrayList();
-		doInItems = new ArrayList();
-		sdtmExItems = new ArrayList();
-		doExItems = new ArrayList();
-		
+			
 		prefices.add("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
 		prefices.add("PREFIX sdtm: <http://www.sdtm.org/vocabulary#>\n");
 		prefices.add("PREFIX spl: <http://www.hl7.org/v3ballot/xml/infrastructure/vocabulary/vocabulary#>\n");
@@ -50,8 +50,6 @@ public class SparqlQueryModel
 		fieldsToReturn.add("?sex");
 		fieldsToReturn.add("?takes");
 		fieldsToReturn.add("?indicDate");
-		
-		varNum = 0;
 		
 		limit = 30;
 	}
@@ -64,6 +62,23 @@ public class SparqlQueryModel
 	public void setExclusionList(ArrayList arr)
 	{
 		exclusionCriteria = arr;
+	}
+	
+
+	public void setInclLinks(ArrayList inclLinks) {
+		this.inclLinks = inclLinks;
+	}
+
+	public ArrayList getInclLinks() {
+		return inclLinks;
+	}
+
+	public void setExclLinks(ArrayList exclLinks) {
+		this.exclLinks = exclLinks;
+	}
+
+	public ArrayList getExclLinks() {
+		return exclLinks;
 	}
 	
 	public String getPrefixStatements()
@@ -82,6 +97,7 @@ public class SparqlQueryModel
 	
 	public String getSelectionStatement()
 	{
+		paramsDefined.clear();
 		selectionStatement = "";
 		if (!fieldsToReturn.isEmpty())
 		{
@@ -96,6 +112,8 @@ public class SparqlQueryModel
 	
 	public String getCriteriaStatement()
 	{
+		previousStatements = false;
+		varIncrementer = 0;
 		//sorts list into local variables
 		readVariables();
 		
@@ -107,229 +125,256 @@ public class SparqlQueryModel
 		criteriaStatement += "           sdtm:sex ?sex .\n\n";
 		
 		//mapping all possible variable combinations: relationship declarations
-		if (ageMinItem != null || ageMaxItem != null)
-		{
-			criteriaStatement += "           ?patient sdtm:hasAge ?age .\n";
-		}
-		int a;
-		for (a = 0; a < sdtmInItems.size(); a++)
-		{
-			TableItem item = (TableItem)sdtmInItems.get(a);
-			criteriaStatement += "           ?x" + a + " rdf:type sdtm:" + item.getCategory() + " .\n";
-			criteriaStatement += "           ?x" + a + " sdtm:dosePerAdministration ?doseX" + a + " .\n";
-		}
-		int b;
-		for (b = 0; b < doInItems.size(); b++)
-		{
-			TableItem item = (TableItem)doInItems.get(b);
-			criteriaStatement += "           ?x" + (a + b) + " rdf:type do:" + item.getCategory() + " .\n";
-			criteriaStatement += "           ?x" + (a + b) + " do:dose ?doseX" + (a + b) + " .\n";
-		}
-		int c;
-		for (c = 0; c < sdtmExItems.size(); c++)
-		{
-			TableItem item = (TableItem)sdtmExItems.get(c);
-			criteriaStatement += "           ?x" + (a + b + c) + " rdf:type do:" + item.getCategory() + " .\n";
-			criteriaStatement += "           ?x" + (a + b + c) + " do:dose ?doseX" + (a + b + c) + " .\n";
-		}
-		int d;
-		for (d = 0; d < doExItems.size(); d++)
-		{
-			TableItem item = (TableItem)doExItems.get(d);
-			criteriaStatement += "           ?x" + (a + b + c + d) + " rdf:type do:" + item.getCategory() + " .\n";
-			criteriaStatement += "           ?x" + (a + b + c + d) + " do:dose ?doseX" + (a + b + c + d) + " .\n";
-		}
-		//mapping all possible variable combinations:query construction
 		
-		boolean firstItem = true;
-		criteriaStatement += "\n           FILTER ("; 
+		defineVars(inclusionCriteria);
+		defineVars(exclusionCriteria);
 		
-		if (maleItem != null && maleItem.getConstraints().equals("true"))
-		{
-			if (femaleItem != null && femaleItem.getConstraints().equals("true"))
-			{
-				criteriaStatement += "(";
-			}
-			criteriaStatement += "?sex = \"Male\"";
-			firstItem = false;
-		}
-		if (femaleItem != null && femaleItem.getConstraints().equals("true"))
-		{
-			if (firstItem == false)
-			{
-				criteriaStatement += " || ";
-			}
-			criteriaStatement += "?sex = \"Female\"";
-			if (maleItem != null && maleItem.getConstraints().equals("true"))
-			{
-				criteriaStatement += ")";
-			}
-			firstItem = false;
-		}
-		if (ageMinItem != null)
-		{
-			if (firstItem == false)
-			{
-				criteriaStatement += " && ";
-			}
-			criteriaStatement += "?age >= " + ageMinItem.getConstraints();
-			firstItem = false;
-		}
-		if (ageMaxItem != null)
-		{
-			if (firstItem == false)
-			{
-				criteriaStatement += " && ";
-			}
-			criteriaStatement += "?age <= " + ageMaxItem.getConstraints();
-			firstItem = false;
-		}
-		for (a = 0; a < sdtmInItems.size(); a++)
-		{
-			TableItem item = (TableItem)sdtmInItems.get(a);
-			if (firstItem == false)
-			{
-				criteriaStatement += " && ";
-			}
-			if (item.getConstraints().contains("<"))
-			{
-				criteriaStatement += "(";
-			}
-			criteriaStatement += "?doseX" + a + " " + item.getConstraints();
-			firstItem = false;
-			if (item.getConstraints().contains("<"))
-			{
-				criteriaStatement += " || !bound (?x" + a + "))";
-			}
-		}
-		for (b = 0; b < doInItems.size(); b++)
-		{
-			TableItem item = (TableItem)doInItems.get(b);
-			if (firstItem == false)
-			{
-				criteriaStatement += " && ";
-			}
-			if (item.getConstraints().contains("<"))
-			{
-				criteriaStatement += "(";
-			}
-			criteriaStatement += "?doseX" + (a + b) + " " + item.getConstraints();
-			firstItem = false;
-			if (item.getConstraints().contains("<"))
-			{
-				criteriaStatement += " || !bound (?x" + ( a + b ) + "))";
-			}
-		}
-		for (c = 0; c < sdtmExItems.size(); c++)
-		{
-			TableItem item = (TableItem)sdtmExItems.get(c);
-			if (firstItem == false)
-			{
-				criteriaStatement += " && ";
-			}
-			if (item.getConstraints().contains(">"))
-			{
-				criteriaStatement += "(";
-			}
-			criteriaStatement += "!(?doseX" + (a + b + c) + " " + item.getConstraints() + ")";
-			firstItem = false;
-			if (item.getConstraints().contains(">"))
-			{
-				criteriaStatement += " || !bound (?x" + ( a + b + c ) + "))";
-			}
-		}
-		for (d = 0; d < doExItems.size(); d++)
-		{
-			TableItem item = (TableItem)doExItems.get(d);
-			if (firstItem == false)
-			{
-				criteriaStatement += " && ";
-			}
-			if (item.getConstraints().contains(">"))
-			{
-				criteriaStatement += "(";
-			}
-			criteriaStatement += "!(?doseX" + (a + b + c + d) + " " + item.getConstraints() + ")";
-			firstItem = false;
-			if (item.getConstraints().contains(">"))
-			{
-				criteriaStatement += " || !bound (?x" + ( a + b + c + d ) + "))";
-			}
-		}
+		criteriaStatement += "\n";
 		
-		criteriaStatement += ") \n";
-		criteriaStatement += "} \n";
+		if (inclLinks.size() > 0         ||
+			exclLinks.size() > 0         ||
+			unlinkedInclItems.size() > 0 ||
+			unlinkedExclItems.size() > 0 )
+		{
+			criteriaStatement += "FILTER (";
+			
+			representLinks(inclLinks);
+			representLinks(exclLinks);
+			
+			addUnlinkedItems(unlinkedInclItems);
+			addUnlinkedItems(unlinkedExclItems);
+			
+			criteriaStatement += ") \n\n";
+			
+		}
+		criteriaStatement += "} \n\n";
 		
 		return criteriaStatement;
 	}
 	
+	private void defineVars(ArrayList tableItems)
+	{
+		for (int i = 0; i < tableItems.size(); i++)
+		{
+			TableItem curItem = (TableItem) tableItems.get(i);
+			if (curItem.getDomain().equals("sdtm"))
+			{
+				if (curItem.getCategory().equals("ageMin") ||
+					curItem.getCategory().equals("ageMax"))
+				{
+					if (shouldDefine(curItem.getCategory()))
+					{
+						criteriaStatement += "?patient sdtm:hasAge ?age .\n";
+					}
+					curItem.setQueryVar("?age");
+				}
+				else if (!(curItem.getConstraints().contains("<")||
+					  curItem.getConstraints().contains(">")||
+					  curItem.getConstraints().contains("=")))
+				{
+					if (shouldDefine(curItem.getCategory()))
+					{
+						criteriaStatement += "?patient sdtm:" + curItem.getCategory() + " ?" + 
+											 curItem.getCategory().toLowerCase() + " . \n";
+					}
+					curItem.setQueryVar("?" + curItem.getCategory().toLowerCase());
+				}
+				else
+				{
+					if (shouldDefine(curItem.getCategory()))
+					{
+						criteriaStatement += "?x" + varIncrementer + " rdf:type sdtm:" +
+										 	 curItem.getCategory() + " . \n";
+						criteriaStatement += "?x" + varIncrementer + 
+					                     	 " sdtm:dosePerAdministration ?doseX" + 
+					                     	 varIncrementer + " . \n";
+						curItem.setQueryVar("?doseX" + varIncrementer);
+						varIncrementer++;
+					}
+					else
+					{
+						searchListsForVar(inclusionCriteria, curItem);
+						searchListsForVar(exclusionCriteria, curItem);
+					}
+				}
+			}
+			else
+			{
+				if (shouldDefine(curItem.getCategory()))
+				{
+					criteriaStatement += "?x" + varIncrementer + " rdf:type do:" +
+					 					 curItem.getItemID() + " . \n";
+					criteriaStatement += "?x" + varIncrementer + " do:dose ?doseX" + 
+	                   					 varIncrementer + " . \n";
+					curItem.setQueryVar("?doseX" + varIncrementer);
+					varIncrementer++;
+				}
+				else
+				{
+					searchListsForVar(inclusionCriteria, curItem);
+					searchListsForVar(exclusionCriteria, curItem);
+				}
+			}
+		}
+	}
+	
+	private void searchListsForVar(ArrayList arr, TableItem item)
+	{
+		for (int a = 0; a < arr.size() && item.getQueryVar() == null; a++)
+		{
+			TableItem compareItem = (TableItem) arr.get(a);
+			if(compareItem.getCategory().equals(item.getCategory()))
+			{
+				item.setQueryVar(compareItem.getQueryVar());
+				break;
+			}
+		}
+	}
+	
+	private void representLinks(ArrayList tableLinks)
+	{
+		for (int a = 0; a < tableLinks.size(); a++)
+		{
+			TableItemLink link = (TableItemLink)tableLinks.get(a);
+			if (previousStatements)
+			{
+				criteriaStatement += " && ";
+			}
+			if (tableLinks.equals(exclLinks))
+			{
+				criteriaStatement += "!";
+			}
+			criteriaStatement += "(";
+			String linkType = link.getLinkType();
+			ArrayList linkItems = link.getLinkItems();
+			for (int b = 0; b < linkItems.size(); b++)
+			{
+				if (b > 0 && linkType.equals("AND"))
+				{
+					criteriaStatement += " && ";
+				}
+				else if (b > 0 && linkType.equals("OR"))
+				{
+					criteriaStatement += " || ";
+				}
+				TableItem item = (TableItem) linkItems.get(b);
+				
+				populateStatement(item, tableLinks);
+				
+				previousStatements = true;
+				//tableitem variable and condition
+			}
+			criteriaStatement += " )";
+		}
+	}
+	
+	private void addUnlinkedItems(ArrayList items)
+	{
+		//*Need to add bound statements depending on inclusion or exclusion statements
+		for (int a = 0; a < items.size(); a++)
+		{
+			if (previousStatements)
+			{
+				criteriaStatement += " && ";
+			}
+			if (items.equals(unlinkedExclItems))
+			{
+				criteriaStatement += "!(";
+			}
+			TableItem item = (TableItem)items.get(a); 
+			
+			populateStatement(item, items);
+			
+			if (items.equals(unlinkedExclItems))
+			{
+				criteriaStatement += ")";
+			}
+			previousStatements = true;
+		}
+	}
+	
+	private void populateStatement(TableItem item, ArrayList list)
+	{
+		if (item.getCategory().contains("ageMin"))
+		{
+			criteriaStatement += item.getQueryVar() + " > " + item.getConstraints();
+		}
+		else if (item.getCategory().contains("ageMax"))
+		{
+			criteriaStatement += item.getQueryVar() + " < " + item.getConstraints();
+		}
+		else if (!(item.getConstraints().contains("<")||
+				  item.getConstraints().contains(">")||
+				  item.getConstraints().contains("=")))
+		{
+			if (item.getConstraints() != null && item.getConstraints() != "")
+			{
+				criteriaStatement += item.getQueryVar() + " = \"" + item.getConstraints() + "\"";
+			}
+			else
+			{
+				criteriaStatement += "bound(" + item.getQueryVar() + ")";
+			}
+			
+		}
+		else
+		{
+			criteriaStatement += item.getQueryVar() + " " + item.getConstraints();
+			if ((list.equals(inclLinks)||list.equals(unlinkedInclItems))&&
+				 item.getConstraints().contains("<"))
+			{
+				criteriaStatement += " && !bound(" + item.getQueryVar() + ")";
+			}
+			else if ((list.equals(exclLinks)||list.equals(unlinkedExclItems))&&
+					  item.getConstraints().contains(">"))
+			{
+				criteriaStatement += " && !bound(" + item.getQueryVar() + ")";
+			}
+		}
+	}
+	
 	public String getLimitStatement()
 	{
-		return "LIMIT " + limit;
+		limitStatement = "LIMIT " + limit;
+		return limitStatement;
 	}
 	
 	private void readVariables()
 	{
-		maleItem = null;
-		femaleItem = null;
-		ageMinItem = null;
-		ageMaxItem = null;
-		sdtmInItems.clear();			
-		doInItems.clear();
-		sdtmExItems.clear();			
-		doExItems.clear();
-
+		paramsDefined.clear();
+		unlinkedInclItems.clear();
+		unlinkedExclItems.clear();
 		
-		//sorts variables so there is less guesswork
-		
-		if (!inclusionCriteria.isEmpty())
+		for (int a = 0; a < inclusionCriteria.size(); a++)
 		{
-			for (int j = 0; j < inclusionCriteria.size(); j++)
+			TableItem item = (TableItem)inclusionCriteria.get(a);
+
+			if(item.getLinkID() == null)
 			{
-				TableItem curItem = ((TableItem)inclusionCriteria.get(j));
-				if (curItem.getDomain().equals("sdtm"))
-				{
-					if (curItem.getCategory().equals("Male"))
-					{
-						maleItem = curItem;
-					}
-					else if (curItem.getCategory().equals("Female"))
-					{
-						femaleItem = curItem;
-					}
-					else if (curItem.getCategory().equals("ageMin"))
-					{
-						ageMinItem = curItem;
-					}
-					else if (curItem.getCategory().equals("ageMax"))
-					{
-						ageMaxItem = curItem;
-					}
-					else
-					{
-						sdtmInItems.add(curItem);
-					}
-				}
-				else
-				{
-					doInItems.add(curItem);
-				}
+				unlinkedInclItems.add(item);
 			}
 		}
-		if (!exclusionCriteria.isEmpty())
+		for (int b = 0; b < exclusionCriteria.size(); b++)
 		{
-			for (int k = 0; k < exclusionCriteria.size(); k++)
+			TableItem item = (TableItem)exclusionCriteria.get(b);
+
+			if(item.getLinkID() == null)
 			{
-				TableItem curItem = ((TableItem)exclusionCriteria.get(k));
-				if (curItem.getDomain().equals("sdtm"))
-				{
-					sdtmExItems.add(curItem);
-				}
-				else
-				{
-					doExItems.add(curItem);
-				}
+				unlinkedExclItems.add(item);
 			}
+		}
+	}
+	
+	private boolean shouldDefine(String itemCategory)
+	{
+		if (!paramsDefined.contains(itemCategory))
+		{
+			paramsDefined.add(itemCategory);
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 }
