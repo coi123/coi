@@ -64,7 +64,7 @@
 				    </f:facet>
 				    <ice:inputText partialSubmit="true"
 				    			   value="#{inclTable.constraints}"
-				    			   valueChangedListener="#{controller.constraintsChanged}"/>
+				    			   valueChangeListener="#{controller.constraintsChanged}"/>
 				  </ice:column>
 				  <ice:column>
 				    <f:facet name="header">
@@ -72,7 +72,7 @@
 				    </f:facet>
 				    <ice:selectBooleanCheckbox partialSubmit="true"
 				    						   value="#{inclTable.toLink}"
-				    						   valueChangedListener="#{controller.addLinkToggle}"/>
+				    						   valueChangeListener="#{controller.addLinkToggle}"/>
 				  </ice:column>
 				  <ice:column>
 				    <f:facet name="header">
@@ -123,7 +123,7 @@
 				    </f:facet>
 				    <ice:inputText partialSubmit="true"
 				    			   value="#{exclTable.constraints}"
-				    			   valueChangedListener="#{controller.constraintsChanged}"/>
+				    			   valueChangeListener="#{controller.constraintsChanged}"/>
 				  </ice:column>
 				  <ice:column>
 				    <f:facet name="header">
@@ -131,7 +131,7 @@
 				    </f:facet>
 				    <ice:selectBooleanCheckbox partialSubmit="true"
 				    						   value="#{exclTable.toLink}"
-				    						   valueChangedListener="#{controller.addLinkToggle}"/>
+				    						   valueChangeListener="#{controller.addLinkToggle}"/>
 				  </ice:column>
 				  <ice:column>
 				    <f:facet name="header">
@@ -288,22 +288,73 @@
 		          </div>
 	            </ice:panelTab>
 	            <ice:panelTab label="Euler Engine">
+	              <ice:selectOneRadio id="fileSourceRadios" 
+	              					  layout="spread"
+	              					  partialSubmit="true"
+	              					  value="#{controller.eulerModel.ruleFileSource}"
+	              					  valueChangeListener="#{controller.toggleEulerRuleSourceFile}">
+	                <f:selectItem itemLabel="Existing File: " itemValue="load"/>
+	                <f:selectItem itemLabel="New Rule: " itemValue="new"/>
+	              </ice:selectOneRadio>
 	              <ice:panelGrid columns="2" columnClasses="eulerLabelCol,eulerInputColumn">
-	                <ice:outputText value="File to excute rule over: "/>
-	                <ice:inputText styleClass="urlBar" value=""/>
-	              	<ice:outputText value="Rule File:"/>
+	                <ice:outputText styleClass="fileInputLabel" 
+	                				value="File to excute rule over: "/>
+	                <ice:inputText styleClass="urlBar"
+	                			   partialSubmit="true"
+	                			   value="#{controller.eulerModel.evalFileUrl}" 
+	                			   valueChangeListener="#{controller.evalFileChanged}"/>
+	              	<ice:outputText style="margin-left:30px" value="Rule File:"/>
 	              	<ice:panelGroup/>
-	              	<ice:outputText value="Existing File"/>
-	              	<ice:inputText styleClass="urlBar" value=""/>
-	                <ice:outputText value="New Rule"/>
+	              	<ice:radio for="fileSourceRadios" index="0"/>
+	              	<ice:inputText styleClass="urlBar"
+	              				   partialSubmit="true"
+	              				   value="#{controller.eulerModel.ruleFileUrl}"
+	              				   valueChangeListener="#{controller.ruleFileUrlChanged}"/>
+	                <ice:radio for="fileSourceRadios" index="1"/>
 	              </ice:panelGrid>
 	              <ice:panelGrid columns="2">
-	              	<ice:panelGrid columns="1">
-	              	  
-	              	</ice:panelGrid>
-	                <ice:inputTextarea>
-	                </ice:inputTextarea>
+	              	<ice:inputTextarea partialSubmit="true"
+	              					   styleClass="newEulerRuleArea"
+	              					   value="#{controller.eulerModel.ruleFileString}"
+	              					   valueChangeListener="#{controller.ruleFileStringChanged}"/>
+	                <!-- 
+	                <ice:selectManyCheckbox layout="pageDirection"
+	                						partialSubmit="true"
+	                						valueChangeListener="#{controller.prefixesAltered}">
+	                  <f:selectItems value="#{controller.eulerModel.prefixSelectItems}"/>
+	                </ice:selectManyCheckbox>
+	                -->
 	              </ice:panelGrid>
+	              <ice:selectOneRadio layout="lineDirection"
+	              					  partialSubmit="true"
+	              					  styleClass="eulerOptions"
+	              					  value="#{controller.eulerModel.language}">
+	              	<f:selectItems value="#{controller.eulerModel.langRadios}"/>
+	              </ice:selectOneRadio>
+	                <ice:selectBooleanCheckbox id="proofBox"
+	                						   partialSubmit="true"
+	              							   value="#{controller.eulerModel.proof}"
+	              							   valueChangeListener="#{controller.proofToggled}"/>
+	              	<ice:outputLabel for="proofBox" value="Proof"/>
+	            	<ice:selectBooleanCheckbox id="fullResultsBox"
+	            							   partialSubmit="true"
+	              							   value="#{controller.eulerModel.fullResults}"
+	              							   valueChangeListener="#{controller.fullResultsToggled}"/>
+	           		<ice:outputLabel for="fullResultsBox" value="Full Results"/>
+	           		<ice:selectBooleanCheckbox id="debugInfoBox"
+	           								   partialSubmit="true"
+	              							   value="#{controller.eulerModel.debugInfo}"
+	              							   valueChangeListener="#{controller.debugInfoToggled}"/>
+	              	<ice:outputLabel for="debugInfoBox" value="Debug"/>
+	                <ice:commandButton value="Run Euler"
+	                				   immediate="true"
+	                				   styleClass="eulerSubmit"
+	              					   actionListener="#{controller.eulerSubmitClicked}"/>
+	            </ice:panelTab>
+	            <ice:panelTab label="Euler Results">
+	              <pre>
+	                <ice:outputText value="#{controller.eulerModel.eulerResults}"/>
+	              </pre>
 	            </ice:panelTab>
 	          </ice:panelTabSet>
 	        </ice:form>
