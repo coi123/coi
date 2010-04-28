@@ -20,6 +20,7 @@ import com.icesoft.faces.component.ext.HtmlSelectBooleanCheckbox;
 import com.icesoft.faces.component.ext.HtmlCommandButton;
 import com.icesoft.faces.component.ext.HtmlCommandLink;
 import com.icesoft.faces.component.ext.HtmlDataTable;
+import com.icesoft.faces.component.ext.HtmlSelectManyCheckbox;
 import com.icesoft.faces.component.ext.HtmlSelectOneRadio;
 import com.icesoft.faces.component.ext.UIColumn;
 import com.icesoft.faces.component.tree.IceUserObject;
@@ -39,6 +40,7 @@ public class ControllerBean
 	private TablesBean tableModel;
 	private InterfaceModel interfaceModel;
 	private SparqlQueryModel queryModel;
+	private EulerEngineModel eulerModel;
 	private PatientTableModel patientTableModel;
 	private BufferedReader hl7_sdtm;
 	private BufferedReader db_hl7;
@@ -47,7 +49,7 @@ public class ControllerBean
 	
 	/**acts as a controller providing actionListeners to the interface as well as making
 	 * values in different models available to one another through the JSF layer
-	 */
+	 */ 
 	public ControllerBean()
 	{
 		//reads necessary files into models to generate interface tree elements
@@ -75,6 +77,7 @@ public class ControllerBean
 		//creates the table and query models
 		queryModel = new SparqlQueryModel();
 		tableModel = new TablesBean(queryModel);
+		eulerModel = new EulerEngineModel();
 		patientTableModel = new PatientTableModel();
 	}
 	
@@ -108,6 +111,11 @@ public class ControllerBean
 	public InterfaceModel getInterfaceModel()
 	{
 		return interfaceModel;
+	}
+	
+	public EulerEngineModel getEulerModel()
+	{
+		return eulerModel;
 	}
 	
 	public PatientTableModel getPatientTableModel()
@@ -316,10 +324,6 @@ public class ControllerBean
 		String category = doTreeModel.getSelectedNodeText();
 		String constraints = "";
 		String drugID = doTreeModel.getSelectedNodeId();
-		//TODO: query should have the drug ID not name, therefore  the node needs an
-		//extra parameter
-		
-		//String itemID = doTreeModel.getSelectedNodeId();
 		tableModel.addItem(domain, category, constraints, drugID);
 	}
 	
@@ -329,6 +333,125 @@ public class ControllerBean
 		tableModel.clearTable();
 	}
 	
+	/*
+	 * the valueChangeListener called when the user changes the url of the file
+	 * to be evaluated
+	 */
+	public void evalFileChanged(ValueChangeEvent e)
+	{
+		if (e.getNewValue() != null)
+		{
+			eulerModel.setEvalFileUrl(e.getNewValue().toString());
+		}
+	}
+	
+	/*
+	 * the valueChangeListener called when the user toggles the radio button set
+	 * that controls the source of the ruleFile
+	 */
+	public void toggleEulerRuleSourceFile(ValueChangeEvent e)
+	{
+		if (e.getNewValue()!=null)
+		{
+			eulerModel.setRuleFileSource(e.getNewValue().toString());
+		}
+	}
+	
+	/*
+	 * the valueChangeListener called when the user changes the url of the rule file
+	 */
+	public void ruleFileUrlChanged(ValueChangeEvent e)
+	{
+		if (e.getNewValue() != null)
+		{
+			eulerModel.setRuleFileUrl(e.getNewValue().toString());
+		}
+	}
+	
+	/*
+	 * the valueChangeListener called when the user changes the user defined rule
+	 */
+	public void ruleFileStringChanged(ValueChangeEvent e)
+	{
+		if (e.getNewValue() != null)
+		{
+			eulerModel.setRuleFileString(e.getNewValue().toString());
+		}
+	}
+	
+	// the valueChangeListener for the prototype prefix adding checkbox set
+	/*
+	public void prefixesAltered(ValueChangeEvent e)
+	{
+		HtmlSelectManyCheckbox boxSetClicked = (HtmlSelectManyCheckbox) e.getSource();
+		String[] prefixes = (String[])boxSetClicked.getSelectedValues();
+		eulerModel.changePrefixes(prefixes);
+		JavascriptContext.addJavascriptCall(FacesContext.getCurrentInstance(), 
+		"alert(\"" + eulerModel.getRuleFileString() + "\")");
+	}
+	*/
+	
+	/*
+	 * the valueChangeListener called when the user toggles the radio button set
+	 * specifying the language to return results in
+	 */
+	public void returnLanguageChanged(ValueChangeEvent e)
+	{
+		HtmlSelectOneRadio radio = (HtmlSelectOneRadio)e.getSource();
+		if (radio.getLocalValue() != null)
+		{
+			eulerModel.setLanguage(radio.getLocalValue().toString());
+		}
+	}
+	
+	/*
+	 * the valueChangeListener called when the proof checkbox is toggled
+	 */
+	public void proofToggled(ValueChangeEvent e)
+	{
+		if (e.getNewValue() != null)
+		{
+			eulerModel.setProof(e.getNewValue().toString());
+		}
+	}
+	
+	/*
+	 * the valueChangeListener called when the fullResults checkbox is toggled
+	 */
+	public void fullResultsToggled(ValueChangeEvent e)
+	{
+		if (e.getNewValue() != null)
+		{
+			eulerModel.setFullResults(e.getNewValue().toString());
+		}
+	}
+	
+	/*
+	 * the valueChangeListener called when the debugInfo checkbox is toggled
+	 */
+	
+	public void debugInfoToggled(ValueChangeEvent e)
+	{
+		if (e.getNewValue() != null)
+		{
+			eulerModel.setFullResults(e.getNewValue().toString());
+		}
+	}
+	
+	/*
+	 * the actionListener called when the Run Euler button is called
+	 */
+	public void eulerSubmitClicked(ActionEvent e)
+	{
+		eulerModel.executeQuery();
+		//could be suited to open a new window with the results instead of passing
+		//passing to a new tab
+	}
+	
+	/*
+	 * the actionListener called when the Run Query button is called, not finished,
+	 * requires the JNI wrapper of the SWObjects transformer
+	 */
 	public void queryDbClicked(ActionEvent e)
 	{
 		FacesContext context = FacesContext.getCurrentInstance();
