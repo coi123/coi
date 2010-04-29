@@ -1,5 +1,8 @@
 
 
+/** a utility class containing fields needed in the construction of ice:tree models
+ */
+
 public class TreeItem 
 {
 	private String itemID;

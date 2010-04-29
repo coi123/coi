@@ -1,4 +1,8 @@
 
+/** a utility class for the PatientTableModel, each field corresponds to a column in the
+ *  table.
+ */
+
 public class PatientTableItem 
 {
 	private String patient;

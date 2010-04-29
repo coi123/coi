@@ -1,9 +1,14 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.faces.component.UIComponent;
-
 import com.icesoft.faces.component.ext.HtmlCommandButton;
+
+/** 
+ *  an extension of the standard HtmlCommandButton to function as a tree node, it maintains
+ *  a list of its child nodes, contains boolean values for expansion and load state 
+ *  (lazy loading), a reference to the parent for inheriting CSS values and css dimension
+ *  parameters
+ */
 
 public class CustomButtonNode extends HtmlCommandButton
 {
@@ -21,7 +26,7 @@ public class CustomButtonNode extends HtmlCommandButton
 		setExpanded(false);
 		setLoaded(false);
 		setParentButton(null);
-		width = 0;
+		setWidth(0);
 		setOffset(0);
 	}
 	

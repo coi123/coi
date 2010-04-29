@@ -1,7 +1,10 @@
 import java.io.*;
 import java.io.BufferedWriter;
-import java.io.OutputStreamWriter;
 import java.net.URLDecoder;
+
+/** this is a utility class meant to be called from the swo.bat file to use in conjunction
+ *  with SWtransformer but will become obsolete when the JNI wrapper is created
+ */
 
 public class CreateFile 
 {	

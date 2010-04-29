@@ -3,12 +3,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
-import com.icesoft.faces.context.effects.JavascriptContext;
-
 import euler.EulerRunner;
+
+/** a core model class used to provide EulerReasoner demonstration in the demo,
+ *  can be easily extended to provide inferencing functionality to the software in
+ *  the future
+ *  
+ *  majority of the class is collecting arguments for the execution of the Euler Reasoner
+ */
 
 public class EulerEngineModel 
 {
@@ -39,7 +43,7 @@ public class EulerEngineModel
 	private String[] resultOptLabels = {"Display Proof", "Display All Results", "Debug"};
 	private String[] resultOptValues = {"true", "true", "true"};
 	
-	private String evalFileUrl;
+	private ArrayList evalFileUrls;
 	private String ruleFileSource;
 	private String ruleFileUrl;
 	private String ruleFileString;
@@ -52,8 +56,10 @@ public class EulerEngineModel
 	
 	public EulerEngineModel()
 	{
+		//provides a temporary file reference for facilitating user-defined rules
 		targetTempFile = "C:\\Temp\\EulerTempFile-" + Math.random() + ".n3";
 		
+		//builds model arrays for interface sets
 		prefixSelectItems = new SelectItem[prefixLabels.length];
 		for (int a = 0; a < prefixLabels.length && a < prefixValues.length; a++)
 		{
@@ -81,7 +87,8 @@ public class EulerEngineModel
 			resultOpts[c] = item;
 		}
 		
-		evalFileUrl = "";
+		evalFileUrls = new ArrayList();
+		addEvalFileUrl();
 		ruleFileSource = "";
 		ruleFileUrl = "";
 		ruleFileString = "";
@@ -93,6 +100,7 @@ public class EulerEngineModel
 		eulerResults = null;
 	}
 	
+	/* start of getters and setters*/
 	public String[] getResultOptLabels()
 	{
 		return resultOptLabels;
@@ -133,14 +141,25 @@ public class EulerEngineModel
 		eulerResults = results;
 	}
 	
-	public String getEvalFileUrl()
+	public void addEvalFileUrl()
 	{
-		return evalFileUrl;
+		evalFileUrls.add("");
 	}
 	
-	public void setEvalFileUrl(String value)
+	public ArrayList getEvalFileUrls()
 	{
-		evalFileUrl = value;
+		return evalFileUrls;
+	}
+	
+	public void setEvalFileUrls(ArrayList value)
+	{
+		evalFileUrls = value;
+	}
+	
+	public void setEvalFileUrlAt(String inUrl, int index)
+	{
+		evalFileUrls.remove(index);
+		evalFileUrls.add(index,inUrl);
 	}
 	
 	public void setRuleFileSource(String value)
@@ -174,7 +193,11 @@ public class EulerEngineModel
 	}
 	
 	// prototype method, attempted to allow dynamic inclusion of prefixes to Euler
-	// user-created rules
+	// user-defined rules
+	
+	// primary difficulty - text-area does not update when ruleFileString is changed
+	
+	// also, no method of defining pre-formatted text inside the text area
 	/*
 	public void changePrefixes(String[] newPrefixArr)
 	{
@@ -191,6 +214,7 @@ public class EulerEngineModel
 		ruleFileString = buffer.toString();
 	}
 	*/
+	
 	public void setLanguage(String value)
 	{
 		language = value;
@@ -252,6 +276,11 @@ public class EulerEngineModel
 		return debugInfo;
 	}
 	
+	/* end getters and setters */
+	
+	/* includes/excludes options in arguments based on user-selection and passes in
+	 * url and file string information deletes temporary file 
+	 */
 	public void executeQuery()
 	{	
 		ArrayList argList = new ArrayList();
@@ -277,7 +306,8 @@ public class EulerEngineModel
 			argList.add("--debug");
 		}
 		
-		argList.add(evalFileUrl);
+		argList.addAll(evalFileUrls);
+		
 		argList.add("--query");
 		
 		if (ruleFileSource.equals("load"))
@@ -296,11 +326,13 @@ public class EulerEngineModel
 			args[a] = (String)argList.get(a);
 		}
 		
+		//executes the Euler Reasoner using the provided arguments
 		eulerResults = EulerRunner.doProof(args);
 		File tempFile = new File(targetTempFile);
 		tempFile.delete();
 	}
 	
+	//writes a temporary file to the destination field using the provided text 
 	private void writeTempFile(String fileName, String inputString)
 	{
 		try 

@@ -3,6 +3,9 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.util.*;
 
+/** called SWtransformer in the past, performed the mysql lookup and returned results 
+ */
+
 public class SwoQuery 
 {
 	public static String queryPatients(String sdtmParam, 

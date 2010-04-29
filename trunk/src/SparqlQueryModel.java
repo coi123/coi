@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 
+/** the model used to generate the SPARQL query from user-selected criteria
+ */
 
 public class SparqlQueryModel 
 {
@@ -26,6 +28,9 @@ public class SparqlQueryModel
 	
 	private int limit;
 	
+	/*
+	 * defines common prefices and specifies which fields will be returned
+	 */
 	public SparqlQueryModel()
 	{
 		inclusionCriteria = new ArrayList();
@@ -81,6 +86,9 @@ public class SparqlQueryModel
 		return exclLinks;
 	}
 	
+	/*
+	 * generates the single string containing the prefixes for the query
+	 */	
 	public String getPrefixStatements()
 	{
 		prefixStatements = "";
@@ -95,6 +103,9 @@ public class SparqlQueryModel
 		return prefixStatements;
 	}
 	
+	/*
+	 * generates the single string containing the SELECT statement for the query
+	 */
 	public String getSelectionStatement()
 	{
 		paramsDefined.clear();
@@ -110,6 +121,10 @@ public class SparqlQueryModel
 		return selectionStatement;
 	}
 	
+	/*
+	 * generates the single string containing the entire criteria description for the 
+	 * query
+	 */
 	public String getCriteriaStatement()
 	{
 		previousStatements = false;
@@ -124,19 +139,22 @@ public class SparqlQueryModel
 		criteriaStatement += "           sdtm:dateTimeOfBirth ?dob ;\n";
 		criteriaStatement += "           sdtm:sex ?sex .\n\n";
 		
-		//mapping all possible variable combinations: relationship declarations
+		//defines all variables
 		
 		defineVars(inclusionCriteria);
 		defineVars(exclusionCriteria);
 		
 		criteriaStatement += "\n";
 		
+		// represents all criteria provided
 		if (inclLinks.size() > 0         ||
 			exclLinks.size() > 0         ||
 			unlinkedInclItems.size() > 0 ||
 			unlinkedExclItems.size() > 0 )
 		{
 			criteriaStatement += "FILTER (";
+			
+			//links are represented first, followed by unlinked items
 			
 			representLinks(inclLinks);
 			representLinks(exclLinks);
@@ -156,9 +174,12 @@ public class SparqlQueryModel
 	{
 		for (int i = 0; i < tableItems.size(); i++)
 		{
+			//divides definitions based on the type of criteria provided
 			TableItem curItem = (TableItem) tableItems.get(i);
+			//sdtm items differ in method of definition
 			if (curItem.getDomain().equals("sdtm"))
 			{
+				//it is an age variable and is handled in a particular manner
 				if (curItem.getCategory().equals("ageMin") ||
 					curItem.getCategory().equals("ageMax"))
 				{
@@ -168,6 +189,7 @@ public class SparqlQueryModel
 					}
 					curItem.setQueryVar("?age");
 				}
+				// it is a qualitative demographic variable
 				else if (!(curItem.getConstraints().contains("<")||
 					  curItem.getConstraints().contains(">")||
 					  curItem.getConstraints().contains("=")))
@@ -179,7 +201,7 @@ public class SparqlQueryModel
 					}
 					curItem.setQueryVar("?" + curItem.getCategory().toLowerCase());
 				}
-				else
+				else //it is a quantitative value from the tree
 				{
 					if (shouldDefine(curItem.getCategory()))
 					{
@@ -198,7 +220,9 @@ public class SparqlQueryModel
 					}
 				}
 			}
-			else
+			//DO items are all defined in the same manner
+			
+			else // it is a DO entry
 			{
 				if (shouldDefine(curItem.getCategory()))
 				{
@@ -218,6 +242,9 @@ public class SparqlQueryModel
 		}
 	}
 	
+	/*
+	 * searches lists to ensure duplicate variables aren't defined
+	 */
 	private void searchListsForVar(ArrayList arr, TableItem item)
 	{
 		for (int a = 0; a < arr.size() && item.getQueryVar() == null; a++)
@@ -231,10 +258,15 @@ public class SparqlQueryModel
 		}
 	}
 	
+	/*
+	 * represents all linked relationships among the criteria
+	 */
 	private void representLinks(ArrayList tableLinks)
 	{
 		for (int a = 0; a < tableLinks.size(); a++)
 		{
+			// checks for conditions that entail additional info before the constraint
+			// statement
 			TableItemLink link = (TableItemLink)tableLinks.get(a);
 			if (previousStatements)
 			{
@@ -247,8 +279,11 @@ public class SparqlQueryModel
 			criteriaStatement += "(";
 			String linkType = link.getLinkType();
 			ArrayList linkItems = link.getLinkItems();
+			
 			for (int b = 0; b < linkItems.size(); b++)
 			{
+				// checks for the presence of previous items that entail an additional
+				// boolean operator
 				if (b > 0 && linkType.equals("AND"))
 				{
 					criteriaStatement += " && ";
@@ -259,10 +294,10 @@ public class SparqlQueryModel
 				}
 				TableItem item = (TableItem) linkItems.get(b);
 				
+				//populates the constraint statement
 				populateStatement(item, tableLinks);
 				
 				previousStatements = true;
-				//tableitem variable and condition
 			}
 			criteriaStatement += " )";
 		}
@@ -273,6 +308,8 @@ public class SparqlQueryModel
 		//*Need to add bound statements depending on inclusion or exclusion statements
 		for (int a = 0; a < items.size(); a++)
 		{
+			// checks for the presence of previous items that entail an additional
+			// boolean operator
 			if (previousStatements)
 			{
 				criteriaStatement += " && ";
@@ -283,6 +320,7 @@ public class SparqlQueryModel
 			}
 			TableItem item = (TableItem)items.get(a); 
 			
+			//populates the constraint statement
 			populateStatement(item, items);
 			
 			if (items.equals(unlinkedExclItems))
@@ -295,6 +333,7 @@ public class SparqlQueryModel
 	
 	private void populateStatement(TableItem item, ArrayList list)
 	{
+		//creates the constraint statement based on the type of constraint
 		if (item.getCategory().contains("ageMin"))
 		{
 			criteriaStatement += item.getQueryVar() + " > " + item.getConstraints();
@@ -326,19 +365,25 @@ public class SparqlQueryModel
 				criteriaStatement += " && !bound(" + item.getQueryVar() + ")";
 			}
 			else if ((list.equals(exclLinks)||list.equals(unlinkedExclItems))&&
-					  item.getConstraints().contains(">"))
+					  !item.getConstraints().contains("<"))
 			{
 				criteriaStatement += " && !bound(" + item.getQueryVar() + ")";
 			}
 		}
 	}
 	
+	/*
+	 * generates the limit statement
+	 */
 	public String getLimitStatement()
 	{
 		limitStatement = "LIMIT " + limit;
 		return limitStatement;
 	}
 	
+	/*
+	 * reads in variables to collections to reduce guessing later
+	 */
 	private void readVariables()
 	{
 		paramsDefined.clear();
@@ -365,6 +410,9 @@ public class SparqlQueryModel
 		}
 	}
 	
+	/*
+	 * checks if a particular item should be defined
+	 */
 	private boolean shouldDefine(String itemCategory)
 	{
 		if (!paramsDefined.contains(itemCategory))

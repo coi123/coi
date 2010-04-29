@@ -1,28 +1,34 @@
-import java.io.BufferedReader;
 import java.io.InputStream;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.*;
 
-import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
+/** a core model class that reads an .n3 ontology from an InputStream into a Jena OntModel.
+ *  The model is queried for appropriate nodes when loading the initial tree display
+ *  and when expanding nodes, nodes are sorted before returning to ensure Alpha-Order
+ *  lists. 
+ *  
+ *  Note: core logic requires reading a node level below the presentation level to 
+ *  identify leaf nodes for display and logic purposes
+ */
+
 public class DOModelBuilder 
 {
-	private String sdtmFileString;
+	//defines the urls for important prefixes for use in Jena queries
 	private String prefixD = "http://www.owl-ontologies.com/DrugOntology.owl#";
 	private String prefixCOLON = "http://www.owl-ontologies.com/2008/4/7/OntologySDTM.owl#";
-	private String prefixRDFS = "http://www.w3.org/2000/01/rdf-schema#";
 	
 	private OntModel superClassModel;
 	private Property superClassOf;
-	private Property level;
 	private Property label;
 	
 	public DOModelBuilder(InputStream inStream)
 	{
+		/* defines important properties, initialises the OntModel and reads InputStream*/
 		try
 		{
 			superClassModel = ModelFactory.createOntologyModel();
@@ -37,49 +43,30 @@ public class DOModelBuilder
 		}
 	}
 	
+	
+	// Called from the constructor of the DOTreeModel, loads all root nodes
 	public TreeItem[] getRootSubNodes()
 	{
-		ResIterator iter = superClassModel.listSubjects();
-		Resource rootResource = superClassModel.getResource(prefixD + "C0013227");
-		ArrayList rootItemList = new ArrayList();
-		while (iter.hasNext())
-		{
-			Resource res = iter.nextResource();
-			if (superClassModel.contains(rootResource, superClassOf, res))
-			{
-				StmtIterator iter2 = superClassModel.listStatements(res, label, (RDFNode)null );
-				String nodeLabel = "";
-				if (iter2.hasNext())
-				{
-					Statement stmt = iter2.nextStatement();
-					nodeLabel = stmt.getObject().toString();
-				}
-				else
-				{
-					nodeLabel = res.getLocalName();
-				}
-				TreeItem rootNodeItem = new TreeItem(res.getLocalName(), 
-													 rootResource.getLocalName(),
-													 nodeLabel);
-				rootItemList.add(rootNodeItem);
-			}
-		}
-		TreeItem[] rootSubNodeItems = new TreeItem[rootItemList.size()];
-		for (int i = 0; i < rootSubNodeItems.length; i ++)
-		{
-			rootSubNodeItems[i] = (TreeItem) rootItemList.get(i);
-		}
-		TreeItemLabelComparator comparer = new TreeItemLabelComparator();
-		Arrays.sort(rootSubNodeItems, comparer);
-		return rootSubNodeItems;
+		return getAllSubNodesOf("C0013227");
 	}
 	
+	/*
+	 *  can be used to return subNodes of a node to be expanded and used to check
+	 *  the presence of leaf nodes / branch nodes
+	 */
 	public TreeItem[] getAllSubNodesOf(String parentID)
 	{
 		Resource parent = superClassModel.getResource(prefixD + parentID);
+		
+		// Checks each resource against the model for statements matching
+		// parentResource is superclass of the current resource 
 		StmtIterator iter = superClassModel.listStatements(parent, superClassOf, (RDFNode)null);
 		ArrayList itemList = new ArrayList();
 		
+		// checks each resource matching the above statement against statements matching
+		// childResource has label labelRepresentation
+		// Care is taken in instances where the resource does not have a label (bnodes)
+		// A TreeItem is then constructed for each child resource and added to an ArrayList
 		while (iter.hasNext())
 		{
 			Statement stmt = iter.nextStatement();
@@ -99,16 +86,21 @@ public class DOModelBuilder
 											  parentID, childLabel);
 			itemList.add(childItem);
 		}
+		
+		// The populated ArrayList is converted to an array to enable custom sorting
 		TreeItem[] subNodeItems = new TreeItem[itemList.size()];
 		for (int i = 0; i < subNodeItems.length; i++)
 		{
 			subNodeItems[i] = (TreeItem) itemList.get(i);
 		}
+		
+		// TreeItems are sorted before they are returned
 		TreeItemLabelComparator comparer = new TreeItemLabelComparator();
 		Arrays.sort(subNodeItems, comparer);
 		return subNodeItems;
 	}
 	
+	// simple comparator that sorts TreeItems into alpha-order by their label
 	class TreeItemLabelComparator implements Comparator
 	{
 		public int compare(Object item1, Object item2) 

@@ -9,16 +9,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
+/** a core supporting class for the SDTMTreeModel. This differs from the DOModelBuilder
+ *  because of the ambiguity surrounding what identifies a Root node.
+ *  This class returns pre-sorted TreeItem[]'s to the model for construction.
+ */
+
 public class SDTMModelBuilder 
 {
-	private String sdtmFileString;
 	private String prefixCOLON = "http://www.owl-ontologies.com/2008/4/7/OntologySDTM.owl#";
 	private String prefixOWL = "http://www.w3.org/2002/07/owl#";
 	
-	private OntModel subClassModel;
 	private OntModel superClassModel;
 	private Property superClassOf;
 	
+	// reads the input file into the model and defines the superClassOf property
 	public SDTMModelBuilder(InputStream inStream)
 	{
 		try
@@ -33,6 +37,13 @@ public class SDTMModelBuilder
 		}
 	}
 	
+	/*
+	 * returns an array of TreeItems representing all root nodes
+	 * currently root nodes are identified as resources never existing as an object
+	 * of a superClassOf statement or of being an obect of a thing is superClassOf
+	 * statement, resources that are not blank nodes and have their first letter
+	 * capitalized
+	 */
 	public TreeItem[] getRootSubNodes()
 	{
 		ResIterator iter = superClassModel.listSubjects();
@@ -61,6 +72,9 @@ public class SDTMModelBuilder
 		return rootSubNodeItems;
 	}
 	
+	/*
+	 * returns all subnodes of a particular parentID
+	 */
 	public TreeItem[] getAllSubNodesOf(String parentID)
 	{
 		Resource parent = superClassModel.getResource(prefixCOLON + parentID);
@@ -86,6 +100,9 @@ public class SDTMModelBuilder
 		return subNodeItems;
 	}
 	
+	/*
+	 * a convenience class that allows the sorting of TreeItem arrays by label
+	 */
 	class TreeItemLabelComparator implements Comparator
 	{
 		public int compare(Object item1, Object item2) 

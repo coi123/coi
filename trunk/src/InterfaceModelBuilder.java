@@ -2,14 +2,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.*;
 
-
+/** A core model class that supports the model for the dynamically loaded interface
+ *  component when it is loaded and expanded
+ */
 
 public class InterfaceModelBuilder 
 {
@@ -24,6 +21,10 @@ public class InterfaceModelBuilder
 	private Property hasOption;
 	private Property hasValue;
 	
+	/*
+	 * initialises the model and defines several important properties for queries of
+	 * the model
+	 */
 	public InterfaceModelBuilder(InputStream iStream)
 	{
 		model = ModelFactory.createOntologyModel();
@@ -36,6 +37,9 @@ public class InterfaceModelBuilder
 		hasValue = model.getProperty(prefixUI + "hasValue");
 	}
 	
+	/*
+	 * returns an ElementMold[] of the root nodes for use in the InterfaceModel
+	 */
 	public ElementMold[] getRootNodes()
 	{
 		ArrayList rootNodes = new ArrayList();
@@ -57,6 +61,11 @@ public class InterfaceModelBuilder
 		return elements;
 	}
 	
+	/* returns an array of ElementMold objects that are children of the node 
+	 * being loaded. This array is passed to the model for construction
+	 * 
+	 * this method should be broken down into smaller methods
+ 	 */
 	public ElementMold[] getChildrenOf(String name)
 	{
 		ElementMold[] elements;
@@ -64,6 +73,8 @@ public class InterfaceModelBuilder
 		
 		Resource currentCriteria = model.getResource(prefixCOLON + name); 		
 		//NOTE: emphasis is placed on developer creating well-formed n3
+		
+		//**NOTE: this may reduce the complexity of the the method, or 
 		
 		//first attempt at using sparql 
 		/*
@@ -120,6 +131,8 @@ public class InterfaceModelBuilder
 					
 					String inputType = ((Resource)fieldType.getObject()).getLocalName();
 					ElementMold moldToAdd = new ElementMold(inputField.getLocalName(), inputType);
+					
+					/* adds criteria to the ElementMold based on the element's type */
 					
 					if (inputType.equals("selectInput"))
 					{
