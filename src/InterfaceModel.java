@@ -59,6 +59,7 @@ public class InterfaceModel
 		currentPanel = curGroup;
 	}
 	
+	// returns the current value pair contained in the panelgroup
 	public String getCurrentPanelChildValue(int childIndex)
 	{
 		Object obj = currentPanel.getChildren().get(childIndex);
@@ -193,9 +194,11 @@ public class InterfaceModel
 		currentPanel = curPanel;
 	}
 	
+	// expands a node, updates its expansion state. updates its loaded state if
+	// applicable and updates the panelGrid 
 	private void expandNode(CustomButtonNode button)
 	{
-		//add an ordering attribute to the RDF file so the model returns the items
+		//TODO: add an ordering attribute to the RDF file so the model returns the items
 		//in proper order
 		if (!button.isLoaded())
 		{	
@@ -252,15 +255,21 @@ public class InterfaceModel
 		updateInterface();
 	}
 	
-	
+	//called when a component is being expanded that has expanded child button nodes
 	private void expandChildrenOf(CustomButtonNode button)
 	{
 		int index = treeStructure.getChildren().indexOf(button);
 		List children = button.getChildren();
+		
+		// inserts node items into the appropriate positions in the panelGrid 
+		// children collection
 		for (int a = 0; a < children.size(); a++)
 		{
 			treeStructure.getChildren().add(index + 1 + a, (UIComponent)children.get(a));
 		}
+		
+		// checks every child, if it is a button and its expanded state is set to true,
+		// recursively call the method to expand the child node
 		for (int a = 0; a < children.size(); a++)
 		{
 			Object curChild = children.get(a);
@@ -275,7 +284,7 @@ public class InterfaceModel
 		}
 	}
 	
-	
+	//collapses the node, updates its expansion state and updates the panelGrid component
 	private void collapseNode(CustomButtonNode button)
 	{
 		this.removeAllChildrenOf(button);
@@ -283,22 +292,28 @@ public class InterfaceModel
 		updateInterface();
 	}
 	
+	// removes all children of the button from the panelGrid to give the appearance
+	// of the node collapsing
 	private void removeAllChildrenOf(CustomButtonNode button)
 	{
 		List children = button.getChildren();
+		
+		// removes every child of the button from the panel grid.
+		// If the node has child buttons that are also expanded, it recursively calls
+		// itself to remove their children as well
 		for (int a = 0; a < children.size(); a++)
 		{
 			Object curChild = children.get(a);
-			if (curChild instanceof CustomButtonNode)
+			if (curChild instanceof CustomButtonNode &&
+				((CustomButtonNode)curChild).isExpanded())
 			{
 				removeAllChildrenOf((CustomButtonNode)curChild);
-				//comment out when attempting recursive expansion
-				//((CustomButtonNode)curChild).setExpanded(false);
 			}
 			treeStructure.getChildren().remove(curChild);
 		}
 	}
 	
+	//necessary housekeeping method that executes updates to the interface
 	private void updateInterface()
 	{
 		treeStructure.processUpdates(FacesContext.getCurrentInstance());

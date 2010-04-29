@@ -30,7 +30,7 @@
 	      <div id="INCLUSIONGRP">
 	        <h2>INCLUSION CRITERIA 
 	        <ice:commandButton id="ADDIN"
-	        				   styleClass="addin"
+	        				   styleClass="addButton"
 	        			       image="images/add.png"
 	        				   actionListener="#{controller.setInclusion}"/>
 	        </h2>
@@ -80,6 +80,7 @@
 				    </f:facet>
 				    <ice:commandButton style="width:19px; height:19px;"
 				    				   image="images/delete.png"
+				    				   styleClass="deleteButton"
 				    				   actionListener="#{controller.deleteRow}"/>
 				  </ice:column>
 				</ice:dataTable>
@@ -89,8 +90,9 @@
 	      <ice:form id="exclForm">
 	      <div id="EXCLUSIONGRP">
 	        <h2>EXCLUSION CRITERIA 
-	          <ice:commandButton id="ADDEX" 
+	          <ice:commandButton id="ADDEX"
 	        					 image="images/add.png"
+	        					 styleClass="addButton"
 	        					 actionListener="#{controller.setExclusion}"/>
 	        </h2>
 	        <hr/>
@@ -138,6 +140,7 @@
 				      <ice:outputText value=""/>
 				    </f:facet>
 				    <ice:commandButton style="width:19px; height:19px;"
+				    				   styleClass="deleteButton"
 				    				   image="images/delete.png"
 				    				   actionListener="#{controller.deleteRow}"/>
 				  </ice:column>
@@ -288,6 +291,7 @@
 		          </div>
 	            </ice:panelTab>
 	            <ice:panelTab label="Euler Engine">
+	              <div class="eulerTab">
 	              <ice:selectOneRadio id="fileSourceRadios" 
 	              					  layout="spread"
 	              					  partialSubmit="true"
@@ -297,13 +301,29 @@
 	                <f:selectItem itemLabel="New Rule: " itemValue="new"/>
 	              </ice:selectOneRadio>
 	              <ice:panelGrid columns="2" columnClasses="eulerLabelCol,eulerInputColumn">
-	                <ice:outputText styleClass="fileInputLabel" 
-	                				value="File to excute rule over: "/>
-	                <ice:inputText styleClass="urlBar"
-	                			   partialSubmit="true"
-	                			   value="#{controller.eulerModel.evalFileUrl}" 
-	                			   valueChangeListener="#{controller.evalFileChanged}"/>
-	              	<ice:outputText style="margin-left:30px" value="Rule File:"/>
+	                <ice:panelGroup>
+	                  <ice:commandButton image="css/css-images/add2.gif"
+	                  					 immediate="true"
+	                  					 styleClass="addButton"
+	                  					 actionListener="#{controller.addEvalFileUrl}"/>
+	                  <ice:outputText styleClass="fileInputLabel"
+	                				  value="File(s) to excute query over: "/>
+	                </ice:panelGroup>
+	                
+	                <ice:panelSeries value="#{controller.eulerModel.evalFileUrls}"
+	                				 var="evalUrl">
+	                  <ice:panelGroup>
+	                    <ice:inputText styleClass="urlBar"
+	                			       partialSubmit="true"
+	                			       value="#{evalUrl}"
+	                			       valueChangeListener="#{controller.evalFileChanged}"/>
+	                	<ice:commandButton image="css/css-images/popupclose2.gif"
+	                					   immediate="true"
+	                					   styleClass="deleteButton"
+	                					   actionListener="#{controller.deleteEvalFileUrl}"/>
+	                  </ice:panelGroup>
+	                </ice:panelSeries>
+	              	<ice:outputText style="margin-left:30px" value="Query File:"/>
 	              	<ice:panelGroup/>
 	              	<ice:radio for="fileSourceRadios" index="0"/>
 	              	<ice:inputText styleClass="urlBar"
@@ -350,6 +370,7 @@
 	                				   immediate="true"
 	                				   styleClass="eulerSubmit"
 	              					   actionListener="#{controller.eulerSubmitClicked}"/>
+	          		</div>
 	            </ice:panelTab>
 	            <ice:panelTab label="Euler Results">
 	              <pre>

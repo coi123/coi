@@ -1,5 +1,7 @@
-import com.icesoft.faces.component.ext.HtmlSelectBooleanCheckbox;
-
+	
+/**class that allows for creation of object collections for table column value
+ * attributes and query model population
+ */
 
 public class TableItem 
 {
@@ -11,18 +13,16 @@ public class TableItem
 	private boolean toLink;
 	private String queryVar;
 	
-	/**class that allows for creation of object collections for table column value
-	 * attributes and query model population
-	 */
+
 	public TableItem(String inDomain, String inCategory, String inConstraints, String inID)
 	{
 		//list of parameters with initial values
-		linkID = null;
+		setLinkID(null);
 		setDomain(inDomain);
 		setCategory(inCategory);
 		setConstraints(inConstraints);
 		setItemID(inID);
-		toLink = false;
+		setToLink(false);
 	}
 	
 	/*

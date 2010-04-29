@@ -1,6 +1,13 @@
 
 import java.io.*;
-import java.util.*;
+
+/** a class found online that properly handles handling external applications' output streams 
+ *  in a separate thread
+ *  
+ *  Was used in conjunction with runtime.exec()
+ *  
+ *  Will likely become obsolete when the 
+ */
 
 public class StreamGobbler extends Thread
 {

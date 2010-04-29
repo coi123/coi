@@ -1,5 +1,9 @@
 import java.util.ArrayList;
 
+/** a utility class that provides the TablesBean model with information about individual
+ *  links and their members
+ */
+
 public class TableItemLink 
 {
 	private ArrayList linkItems;

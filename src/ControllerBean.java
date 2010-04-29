@@ -1,18 +1,12 @@
 import java.io.BufferedReader;
-import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.List;
 
-
-import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
-import javax.faces.model.SelectItem;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 import com.icesoft.faces.component.ext.HtmlPanelGroup;
 import com.icesoft.faces.component.ext.HtmlInputText;
@@ -20,16 +14,12 @@ import com.icesoft.faces.component.ext.HtmlSelectBooleanCheckbox;
 import com.icesoft.faces.component.ext.HtmlCommandButton;
 import com.icesoft.faces.component.ext.HtmlCommandLink;
 import com.icesoft.faces.component.ext.HtmlDataTable;
-import com.icesoft.faces.component.ext.HtmlSelectManyCheckbox;
 import com.icesoft.faces.component.ext.HtmlSelectOneRadio;
-import com.icesoft.faces.component.ext.UIColumn;
-import com.icesoft.faces.component.tree.IceUserObject;
+import com.icesoft.faces.component.panelseries.PanelSeries;
 import com.icesoft.faces.component.tree.Tree;
 import com.icesoft.faces.context.effects.Effect;
 import com.icesoft.faces.context.effects.Fade;
-import com.icesoft.faces.context.effects.Highlight;
 import com.icesoft.faces.context.effects.JavascriptContext;
-import com.icesoft.faces.context.effects.Opacity;
 
 
 public class ControllerBean 
@@ -333,6 +323,12 @@ public class ControllerBean
 		tableModel.clearTable();
 	}
 	
+	// the action listener called when adding a new file to the list of those queried
+	public void addEvalFileUrl(ActionEvent e)
+	{
+		eulerModel.addEvalFileUrl();
+	}
+	
 	/*
 	 * the valueChangeListener called when the user changes the url of the file
 	 * to be evaluated
@@ -341,8 +337,22 @@ public class ControllerBean
 	{
 		if (e.getNewValue() != null)
 		{
-			eulerModel.setEvalFileUrl(e.getNewValue().toString());
+			HtmlInputText edited = (HtmlInputText) e.getSource();
+			PanelSeries panelSeries = 
+				(PanelSeries) edited.getParent().getParent();
+			int index = panelSeries.getRowIndex();
+			eulerModel.setEvalFileUrlAt(e.getNewValue().toString(),index);
 		}
+	}
+	
+	// the action listener called when the user deletes an eval file url textbox
+	public void deleteEvalFileUrl(ActionEvent e)
+	{
+		HtmlCommandButton edited = (HtmlCommandButton) e.getSource();
+		PanelSeries panelSeries = 
+			(PanelSeries) edited.getParent().getParent();
+		int index = panelSeries.getRowIndex();
+		eulerModel.getEvalFileUrls().remove(index);
 	}
 	
 	/*

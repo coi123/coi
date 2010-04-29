@@ -1,5 +1,11 @@
 import java.util.ArrayList;
 
+/** a utility/convenience class that allows support for different interface components
+ *  through optional fields encompassing currently used components.
+ *  Includes name (identifier) and type parameters, an option array in the case of a 
+ *  UISelectMany based component and optionList for ease of use
+ *  and a text field for HtmlOutputText fields 
+ */
 
 public class ElementMold 
 {

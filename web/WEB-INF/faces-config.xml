@@ -63,26 +63,4 @@
 	<managed-bean-scope>session</managed-bean-scope>
 </managed-bean>
 
-<!-- bean for managing the tree structure -->
-<managed-bean>
-	<description>
-		bean for managing the tree structure
-	</description>
-	<managed-bean-name>tree</managed-bean-name>
-	<managed-bean-class>TreeBean</managed-bean-class>
-	<managed-bean-scope>session</managed-bean-scope>
-</managed-bean>
-
-<!-- bean for managing inclusion and exclusion tables -->
-<managed-bean>
-	<description>
-		bean for managing table content
-	</description>
-	<managed-bean-name>table</managed-bean-name>
-	<managed-bean-class>TablesBean</managed-bean-class>
-	<managed-bean-scope>session</managed-bean-scope>
-</managed-bean>
-
-
-
 </faces-config>

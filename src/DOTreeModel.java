@@ -1,16 +1,10 @@
 import com.icesoft.faces.component.tree.IceUserObject;
-import com.icesoft.faces.component.tree.Tree;
 
-import javax.faces.event.ActionEvent;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import java.io.BufferedReader;
 import java.util.ArrayList;
-import java.util.List;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
 
 public class DOTreeModel {
 
@@ -28,7 +22,6 @@ public class DOTreeModel {
     private ArrayList rawNodesCollection;
     //type DefaultMutableTreeNode
     private ArrayList nodesLoaded;
-    private URL url;
     
     private DOModelBuilder builder;
     
@@ -44,6 +37,7 @@ public class DOTreeModel {
         // model is accessed by by the ice:tree component
         model =  new DefaultTreeModel(rootTreeNode);
         
+        //creates collections for later reference and future extensibility
         nodeCollection = new ArrayList();
         nodeCollection.add(rootTreeNode);
         
@@ -66,6 +60,8 @@ public class DOTreeModel {
         {
         	System.out.println("Exception: " + ex);
         }
+        
+        // ensures the root node is properly rendered on application startup 
         initRoot(rootTreeNode);
     }
 
@@ -94,9 +90,13 @@ public class DOTreeModel {
     	return selectedNodeProperty;
     }
     
+    // sets the property for display in the property window and 
+    // sets the itemID for proper inclusion in the SPARQL query
     private void setSelectedNodePropertyAndId(String selectedNode)
     {
     	String nodeID = "";
+    	
+    	//finds the id of the item in through searching its label in the rawNodesCollection
     	for (int a = 0; a < rawNodesCollection.size(); a++)
     	{
     		if (((TreeItem)rawNodesCollection.get(a)).getLabel().equals(selectedNode))
@@ -109,12 +109,17 @@ public class DOTreeModel {
     	selectedNodeProperty = DOSubProperty.getPropertyFromNode(nodeID);
     }
     
+    // sets the selected node text for use if the node is added to a table
+    // also sets other useful params through setSelectedNodePropertyAndId
     public void setSelectedNodeText(String selNode)
     {
     	selectedNode = selNode;
     	setSelectedNodePropertyAndId(selNode);
     }
     
+    /* Loads the root node and preloads the nodes below the presentation level to 
+     * properly identify child nodes
+     */
     public void initRoot(DefaultMutableTreeNode node)
     {
     	try
@@ -157,17 +162,30 @@ public class DOTreeModel {
         }
     }
     
+    /*
+     *  The method called when a node is clicked for expansion that has not be loaded.
+     *  This method expands the model the tree is based on to provide navigate to the
+     *  sub-nodes requested.
+     *  
+     *  Because all of the level one nodes have already been returned, they do not need
+     *  to be loaded into the tree model, but the do need to be loaded in order to pre-
+     *  load their children
+     */
     public void expandModel(DefaultMutableTreeNode node)
     {
     	try
         { 
 	        int nodeIndex = nodeCollection.indexOf(node);
 	        String itemID = ((TreeItem) rawNodesCollection.get(nodeIndex)).getItemID();
+	        
+	        // returns all sub-nodes of the node clicked
 	        TreeItem[] rawLevel1SubNodes = builder.getAllSubNodesOf(itemID);
 	        int listIndex = 0;
 	        
+	        // for every sub-node of the node clicked 
 	        for (int j = 0; j < rawLevel1SubNodes.length; j++)
 	        {
+	        	// finds the index of the node in the collection of TreeItems maintained 
 	        	for (int k = 0; k < rawNodesCollection.size(); k++)
 	        	{
 	        		if (((TreeItem)rawNodesCollection.get(k)).getItemID().equals(rawLevel1SubNodes[j].getItemID()))
@@ -176,9 +194,18 @@ public class DOTreeModel {
 	        		}
 	        	}
 	        	
+	        	// returns all subNode TreeItems of the current childNode
 	        	TreeItem[] rawLevel2SubNodes = 
 	        		    builder.getAllSubNodesOf(rawLevel1SubNodes[j].getItemID());
-		        DefaultMutableTreeNode[] treeLevel2MutNodes = new DefaultMutableTreeNode[rawLevel2SubNodes.length];
+		        
+	        	/* subsequent code creates arrays for the DefaulMutableTreeNode and
+	        	 * IceUserObject elements of the tree nodes.
+	        	 * Each node is constructed in a standard manner and then added to the
+	        	 * appropriate parent node in the nodeCollection
+	        	 * All collections are subsequently updated
+	        	 */
+	        	
+	        	DefaultMutableTreeNode[] treeLevel2MutNodes = new DefaultMutableTreeNode[rawLevel2SubNodes.length];
 		        IceUserObject[] treeLevel2Branches = new IceUserObject[rawLevel2SubNodes.length];
 		        for (int k = 0; k < rawLevel2SubNodes.length; k++)
 		        {
@@ -191,6 +218,9 @@ public class DOTreeModel {
 		        updateCollections(treeLevel2MutNodes, treeLevel2Branches, rawLevel2SubNodes);
 	        }
 	        checkLeaves();
+	        
+	        // finally the node is added to the nodesLoaded list to ensure it is not
+	        // loaded again
 	        nodesLoaded.add(node);
         }
         catch (Exception ex)
@@ -203,6 +233,8 @@ public class DOTreeModel {
         }
     }
     
+    // updates all lists with any newly loaded DefaultMutableTreeNodes, IceUserObjects
+    // and TreeItems
     private void updateCollections(DefaultMutableTreeNode[] addNodes,
     							   IceUserObject[] addObjects,
     							   TreeItem[] addRawItems)
@@ -218,6 +250,8 @@ public class DOTreeModel {
     	}
     }
     
+    // checks every node for children and sets the boolean flag of the IceUserObject 
+    // as to whether it should be rendered as a branch node or leaf node
     private void checkLeaves()
     {
     	for (int a = 0; a < nodeCollection.size(); a++)

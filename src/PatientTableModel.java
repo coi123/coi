@@ -1,6 +1,10 @@
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.util.ArrayList;
+
+/** the class used to run the query transformation and display results of the query
+ *  
+ *  Will need major modifications when the JNI wrapper is finished from Eric
+ */
 
 public class PatientTableModel 
 {
@@ -55,6 +59,11 @@ public class PatientTableModel
 		PatientTableItem newItem = new PatientTableItem(patient, dob, sex, 
 														medication, datePrescribed);
 		patientItems.add(newItem);
+		
+		/*
+		 * not finished properly
+		 */
+		
 		/*
 		String[] patientList = resultString.replace("/00:00:00/gi", "").split("|");
 		
