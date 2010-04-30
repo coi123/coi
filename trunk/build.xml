@@ -1,6 +1,6 @@
 <project name="coi" default="tomcat6.0">
     
-    <import file="../etc/build-common.xml"/>
+    <import file="web/WEB-INF/build-common.xml"/>
     
     <!--property name="ant.project.name" value="coi"/-->
     
