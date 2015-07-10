@@ -1,0 +1,7 @@
+There is great perceived value in being able to work with clinical research data and clinical care data across clinical domains, e.g. health care, pharmaceutical development, pharmcosurveillance. This include the interest to re-use patient data collected in the care context (from EMRs) for data collection points in a clinical research protocol.
+
+Although there is significant overlap in the clinical data content of collected in clinical research and clinical care, the different emerging standard data representations are not taken that into consideration, therefore usage of data across domains is a challenge.
+
+Clinical research data and clinical care data from EMRs have different information models and different terminological standards. CDISC's Study Data Tabulation Model (SDTM), an emerging standard for regulatory reporting of clinical research data, defines the study variables for a given clinical trial in terms of domains and observations. Although many EMRs do not use standards in the modeling of clinical information, there is a large body of work in the Healthcare/Clinical Practice arena where detailed clinical models (DCM) have been developed, e.g. HL7 CDA templates.
+
+The goal of this task is to investigate, and if possible propose, a model that enable re-use of common observation models across the clinical trials and clinical practice contexts. This of course, include how Semantic Web specifications such as RDF/OWL can be leveraged to achieve this.
